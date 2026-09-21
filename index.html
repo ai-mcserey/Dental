@@ -37,15 +37,9 @@
   button{font-family:inherit;}
   .hidden{display:none !important;}
 
-  /* topbar */
-  .topbar{background:var(--surface);border-bottom:1px solid var(--border-soft);padding:14px 22px;position:sticky;top:0;z-index:40;box-shadow:0 2px 16px -10px rgba(11,59,54,0.12);}
-  .topbar-inner{max-width:1180px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;}
-  .brand{display:flex;align-items:center;gap:11px;}
+  /* brand mark (used in the sidebar) */
   .brand-mark{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg, #FDE047 0%, #F59E0B 100%);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);}
   .brand-mark svg{width:24px;height:24px;}
-  .brand-text h1{margin:0;font-size:18px;color:#fff;font-weight:700;letter-spacing:-0.01em;background:linear-gradient(155deg, var(--primary), var(--primary-dark));padding:5px 12px;border-radius:8px;display:inline-block;box-shadow:var(--shadow-sm);}
-  .brand-text .sub{font-size:11.5px;color:var(--ink-dim);margin-top:1px;font-weight:500;}
-  .topbar-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
   
   .topbar-btn-uniform {
     font-family: 'Inter', 'Noto Sans Khmer', sans-serif;
@@ -210,11 +204,6 @@
     font-weight:500; transition:all .2s ease; height: 34px;
   }
   .search-input-topbar:focus{ outline:none; border-color:var(--coral-dark); box-shadow:0 0 0 4px rgba(228,87,76,0.22); background:#fff; }
-  @media (max-width:640px){ 
-    .search-input-topbar{width:100%;order:1;} 
-    #fabAdd { width: 100%; order: 2; margin-bottom: 4px; }
-    .sync-badge, #settingsBtn, #reportBtn { order: 3; }
-  }
 
   .section-title{display:flex;align-items:center;justify-content:space-between;margin:16px 0 10px;}
   .section-title h2{font-size:15px;margin:0;color:var(--ink);font-weight:700;}
@@ -273,7 +262,6 @@
   #printSizeModalOverlay    { z-index: 92 !important; }
   #xrayModalOverlay         { z-index: 95 !important; }
   #xrayGalleryOverlay       { z-index: 96 !important; }
-  #reportOverlay            { z-index: 98 !important; }
   #expenseOverlay           { z-index: 99 !important; }
   #invoiceOverlay           { z-index: 99 !important; }
   #settingsOverlay          { z-index: 102 !important; }
@@ -512,8 +500,8 @@
 
   @media print{
     body{background:none;}
-    .topbar, .wrap, .fab,
-    #detailOverlay, #formOverlay, #settingsOverlay, #clinicalConfigOverlay, #patientOverlay, #toothHistoryModalOverlay, #printSizeModalOverlay, #reportOverlay, #expenseOverlay, #invoiceOverlay, #pinModalOverlay{ display:none !important; }
+    .app-shell, .sidebar-scrim, .topbar, .wrap, .fab,
+    #detailOverlay, #formOverlay, #settingsOverlay, #clinicalConfigOverlay, #patientOverlay, #toothHistoryModalOverlay, #printSizeModalOverlay, #expenseOverlay, #invoiceOverlay, #pinModalOverlay{ display:none !important; }
     #printOverlay{ position:static !important; inset:auto; background:none !important; backdrop-filter:none !important; padding:0 !important; display:block !important; }
     #printOverlay .modal{ box-shadow:none !important; border:none !important; max-width:100% !important; border-radius:0 !important; background:none !important; margin:0 !important; }
     #printOverlay .modal-head, #printOverlay .modal-actions{ display:none !important; }
@@ -553,14 +541,188 @@
     .patient-card-badge { max-width: 100% !important; text-align: left !important; }
     .patient-card-badge > div { text-align: left !important; }
   }
+
+  /* =====================================================================
+     APP SHELL — left sidebar (EMR layout)
+     ===================================================================== */
+  :root{
+    --sb-w:264px; --sb-w-min:76px;
+    --sb-bg:#0B3B36; --sb-ink:#D6ECE8; --sb-dim:#86A8A2;
+    --sb-line:rgba(255,255,255,.09); --sb-hover:rgba(255,255,255,.07); --sb-active:rgba(255,255,255,.13);
+  }
+  .sidebar{
+    position:fixed; top:0; left:0; bottom:0; width:var(--sb-w); z-index:50;
+    background:var(--sb-bg); color:var(--sb-ink);
+    display:flex; flex-direction:column;
+    transition:width .2s ease, transform .25s ease, visibility 0s;
+  }
+  .app-main{ margin-left:var(--sb-w); min-height:100vh; min-width:0; transition:margin-left .2s ease; }
+
+  .sb-brand{ display:flex; align-items:center; gap:12px; padding:16px; min-height:76px; border-bottom:1px solid var(--sb-line); }
+  .sb-brand-text{ min-width:0; }
+  .sb-name{ font-family:'Sora','Noto Sans Khmer',sans-serif; font-size:15px; font-weight:700; color:#fff; letter-spacing:-.01em; white-space:nowrap; }
+  .sb-sub{ font-size:11.5px; color:var(--sb-dim); margin-top:2px; white-space:nowrap; }
+
+  .sb-nav{ flex:1; overflow-y:auto; padding:6px 10px 12px; scrollbar-width:thin; scrollbar-color:rgba(255,255,255,.2) transparent; }
+  .sb-group{ font-size:11.5px; font-weight:600; color:var(--sb-dim); padding:14px 12px 6px; }
+  .sb-section + .sb-section{ margin-top:4px; }
+
+  .sb-item{
+    position:relative; display:flex; align-items:center; gap:12px; width:100%;
+    padding:9px 12px; margin:2px 0; border:0; border-radius:10px;
+    background:transparent; color:var(--sb-ink); font:inherit; text-align:left; cursor:pointer;
+    transition:background .12s ease;
+  }
+  .sb-item:hover{ background:var(--sb-hover); }
+  .sb-item:focus-visible{ outline:2px solid var(--amber); outline-offset:2px; }
+  .sb-item[aria-current="page"]{ background:var(--sb-active); color:#fff; }
+  .sb-item[aria-current="page"]::before{
+    content:""; position:absolute; left:-10px; top:9px; bottom:9px; width:3px; border-radius:0 3px 3px 0; background:var(--amber);
+  }
+  .sb-ico{ width:20px; height:20px; flex:none; display:grid; place-items:center; color:#7FD6C8; }
+  .sb-item[aria-current="page"] .sb-ico{ color:var(--amber); }
+  .sb-ico svg{ width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+  .sb-label{ display:flex; flex-direction:column; line-height:1.3; min-width:0; flex:1; }
+  .sb-kh{ font-family:'Noto Sans Khmer','Inter',sans-serif; font-size:13.5px; font-weight:600; }
+  .sb-en{ font-family:'Inter',sans-serif; font-size:10.5px; color:var(--sb-dim); }
+  .sb-item[aria-current="page"] .sb-en{ color:#A9CBC5; }
+  .sb-badge{
+    font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:600; line-height:1;
+    padding:4px 7px; border-radius:999px; min-width:24px; text-align:center;
+    background:rgba(255,255,255,.12); color:#DCEFEB;
+  }
+  .sb-badge.amber{ background:var(--amber); color:#3B2705; }
+  .sb-badge:empty{ display:none; }
+
+  .sb-foot{ padding:10px; border-top:1px solid var(--sb-line); display:flex; flex-direction:column; gap:6px; }
+  .sb-sync{
+    display:block; height:38px; line-height:36px; padding:0 12px; border-radius:10px; cursor:pointer;
+    border:1px solid rgba(255,255,255,.2); background:rgba(255,255,255,.05); color:#DCEFEB;
+    font-size:12.5px; font-weight:600; text-align:center; white-space:nowrap; overflow:hidden;
+    transition:background .12s ease;
+  }
+  .sb-sync:hover{ background:rgba(255,255,255,.11); }
+
+  /* top bar */
+  .topbar{
+    position:sticky; top:0; z-index:40; display:flex; align-items:center; gap:14px;
+    padding:12px 22px; background:var(--surface); border-bottom:1px solid var(--border-soft);
+    box-shadow:0 2px 16px -10px rgba(11,59,54,0.12);
+  }
+  .menu-btn{
+    flex:none; width:36px; height:36px; border-radius:9px; display:grid; place-items:center; cursor:pointer;
+    border:1px solid var(--border); background:var(--surface-2); color:var(--ink);
+  }
+  .menu-btn:hover{ border-color:var(--primary); background:var(--primary-softer); }
+  .menu-btn:focus-visible{ outline:2px solid var(--primary); outline-offset:2px; }
+  .menu-btn svg{ width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; }
+  .topbar-title{ min-width:0; }
+  .topbar-title h1{ margin:0; font-size:17px; line-height:1.3; font-weight:700; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .topbar-title .sub{ font-size:11.5px; color:var(--ink-dim); font-weight:500; }
+  .topbar-actions{ margin-left:auto; display:flex; gap:10px; align-items:center; }
+
+  .search-input-topbar{ flex:none; width:300px; min-width:160px; }
+
+  .sidebar-scrim{
+    position:fixed; inset:0; z-index:49; background:rgba(11,42,39,.5);
+    opacity:0; pointer-events:none; transition:opacity .2s ease;
+  }
+
+  /* pages */
+  .wrap{ container-type:inline-size; max-width:1320px; }
+  .view{ display:none; }
+  .view.active{ display:block; }
+  .view > .section-title:first-child{ margin-top:0; }
+  .dash-stats{ grid-template-columns:repeat(4,1fr); }
+  .report-actions{ display:flex; justify-content:flex-end; gap:8px; margin-bottom:14px; flex-wrap:wrap; }
+
+  /* patient filter chips */
+  .filter-chips{ display:flex; gap:8px; overflow-x:auto; padding:2px 2px 8px; margin-bottom:6px; scrollbar-width:thin; }
+  .chip{
+    flex:none; display:inline-flex; align-items:center; gap:7px; padding:6px 13px; border-radius:999px;
+    border:1.5px solid var(--border); background:var(--surface); color:var(--ink-soft);
+    font-family:'Inter','Noto Sans Khmer',sans-serif; font-size:12.5px; font-weight:600; cursor:pointer;
+  }
+  .chip:hover{ border-color:var(--primary); color:var(--ink); }
+  .chip:focus-visible{ outline:2px solid var(--primary); outline-offset:2px; }
+  .chip[aria-pressed="true"]{ background:var(--primary); border-color:var(--primary); color:#fff; }
+  .chip-dot{ width:8px; height:8px; border-radius:50%; flex:none; }
+  .chip-dot.appt{ background:var(--amber); }
+  .chip-dot.missing{ background:var(--coral); }
+  .chip-dot.planning{ background:#6D28D9; }
+  .chip-dot.labo{ background:#1D4ED8; }
+  .chip-dot.done{ background:var(--primary); }
+  .chip[aria-pressed="true"] .chip-dot{ box-shadow:0 0 0 2px rgba(255,255,255,.85); }
+  .chip-n{ font-family:'IBM Plex Mono',monospace; font-size:11px; opacity:.8; }
+
+  #recordList[data-filter="appt"] .record-card:not([data-state="appt"]),
+  #recordList[data-filter="missing"] .record-card:not([data-state="missing"]),
+  #recordList[data-filter="planning"] .record-card:not([data-state="planning"]),
+  #recordList[data-filter="labo"] .record-card:not([data-state="labo"]),
+  #recordList[data-filter="done"] .record-card:not([data-state="done"]){ display:none; }
+
+  /* content width follows the space next to the sidebar, not the screen */
+  @container (max-width: 820px){
+    .appt-grid{ grid-template-columns:1fr; }
+    .treatment-stats-grid{ grid-template-columns:repeat(3,1fr); }
+  }
+  @container (max-width: 560px){
+    .dash-stats{ grid-template-columns:repeat(2,1fr); }
+    .treatment-stats-grid{ grid-template-columns:repeat(2,1fr); }
+  }
+
+  /* desktop: collapsed icon rail */
+  @media (min-width:901px){
+    .sidebar-scrim{ display:none; }
+    body.sb-collapsed .sidebar{ width:var(--sb-w-min); }
+    body.sb-collapsed .app-main{ margin-left:var(--sb-w-min); }
+    body.sb-collapsed .sb-brand{ justify-content:center; padding-left:0; padding-right:0; }
+    body.sb-collapsed .sb-brand-text,
+    body.sb-collapsed .sb-label,
+    body.sb-collapsed .sb-group{ display:none; }
+    body.sb-collapsed .sb-section + .sb-section{ margin-top:8px; padding-top:8px; border-top:1px solid var(--sb-line); }
+    body.sb-collapsed .sb-item{ justify-content:center; padding:11px 0; }
+    body.sb-collapsed .sb-item[aria-current="page"]::before{ left:-10px; }
+    body.sb-collapsed .sb-badge{ position:absolute; top:3px; right:6px; min-width:0; padding:2px 5px; font-size:9.5px; }
+    /* rail is too narrow for the label: keep only the leading status icon */
+    body.sb-collapsed .sb-sync{
+      padding:0 0 0 18px; text-align:left; font-size:15px; border-color:transparent; background:transparent;
+      -webkit-mask-image:linear-gradient(90deg,#000 0,#000 38px,transparent 40px);
+      mask-image:linear-gradient(90deg,#000 0,#000 38px,transparent 40px);
+    }
+    body.sb-collapsed .sb-sync:hover{ background:var(--sb-hover); }
+  }
+
+  /* tablet + phone: sidebar becomes a drawer */
+  @media (max-width:900px){
+    .sidebar{ width:280px; transform:translateX(-100%); visibility:hidden; transition:transform .25s ease, visibility 0s .25s; box-shadow:0 0 40px rgba(0,0,0,.3); }
+    body.sb-open .sidebar{ transform:none; visibility:visible; transition:transform .25s ease, visibility 0s; }
+    body.sb-open .sidebar-scrim{ opacity:1; pointer-events:auto; }
+    body.sb-open{ overflow:hidden; }
+    .app-main{ margin-left:0; }
+    .topbar{ padding:10px 14px; }
+  }
+  @media (max-width:640px){
+    .topbar{ flex-wrap:wrap; row-gap:10px; }
+    .topbar-title{ flex:1; }
+    .topbar-actions{ order:3; width:100%; margin-left:0; }
+    .search-input-topbar{ flex:1; width:auto; min-width:0; }
+    .wrap{ padding:16px 14px 0; }
+    .report-actions{ justify-content:stretch; }
+    .report-actions .btn{ flex:1; justify-content:center; }
+  }
+  @media (prefers-reduced-motion:reduce){
+    .sidebar, .app-main, .sidebar-scrim{ transition:none !important; }
+  }
 </style>
 <style id="dynamicPageStyle">@page{ size: A4 portrait; margin: 15mm; }</style>
 </head>
 <body>
 
-<div class="topbar">
-  <div class="topbar-inner">
-    <div class="brand">
+<div class="app-shell" id="appShell">
+
+  <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+    <div class="sb-brand">
       <div class="brand-mark">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M10 21.3V19a2 2 0 0 1 2-2h0a2 2 0 0 1 2 2v2.3"></path>
@@ -568,45 +730,140 @@
           <path d="M12 8l0 .01"></path>
         </svg>
       </div>
-      <div class="brand-text">
-        <h1 class="kh" style="background: none; padding: 0; color: var(--ink);">KEP Dental Clinic</h1>
-        <div class="sub">កត់ត្រាជំងឺមាត់ធ្មេញ</div>
+      <div class="sb-brand-text">
+        <div class="sb-name">KEP Dental Clinic</div>
+        <div class="sb-sub kh">កត់ត្រាជំងឺមាត់ធ្មេញ</div>
       </div>
     </div>
-    <div class="topbar-actions">
-      <input type="text" class="search-input search-input-topbar kh" id="searchInput" placeholder="🔍 ស្វែងរក ឈ្មោះ, លេខធ្មេញ...">
-      <button class="btn btn-primary kh" id="fabAdd" style="height: 34px; padding: 0 14px; border-radius: 8px;">＋ កត់ត្រាថ្មី</button>
-      <span class="topbar-btn-uniform sync-badge" id="syncBadge" title="ចុចដើម្បីទាញទិន្នន័យពី Sheet មក App">🔄 Sync</span>
-      <button class="topbar-btn-uniform btn-blue kh" id="reportBtn" title="របាយការណ៍">📊 Report</button>
-      <button class="topbar-btn-uniform btn-outline" id="settingsBtn" title="ការកំណត់គ្លីនិក">⚙</button>
+
+    <nav class="sb-nav">
+      <div class="sb-section">
+        <div class="sb-group kh">ទូទៅ</div>
+        <button type="button" class="sb-item" data-nav="dashboard" title="ផ្ទាំងគ្រប់គ្រង · Dashboard">
+          <span class="sb-ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg></span>
+          <span class="sb-label"><span class="sb-kh">ផ្ទាំងគ្រប់គ្រង</span><span class="sb-en">Dashboard</span></span>
+        </button>
+        <button type="button" class="sb-item" data-nav="patients" title="អ្នកជំងឺ · Patients">
+          <span class="sb-ico"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+          <span class="sb-label"><span class="sb-kh">អ្នកជំងឺ</span><span class="sb-en">Patients</span></span>
+          <span class="sb-badge" id="nbPatients"></span>
+        </button>
+        <button type="button" class="sb-item" data-nav="appointments" title="ការណាត់ជួប · Appointments">
+          <span class="sb-ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="m9 16 2 2 4-4"/></svg></span>
+          <span class="sb-label"><span class="sb-kh">ការណាត់ជួប</span><span class="sb-en">Appointments</span></span>
+          <span class="sb-badge amber" id="nbAppointments"></span>
+        </button>
+      </div>
+
+      <div class="sb-section">
+        <div class="sb-group kh">គ្រប់គ្រង</div>
+        <button type="button" class="sb-item" id="navInvoices" title="វិក្កយបត្រ · Invoices">
+          <span class="sb-ico"><svg viewBox="0 0 24 24"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/></svg></span>
+          <span class="sb-label"><span class="sb-kh">វិក្កយបត្រ</span><span class="sb-en">Invoices</span></span>
+        </button>
+        <button type="button" class="sb-item" id="navExpenses" title="ចំណាយ · Expenses">
+          <span class="sb-ico"><svg viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg></span>
+          <span class="sb-label"><span class="sb-kh">ចំណាយ</span><span class="sb-en">Expenses</span></span>
+        </button>
+        <button type="button" class="sb-item" data-nav="reports" title="របាយការណ៍ · Reports">
+          <span class="sb-ico"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg></span>
+          <span class="sb-label"><span class="sb-kh">របាយការណ៍</span><span class="sb-en">Reports</span></span>
+        </button>
+      </div>
+    </nav>
+
+    <div class="sb-foot">
+      <span class="sb-sync" id="syncBadge" role="button" tabindex="0" title="ចុចដើម្បីទាញទិន្នន័យពី Sheet មក App">🔄 Sync</span>
+      <button type="button" class="sb-item" id="settingsBtn" title="ការកំណត់គ្លីនិក · Settings">
+        <span class="sb-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
+        <span class="sb-label"><span class="sb-kh">ការកំណត់</span><span class="sb-en">Settings</span></span>
+      </button>
     </div>
+  </aside>
+
+  <div class="app-main">
+    <header class="topbar">
+      <button type="button" class="menu-btn" id="menuBtn" aria-label="Toggle menu" aria-controls="sidebar" aria-expanded="true">
+        <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <div class="topbar-title">
+        <h1 class="kh" id="pageTitle">ផ្ទាំងគ្រប់គ្រង</h1>
+        <div class="sub" id="pageSub">Dashboard</div>
+      </div>
+      <div class="topbar-actions">
+        <input type="text" class="search-input search-input-topbar kh" id="searchInput" placeholder="🔍 ស្វែងរក ឈ្មោះ, លេខធ្មេញ...">
+        <button class="btn btn-primary kh" id="fabAdd" style="height: 34px; padding: 0 14px; border-radius: 8px; white-space:nowrap;">＋ កត់ត្រាថ្មី</button>
+      </div>
+    </header>
+
+    <main class="wrap">
+
+      <!-- Dashboard -->
+      <section class="view active" id="view-dashboard">
+        <div class="section-title">
+          <h2 class="kh">សង្ខេបថ្ងៃនេះ · Today at a glance</h2>
+          <span class="kh" id="dashDate" style="font-size:12px;color:var(--ink-dim)"></span>
+        </div>
+        <div class="stats2 dash-stats" id="demoStatsRow"></div>
+
+        <div class="appt-grid">
+          <div class="appt-panel">
+            <div class="appt-panel-head">
+              <h3 class="kh">ការណាត់ជួប · Appointments</h3>
+              <span class="count-pill" id="apptTodayCount">0</span>
+            </div>
+            <div id="apptTodayBody"></div>
+          </div>
+          <div class="appt-panel">
+            <div class="appt-panel-head">
+              <h3 class="kh">ការព្យាបាល · Procedures</h3>
+              <span class="count-pill" id="procTodayCount">0</span>
+            </div>
+            <div id="procTodayBody"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Patients + Appointments -->
+      <section class="view" id="view-patients">
+        <div class="section-title">
+          <h2 class="kh" id="listTitle">កំណត់ត្រាអ្នកជំងឺ · Patient records</h2>
+          <span class="mono" id="listCount" style="font-size:12px;color:var(--ink-dim)"></span>
+        </div>
+        <div class="filter-chips" id="patientFilters" role="group" aria-label="Filter patients by status">
+          <button type="button" class="chip" data-filter="all" aria-pressed="true"><span class="kh">ទាំងអស់</span><span class="chip-n">0</span></button>
+          <button type="button" class="chip" data-filter="appt" aria-pressed="false"><span class="chip-dot appt"></span>Appt<span class="chip-n">0</span></button>
+          <button type="button" class="chip" data-filter="missing" aria-pressed="false"><span class="chip-dot missing"></span>Missing<span class="chip-n">0</span></button>
+          <button type="button" class="chip" data-filter="planning" aria-pressed="false"><span class="chip-dot planning"></span>Planning<span class="chip-n">0</span></button>
+          <button type="button" class="chip" data-filter="labo" aria-pressed="false"><span class="chip-dot labo"></span>Labo<span class="chip-n">0</span></button>
+          <button type="button" class="chip" data-filter="done" aria-pressed="false"><span class="chip-dot done"></span>Done<span class="chip-n">0</span></button>
+        </div>
+        <div class="record-list" id="recordList" data-filter="all"></div>
+        <div class="empty-state kh hidden" id="filterEmpty">មិនមានអ្នកជំងឺក្នុងស្ថានភាពនេះទេ<br><span style="opacity:.7">No patients with this status</span></div>
+      </section>
+
+      <!-- Reports -->
+      <section class="view" id="view-reports">
+        <div class="report-actions">
+          <button class="btn btn-outline btn-sm kh" id="invoiceBtn" title="បញ្ជីវិក្កយបត្រ">🧾 វិក្កយបត្រ (Invoices)</button>
+          <button class="btn btn-outline btn-sm kh" id="expenseBtn" title="គ្រប់គ្រងចំណាយ">💸 ចំណាយ (Expenses)</button>
+          <button class="btn btn-primary btn-sm kh" id="exportBtn" title="នាំចេញ Excel">📊 នាំចេញទិន្នន័យ (Export Excel)</button>
+        </div>
+
+        <div class="stats2 dash-stats" id="demoStatsRowReport"></div>
+
+        <div class="card-type-stats-panel" style="margin-top: 15px;">
+          <div class="card-type-stats-head">
+            <h4 class="kh">ស្ថិតិការព្យាបាល · Treatment Statistics</h4>
+          </div>
+          <div class="treatment-stats-grid" id="treatmentStatsRow"></div>
+        </div>
+      </section>
+
+    </main>
   </div>
 </div>
-
-<div class="wrap">
-  <div class="appt-grid">
-    <div class="appt-panel">
-      <div class="appt-panel-head">
-        <h3 class="kh">ការណាត់ជួប · Appointments</h3>
-        <span class="count-pill" id="apptTodayCount">0</span>
-      </div>
-      <div id="apptTodayBody"></div>
-    </div>
-    <div class="appt-panel">
-      <div class="appt-panel-head">
-        <h3 class="kh">ការព្យាបាល · Procedures</h3>
-        <span class="count-pill" id="procTodayCount">0</span>
-      </div>
-      <div id="procTodayBody"></div>
-    </div>
-  </div>
-
-  <div class="section-title">
-    <h2 class="kh" id="listTitle">កំណត់ត្រាអ្នកជំងឺ · Patient records</h2>
-    <span class="mono" id="listCount" style="font-size:12px;color:var(--ink-dim)"></span>
-  </div>
-  <div class="record-list" id="recordList"></div>
-</div>
+<div class="sidebar-scrim" id="sbScrim"></div>
 
 <!-- Modal ផ្ទៀងផ្ទាត់ PIN មុនចូលទៅកាន់ ព័ត៌មានគ្លីនិក · Clinic Info -->
 <div class="overlay hidden" id="pinModalOverlay">
@@ -1063,33 +1320,6 @@
 </div>
 
 <!-- Modal របាយការណ៍ Report -->
-<div class="overlay hidden" id="reportOverlay">
-  <div class="modal">
-    <div class="modal-head">
-      <h2 class="kh">របាយការណ៍ · Report</h2>
-      <button class="x" id="closeReport">✕</button>
-    </div>
-    <div class="modal-body">
-      <!-- ប៊ូតុង Invoices, Expense & Export -->
-      <div style="display: flex; justify-content: flex-end; gap: 8px; margin-bottom: 15px; flex-wrap: wrap;">
-        <button class="btn btn-outline btn-sm kh" id="invoiceBtn" title="បញ្ជីវិក្កយបត្រ">🧾 វិក្កយបត្រ (Invoices)</button>
-        <button class="btn btn-outline btn-sm kh" id="expenseBtn" title="គ្រប់គ្រងចំណាយ">💸 ចំណាយ (Expenses)</button>
-        <button class="btn btn-primary btn-sm kh" id="exportBtn" title="នាំចេញ Excel">📊 នាំចេញទិន្នន័យ (Export Excel)</button>
-      </div>
-      
-      <div class="stats2" id="demoStatsRow"></div>
-
-      <div class="card-type-stats-panel" style="margin-top: 15px;">
-        <div class="card-type-stats-head">
-          <h4 class="kh">ស្ថិតិការព្យាបាល · Treatment Statistics</h4>
-        </div>
-        <div class="treatment-stats-grid" id="treatmentStatsRow"></div>
-      </div>
-
-    </div>
-  </div>
-</div>
-
 <!-- Modal បញ្ជីវិក្កយបត្រ (Invoices Modal Overlay) -->
 <div class="overlay hidden" id="invoiceOverlay" style="z-index: 99 !important;">
   <div class="modal" style="max-width: 900px;">
@@ -2017,8 +2247,11 @@ function renderPatientDemographics(){
     {label:'អ្នកជំងឺសប្តាហ៍នេះ', sub:'Patients This Week', val: weekSet.size, cls:'amber'},
     {label:'អ្នកជំងឺខែនេះ', sub:'Patients This Month', val: monthSet.size, cls:'amber'},
   ];
-  document.getElementById('demoStatsRow').innerHTML = stats.map(s=>`
+  const statsHTML = stats.map(s=>`
     <div class="stat-card ${s.cls}"><div class="stat-label kh">${s.label}</div><div class="stat-value">${s.val}</div><div class="stat-khmer">${s.sub}</div></div>`).join('');
+  document.getElementById('demoStatsRow').innerHTML = statsHTML;
+  const statsReport = document.getElementById('demoStatsRowReport');
+  if(statsReport) statsReport.innerHTML = statsHTML;
 }
 
 function renderTreatmentStats(){
@@ -2068,9 +2301,9 @@ function matchesSearch(r, term){
   return hay.includes(term.toLowerCase()); 
 }
 
-function renderList(){
+function buildPatientGroups(filterFn){
   let rows = allRecords;
-  rows = rows.filter(r=>matchesSearch(r, searchTerm));
+  if(filterFn) rows = rows.filter(filterFn);
 
   const matchingKeys = new Set(rows.map(patientKey));
   const groups = new Map();
@@ -2105,6 +2338,13 @@ function renderList(){
   });
 
   patients.sort((a,b)=> (parseAnyDate(b.latest.timestamp)||0) - (parseAnyDate(a.latest.timestamp)||0));
+  return patients;
+}
+
+function renderListBase(){
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+  const patients = buildPatientGroups(r=>matchesSearch(r, searchTerm));
 
   document.getElementById('listCount').textContent = patients.length + ' patients';
   const list = document.getElementById('recordList');
@@ -2150,23 +2390,24 @@ function renderList(){
     }
     
     let st = p.latest.status === 'Doing' ? 'Appt' : (p.latest.status || 'Missing');
+    const stateKey = patientState(p, startOfToday);
     let cardClass = '';
     let badgeStyle = '';
 
-    if (isMissedAppt || st === 'Missing') {
+    if (stateKey === 'missing') {
         cardClass = ' has-missing-appt';
         badgeStyle = 'background:var(--coral-soft); color:var(--coral-dark); border-color:rgba(228,87,76,0.4);';
-    } else if (p.hasActiveAppt || st === 'Appt') {
+    } else if (stateKey === 'appt') {
         cardClass = ' has-active-appt';
         badgeStyle = '';
-    } else if (st === 'Planning') {
+    } else if (stateKey === 'planning') {
         badgeStyle = 'background:#EDE9FE; color:#6D28D9; border-color:rgba(109,40,217,0.4);';
     } else {
         badgeStyle = 'background:var(--primary-soft); color:var(--primary-dark); border-color:rgba(14,147,132,0.4);';
     }
 
     return `
-    <div class="appt-row record-card${cardClass}" data-name="${nameKey}">
+    <div class="appt-row record-card${cardClass}" data-name="${nameKey}" data-state="${stateKey}">
       <div class="appt-time">
         <div class="mono">${tStr}</div>
         <div class="appt-day mono">${dStr}</div>
@@ -3415,6 +3656,7 @@ function renderAll(){
   renderTreatmentStats(); 
   renderAppointments(); 
   renderList(); 
+  updateShell();
 }
 
 function closePatientModal(){
@@ -3696,9 +3938,6 @@ async function uploadXrayImage(){
   }
 }
 
-document.getElementById('reportBtn').addEventListener('click', () => document.getElementById('reportOverlay').classList.remove('hidden'));
-document.getElementById('closeReport').addEventListener('click', () => document.getElementById('reportOverlay').classList.add('hidden'));
-document.getElementById('reportOverlay').addEventListener('click', (e) => { if(e.target.id === 'reportOverlay') document.getElementById('reportOverlay').classList.add('hidden'); });
 
 /* ========================================================
    🧾 មុខងារគ្រប់គ្រងវិក្កយបត្រ (INVOICE MANAGEMENT)
@@ -3945,6 +4184,165 @@ document.getElementById('expenseOverlay').addEventListener('click', (e) => {
 
 document.getElementById('addExpenseBtn').addEventListener('click', addExpenseItem);
 document.getElementById('printExpenseBtn').addEventListener('click', printExpensesReport);
+
+
+/* ========================================================
+   APP SHELL — sidebar navigation, pages, patient filters
+======================================================== */
+const SB_COLLAPSED_KEY = 'kep_dental_sidebar_collapsed';
+const VIEW_META = {
+  dashboard:    { kh: 'ផ្ទាំងគ្រប់គ្រង',      en: 'Dashboard' },
+  patients:     { kh: 'កំណត់ត្រាអ្នកជំងឺ',   en: 'Patient records' },
+  appointments: { kh: 'ការណាត់ជួប',          en: 'Appointments' },
+  reports:      { kh: 'របាយការណ៍',           en: 'Reports' }
+};
+let currentView = 'dashboard';
+let patientFilter = 'all';
+
+/* One place that decides which status bucket a patient belongs to
+   (used for card colours, filter chips and sidebar counts). */
+function patientState(p, startOfToday){
+  let isMissed = false;
+  if(p.latest.timeLast){
+    const ad = parseAnyDate(p.latest.timeLast);
+    if(ad && ad < startOfToday) isMissed = true;
+  }
+  const st = p.latest.status === 'Doing' ? 'Appt' : (p.latest.status || 'Missing');
+  if(isMissed || st === 'Missing') return 'missing';
+  if(p.hasActiveAppt || st === 'Appt') return 'appt';
+  if(st === 'Planning') return 'planning';
+  if(st === 'Labo') return 'labo';
+  return 'done';
+}
+
+function renderList(){
+  renderListBase();
+  applyPatientFilter();
+}
+
+function applyPatientFilter(){
+  const list = document.getElementById('recordList');
+  if(!list) return;
+  const counts = { all:0, appt:0, missing:0, planning:0, labo:0, done:0 };
+  list.querySelectorAll('.record-card').forEach(c=>{
+    counts.all++;
+    if(counts[c.dataset.state] !== undefined) counts[c.dataset.state]++;
+  });
+  document.querySelectorAll('#patientFilters .chip').forEach(ch=>{
+    const n = ch.querySelector('.chip-n');
+    if(n) n.textContent = counts[ch.dataset.filter];
+  });
+  const visible = counts[patientFilter] !== undefined ? counts[patientFilter] : counts.all;
+  if(counts.all > 0) document.getElementById('listCount').textContent = visible + ' patients';
+  document.getElementById('filterEmpty').classList.toggle('hidden', !(counts.all > 0 && visible === 0));
+}
+
+function setPatientFilter(f, skipNavSync){
+  patientFilter = f;
+  document.getElementById('recordList').dataset.filter = f;
+  document.querySelectorAll('#patientFilters .chip').forEach(ch=>{
+    ch.setAttribute('aria-pressed', ch.dataset.filter === f ? 'true' : 'false');
+  });
+  applyPatientFilter();
+  if(!skipNavSync) syncNav();
+}
+
+function activeNavKey(){
+  if(currentView === 'patients') return patientFilter === 'appt' ? 'appointments' : 'patients';
+  return currentView;
+}
+
+function syncNav(){
+  const key = activeNavKey();
+  document.querySelectorAll('.sb-item[data-nav]').forEach(b=>{
+    if(b.dataset.nav === key) b.setAttribute('aria-current', 'page');
+    else b.removeAttribute('aria-current');
+  });
+  const meta = VIEW_META[key];
+  if(meta){
+    document.getElementById('pageTitle').textContent = meta.kh;
+    document.getElementById('pageSub').textContent = meta.en;
+    if(currentView === 'patients') document.getElementById('listTitle').textContent = meta.kh + ' · ' + meta.en;
+  }
+}
+
+function showView(key){
+  let view = key;
+  if(key === 'appointments'){ view = 'patients'; setPatientFilter('appt', true); }
+  else if(key === 'patients'){ setPatientFilter('all', true); }
+  currentView = view;
+  document.querySelectorAll('.view').forEach(v=> v.classList.toggle('active', v.id === 'view-' + view));
+  syncNav();
+  closeSidebarDrawer();
+  window.scrollTo(0, 0);
+}
+
+function updateShell(){
+  const groups = buildPatientGroups(null);
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+  let appt = 0;
+  groups.forEach(p=>{ if(patientState(p, startOfToday) === 'appt') appt++; });
+  document.getElementById('nbPatients').textContent = groups.length || '';
+  document.getElementById('nbAppointments').textContent = appt || '';
+
+  const dateEl = document.getElementById('dashDate');
+  if(dateEl){
+    let s;
+    try{ s = now.toLocaleDateString('km-KH', { weekday:'long', day:'numeric', month:'long', year:'numeric' }); }
+    catch(e){ s = now.toDateString(); }
+    dateEl.textContent = s;
+  }
+}
+
+/* sidebar: collapse on desktop, drawer on tablet / phone */
+function isDrawerMode(){ return window.innerWidth <= 900; }
+
+function closeSidebarDrawer(){
+  document.body.classList.remove('sb-open');
+  const mb = document.getElementById('menuBtn');
+  if(mb && isDrawerMode()) mb.setAttribute('aria-expanded', 'false');
+}
+
+function toggleSidebar(){
+  const mb = document.getElementById('menuBtn');
+  if(isDrawerMode()){
+    const open = document.body.classList.toggle('sb-open');
+    mb.setAttribute('aria-expanded', open ? 'true' : 'false');
+  } else {
+    const collapsed = document.body.classList.toggle('sb-collapsed');
+    mb.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    try{ localStorage.setItem(SB_COLLAPSED_KEY, collapsed ? '1' : '0'); }catch(e){}
+  }
+}
+
+(function initShell(){
+  try{ if(localStorage.getItem(SB_COLLAPSED_KEY) === '1' && !isDrawerMode()) document.body.classList.add('sb-collapsed'); }catch(e){}
+  const mb = document.getElementById('menuBtn');
+  mb.setAttribute('aria-expanded', isDrawerMode() ? 'false' : (document.body.classList.contains('sb-collapsed') ? 'false' : 'true'));
+  mb.addEventListener('click', toggleSidebar);
+  document.getElementById('sbScrim').addEventListener('click', closeSidebarDrawer);
+  document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape' && document.body.classList.contains('sb-open')) closeSidebarDrawer(); });
+  window.addEventListener('resize', ()=>{
+    if(!isDrawerMode()) document.body.classList.remove('sb-open');
+    mb.setAttribute('aria-expanded', isDrawerMode() ? (document.body.classList.contains('sb-open') ? 'true' : 'false') : (document.body.classList.contains('sb-collapsed') ? 'false' : 'true'));
+  });
+
+  document.querySelectorAll('.sb-item[data-nav]').forEach(b=> b.addEventListener('click', ()=> showView(b.dataset.nav)));
+  document.querySelectorAll('#patientFilters .chip').forEach(ch=> ch.addEventListener('click', ()=> setPatientFilter(ch.dataset.filter)));
+
+  document.getElementById('navInvoices').addEventListener('click', ()=>{ closeSidebarDrawer(); document.getElementById('invoiceBtn').click(); });
+  document.getElementById('navExpenses').addEventListener('click', ()=>{ closeSidebarDrawer(); document.getElementById('expenseBtn').click(); });
+  document.getElementById('settingsBtn').addEventListener('click', closeSidebarDrawer);
+
+  const sync = document.getElementById('syncBadge');
+  sync.addEventListener('keydown', (e)=>{ if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); sync.click(); } });
+
+  // typing in the search box takes you to the patient list
+  document.getElementById('searchInput').addEventListener('input', ()=>{ if(currentView !== 'patients') showView('patients'); });
+
+  syncNav();
+})();
 
 let storedUrl = localStorage.getItem('kep_dental_webapp_url');
 if(storedUrl && storedUrl !== DEFAULT_WEB_APP_URL) {
