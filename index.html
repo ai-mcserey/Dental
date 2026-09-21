@@ -501,7 +501,7 @@
   @media print{
     body{background:none;}
     .app-shell, .sidebar-scrim, .topbar, .wrap, .fab,
-    #detailOverlay, #formOverlay, #settingsOverlay, #clinicalConfigOverlay, #patientOverlay, #toothHistoryModalOverlay, #printSizeModalOverlay, #expenseOverlay, #invoiceOverlay, #pinModalOverlay{ display:none !important; }
+    #detailOverlay, #formOverlay, #settingsOverlay, #clinicalConfigOverlay, #patientOverlay, #toothHistoryModalOverlay, #printSizeModalOverlay, #expenseOverlay, #invoiceOverlay, #pinModalOverlay, #laboFormOverlay, #invFormOverlay, #invAdjustOverlay, #invHistoryOverlay{ display:none !important; }
     #printOverlay{ position:static !important; inset:auto; background:none !important; backdrop-filter:none !important; padding:0 !important; display:block !important; }
     #printOverlay .modal{ box-shadow:none !important; border:none !important; max-width:100% !important; border-radius:0 !important; background:none !important; margin:0 !important; }
     #printOverlay .modal-head, #printOverlay .modal-actions{ display:none !important; }
@@ -714,6 +714,55 @@
   @media (prefers-reduced-motion:reduce){
     .sidebar, .app-main, .sidebar-scrim{ transition:none !important; }
   }
+
+  /* =====================================================================
+     Labo + Inventory pages
+     ===================================================================== */
+  .page-toolbar{ display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:12px; }
+  .page-toolbar .filter-chips{ flex:1 1 320px; margin-bottom:0; }
+  .toolbar-actions{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .tb-search{
+    height:34px; width:230px; padding:0 12px; border:1.5px solid var(--border); border-radius:9px;
+    background:#fff; font-size:12.5px; color:var(--ink); font-family:'Inter','Noto Sans Khmer',sans-serif;
+  }
+  .tb-search:focus{ outline:none; border-color:var(--primary); }
+  .cell-sub{ font-size:11.5px; color:var(--ink-dim); margin-top:2px; }
+  .row-actions{ display:flex; gap:6px; justify-content:flex-end; flex-wrap:wrap; }
+  .icon-btn{
+    width:28px; height:28px; border-radius:7px; border:1px solid var(--border-soft); background:var(--surface-2);
+    color:var(--ink-soft); cursor:pointer; font-size:13px; line-height:1; display:inline-grid; place-items:center;
+  }
+  .icon-btn:hover{ border-color:var(--primary); color:var(--ink); background:var(--primary-softer); }
+  .icon-btn.danger:hover{ border-color:#f5b5af; background:var(--coral-soft); color:var(--coral-dark); }
+  .icon-btn:focus-visible{ outline:2px solid var(--primary); outline-offset:2px; }
+  .pt-link{ color:var(--primary-dark); cursor:pointer; font-weight:700; text-decoration:underline; text-decoration-color:rgba(14,147,132,.35); text-underline-offset:3px; }
+  .qty-big{ font-family:'IBM Plex Mono',monospace; font-weight:800; font-size:15px; color:var(--ink); }
+  .form-error{ color:var(--coral-dark); background:var(--coral-soft); border:1px solid #f5b5af; border-radius:8px; padding:8px 10px; font-size:12px; margin-top:12px; }
+
+  .st-select{ font-family:inherit; font-size:11.5px; font-weight:700; padding:5px 8px; border-radius:7px; border:1px solid; cursor:pointer; max-width:100%; }
+  .st-select.st-sent{ background:#DBEAFE; color:#1D4ED8; border-color:#1D4ED840; }
+  .st-select.st-received{ background:var(--amber-soft); color:var(--amber-dark); border-color:rgba(232,163,61,.5); }
+  .st-select.st-delivered{ background:#E0F2E9; color:#198754; border-color:#19875440; }
+
+  .badge-mini{ display:inline-block; font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:6px; margin:2px 4px 2px 0; white-space:nowrap; }
+  .badge-mini.ok{ background:#E0F2E9; color:#198754; }
+  .badge-mini.low, .badge-mini.expiring{ background:var(--amber-soft); color:var(--amber-dark); }
+  .badge-mini.out, .badge-mini.expired{ background:var(--coral-soft); color:var(--coral-dark); }
+  .badge-mini.in{ background:#E0F2E9; color:#198754; }
+  .badge-mini.set{ background:#EDE9FE; color:#6D28D9; }
+  .is-bad{ color:var(--coral-dark); font-weight:700; }
+  .is-warn{ color:var(--amber-dark); font-weight:700; }
+  .lab-row.is-overdue td:first-child{ box-shadow:inset 3px 0 0 var(--coral); }
+  .sb-badge.coral{ background:var(--coral); color:#fff; }
+
+  @media (max-width:640px){
+    .toolbar-actions{ width:100%; }
+    .tb-search{ flex:1; width:auto; min-width:0; }
+    .row-actions{ justify-content:flex-start; }
+  }
+  #laboFormOverlay, #invFormOverlay{ z-index:86 !important; }
+  #invHistoryOverlay{ z-index:87 !important; }
+  #invAdjustOverlay{ z-index:88 !important; }
 </style>
 <style id="dynamicPageStyle">@page{ size: A4 portrait; margin: 15mm; }</style>
 </head>
@@ -752,6 +801,20 @@
           <span class="sb-ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="m9 16 2 2 4-4"/></svg></span>
           <span class="sb-label"><span class="sb-kh">ការណាត់ជួប</span><span class="sb-en">Appointments</span></span>
           <span class="sb-badge amber" id="nbAppointments"></span>
+        </button>
+      </div>
+
+      <div class="sb-section">
+        <div class="sb-group kh">ប្រតិបត្តិការ</div>
+        <button type="button" class="sb-item" data-nav="labo" title="Labo ធ្មេញ · Dental Lab">
+          <span class="sb-ico"><svg viewBox="0 0 24 24"><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/></svg></span>
+          <span class="sb-label"><span class="sb-kh">Labo ធ្មេញ</span><span class="sb-en">Dental Lab</span></span>
+          <span class="sb-badge amber" id="nbLabo"></span>
+        </button>
+        <button type="button" class="sb-item" data-nav="inventory" title="ឃ្លាំងបរិក្ខា · Inventory">
+          <span class="sb-ico"><svg viewBox="0 0 24 24"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></span>
+          <span class="sb-label"><span class="sb-kh">ឃ្លាំងបរិក្ខា</span><span class="sb-en">Inventory</span></span>
+          <span class="sb-badge amber" id="nbInventory"></span>
         </button>
       </div>
 
@@ -860,10 +923,147 @@
         </div>
       </section>
 
+      <!-- Dental Lab -->
+      <section class="view" id="view-labo">
+        <div class="stats2 dash-stats" id="laboStats"></div>
+        <div class="page-toolbar">
+          <div class="filter-chips" id="laboFilters" role="group" aria-label="Filter lab orders">
+            <button type="button" class="chip" data-filter="all" aria-pressed="true"><span class="kh">ទាំងអស់</span><span class="chip-n">0</span></button>
+            <button type="button" class="chip" data-filter="sent" aria-pressed="false"><span class="chip-dot labo"></span>Sent<span class="chip-n">0</span></button>
+            <button type="button" class="chip" data-filter="received" aria-pressed="false"><span class="chip-dot appt"></span>Received<span class="chip-n">0</span></button>
+            <button type="button" class="chip" data-filter="delivered" aria-pressed="false"><span class="chip-dot done"></span>Delivered<span class="chip-n">0</span></button>
+            <button type="button" class="chip" data-filter="overdue" aria-pressed="false"><span class="chip-dot missing"></span>Overdue<span class="chip-n">0</span></button>
+          </div>
+          <div class="toolbar-actions">
+            <input type="text" class="tb-search kh" id="laboSearch" placeholder="🔍 ស្វែងរក ឈ្មោះ, ការងារ, Lab...">
+            <button type="button" class="btn btn-outline btn-sm kh" id="laboExportBtn">⬇ CSV</button>
+            <button type="button" class="btn btn-primary btn-sm kh" id="laboAddBtn">＋ បញ្ជា Labo ថ្មី</button>
+          </div>
+        </div>
+        <div class="emr-notes-section">
+          <div class="emr-table-wrap">
+            <table class="emr-table">
+              <thead><tr>
+                <th>អ្នកជំងឺ</th><th>ការងារ</th><th>ធ្មេញ · ពណ៌</th><th>Lab</th><th>ថ្ងៃផ្ញើ → ថ្ងៃយក</th><th style="text-align:right;">តម្លៃ</th><th>ស្ថានភាព</th><th></th>
+              </tr></thead>
+              <tbody id="laboTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="empty-state kh hidden" id="laboEmpty" style="margin-top:12px;"></div>
+      </section>
+
+      <!-- Inventory -->
+      <section class="view" id="view-inventory">
+        <div class="stats2 dash-stats" id="invStats"></div>
+        <div class="page-toolbar">
+          <div class="filter-chips" id="invFilters" role="group" aria-label="Filter inventory">
+            <button type="button" class="chip" data-filter="all" aria-pressed="true"><span class="kh">ទាំងអស់</span><span class="chip-n">0</span></button>
+            <button type="button" class="chip" data-filter="low" aria-pressed="false"><span class="chip-dot appt"></span><span class="kh">ជិតអស់</span><span class="chip-n">0</span></button>
+            <button type="button" class="chip" data-filter="out" aria-pressed="false"><span class="chip-dot missing"></span><span class="kh">អស់ស្តុក</span><span class="chip-n">0</span></button>
+            <button type="button" class="chip" data-filter="expiry" aria-pressed="false"><span class="chip-dot planning"></span><span class="kh">ផុតកំណត់</span><span class="chip-n">0</span></button>
+          </div>
+          <div class="toolbar-actions">
+            <input type="text" class="tb-search kh" id="invSearch" placeholder="🔍 ស្វែងរកបរិក្ខា...">
+            <button type="button" class="btn btn-outline btn-sm kh" id="invExportBtn">⬇ CSV</button>
+            <button type="button" class="btn btn-primary btn-sm kh" id="invAddBtn">＋ បន្ថែមបរិក្ខា</button>
+          </div>
+        </div>
+        <div class="emr-notes-section">
+          <div class="emr-table-wrap">
+            <table class="emr-table">
+              <thead><tr>
+                <th>បរិក្ខា</th><th>ប្រភេទ</th><th>ក្នុងស្តុក</th><th>អប្បបរមា</th><th>ផុតកំណត់</th><th>ស្ថានភាព</th><th></th>
+              </tr></thead>
+              <tbody id="invTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="empty-state kh hidden" id="invEmpty" style="margin-top:12px;"></div>
+      </section>
+
     </main>
   </div>
 </div>
 <div class="sidebar-scrim" id="sbScrim"></div>
+
+<!-- Labo order form -->
+<div class="overlay hidden" id="laboFormOverlay">
+  <div class="modal narrow" style="max-width:580px;">
+    <div class="modal-head"><h2 class="kh" id="laboFormTitle">🧪 បញ្ជា Labo ថ្មី</h2><button class="x" id="laboFormClose">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="field full"><label>ឈ្មោះអ្នកជំងឺ (Patient) *</label><input type="text" id="lab_patient" class="kh" list="lab_patient_list" autocomplete="off"><datalist id="lab_patient_list"></datalist></div>
+        <div class="field"><label>ប្រភេទការងារ (Work) *</label><input type="text" id="lab_work" class="kh" list="lab_work_list" autocomplete="off"><datalist id="lab_work_list"></datalist></div>
+        <div class="field"><label>Lab</label><input type="text" id="lab_lab" class="kh" list="lab_lab_list" autocomplete="off"><datalist id="lab_lab_list"></datalist></div>
+        <div class="field"><label>លេខធ្មេញ (Teeth)</label><input type="text" id="lab_teeth" class="mono" placeholder="11, 21"></div>
+        <div class="field"><label>ពណ៌ (Shade)</label><input type="text" id="lab_shade" class="mono" placeholder="A2"></div>
+        <div class="field"><label>ថ្ងៃផ្ញើ (Sent)</label><input type="date" id="lab_sent" class="mono"></div>
+        <div class="field"><label>ថ្ងៃត្រូវយក (Due)</label><input type="date" id="lab_due" class="mono"></div>
+        <div class="field"><label>តម្លៃ (Cost $)</label><input type="number" id="lab_cost" class="mono" step="0.01" min="0" placeholder="0.00"></div>
+        <div class="field"><label>ស្ថានភាព (Status)</label><select id="lab_status" class="kh"></select></div>
+        <div class="field full"><label>កំណត់ចំណាំ (Note)</label><textarea id="lab_note" class="kh"></textarea></div>
+      </div>
+      <div class="form-error kh hidden" id="labFormError"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-outline kh" id="labFormCancel">បោះបង់ Cancel</button>
+        <button type="button" class="btn btn-primary kh" id="labFormSave">💾 រក្សាទុក Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Inventory item form -->
+<div class="overlay hidden" id="invFormOverlay">
+  <div class="modal narrow" style="max-width:560px;">
+    <div class="modal-head"><h2 class="kh" id="invFormTitle">📦 បន្ថែមបរិក្ខា</h2><button class="x" id="invFormClose">✕</button></div>
+    <div class="modal-body">
+      <div class="form-grid">
+        <div class="field full"><label>ឈ្មោះបរិក្ខា (Item) *</label><input type="text" id="inv_name" class="kh" list="inv_name_list" autocomplete="off"><datalist id="inv_name_list"></datalist></div>
+        <div class="field"><label>ប្រភេទ (Category)</label><select id="inv_cat" class="kh"></select></div>
+        <div class="field"><label>ខ្នាត (Unit)</label><input type="text" id="inv_unit" class="kh" list="inv_unit_list" autocomplete="off" placeholder="ប្រអប់ / box"><datalist id="inv_unit_list"></datalist></div>
+        <div class="field"><label>ចំនួនក្នុងស្តុក (Quantity)</label><input type="number" id="inv_qty" class="mono" step="any" min="0" placeholder="0"></div>
+        <div class="field"><label>កម្រិតអប្បបរមា (Min level)</label><input type="number" id="inv_min" class="mono" step="any" min="0" placeholder="0"></div>
+        <div class="field full"><label>ថ្ងៃផុតកំណត់ (Expiry)</label><input type="date" id="inv_expiry" class="mono"></div>
+        <div class="field full"><label>កំណត់ចំណាំ (Note)</label><input type="text" id="inv_note" class="kh"></div>
+      </div>
+      <div class="form-error kh hidden" id="invFormError"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-outline kh" id="invFormCancel">បោះបង់ Cancel</button>
+        <button type="button" class="btn btn-primary kh" id="invFormSave">💾 រក្សាទុក Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Inventory stock in / out -->
+<div class="overlay hidden" id="invAdjustOverlay">
+  <div class="modal narrow" style="max-width:420px;">
+    <div class="modal-head"><h2 class="kh" id="invAdjustTitle">ស្តុកចូល</h2><button class="x" id="invAdjustClose">✕</button></div>
+    <div class="modal-body">
+      <div class="kh" id="invAdjustItem" style="font-weight:700;font-size:14px;"></div>
+      <div class="cell-sub kh" id="invAdjustCur" style="margin-bottom:14px;"></div>
+      <div class="form-grid">
+        <div class="field"><label>ចំនួន (Quantity) *</label><input type="number" id="adj_qty" class="mono" step="any" min="0" placeholder="0"></div>
+        <div class="field"><label>ថ្ងៃខែ (Date)</label><input type="date" id="adj_date" class="mono"></div>
+        <div class="field full"><label>កំណត់ចំណាំ (Note)</label><input type="text" id="adj_note" class="kh" placeholder="ឧ. ទិញពីអ្នកផ្គត់ផ្គង់ / ប្រើសម្រាប់អ្នកជំងឺ..."></div>
+      </div>
+      <div class="form-error kh hidden" id="invAdjustError"></div>
+      <div class="modal-actions">
+        <button type="button" class="btn btn-outline kh" id="invAdjustCancel">បោះបង់ Cancel</button>
+        <button type="button" class="btn btn-primary kh" id="invAdjustSave">✓ បញ្ជាក់ Confirm</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Inventory history -->
+<div class="overlay hidden" id="invHistoryOverlay">
+  <div class="modal narrow" style="max-width:620px;">
+    <div class="modal-head"><h2 class="kh" id="invHistoryTitle">ប្រវត្តិចលនាស្តុក</h2><button class="x" id="invHistoryClose">✕</button></div>
+    <div class="modal-body" id="invHistoryBody"></div>
+  </div>
+</div>
 
 <!-- Modal ផ្ទៀងផ្ទាត់ PIN មុនចូលទៅកាន់ ព័ត៌មានគ្លីនិក · Clinic Info -->
 <div class="overlay hidden" id="pinModalOverlay">
@@ -4194,7 +4394,9 @@ const VIEW_META = {
   dashboard:    { kh: 'ផ្ទាំងគ្រប់គ្រង',      en: 'Dashboard' },
   patients:     { kh: 'កំណត់ត្រាអ្នកជំងឺ',   en: 'Patient records' },
   appointments: { kh: 'ការណាត់ជួប',          en: 'Appointments' },
-  reports:      { kh: 'របាយការណ៍',           en: 'Reports' }
+  reports:      { kh: 'របាយការណ៍',           en: 'Reports' },
+  labo:         { kh: 'Labo ធ្មេញ',           en: 'Dental Lab orders' },
+  inventory:    { kh: 'ឃ្លាំងបរិក្ខា',        en: 'Inventory' }
 };
 let currentView = 'dashboard';
 let patientFilter = 'all';
@@ -4271,6 +4473,8 @@ function showView(key){
   if(key === 'appointments'){ view = 'patients'; setPatientFilter('appt', true); }
   else if(key === 'patients'){ setPatientFilter('all', true); }
   currentView = view;
+  if(view === 'labo') renderLab();
+  if(view === 'inventory') renderInventory();
   document.querySelectorAll('.view').forEach(v=> v.classList.toggle('active', v.id === 'view-' + view));
   syncNav();
   closeSidebarDrawer();
@@ -4285,6 +4489,7 @@ function updateShell(){
   groups.forEach(p=>{ if(patientState(p, startOfToday) === 'appt') appt++; });
   document.getElementById('nbPatients').textContent = groups.length || '';
   document.getElementById('nbAppointments').textContent = appt || '';
+  updateOpsBadges();
 
   const dateEl = document.getElementById('dashDate');
   if(dateEl){
@@ -4342,6 +4547,472 @@ function toggleSidebar(){
   document.getElementById('searchInput').addEventListener('input', ()=>{ if(currentView !== 'patients') showView('patients'); });
 
   syncNav();
+})();
+
+
+/* ========================================================
+   LABO (ធ្មេញ) + ឃ្លាំងបរិក្ខា (INVENTORY)
+   Stored in this browser's localStorage, like Expenses.
+======================================================== */
+function escHTML(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function isYMD(s){ return /^\d{4}-\d{2}-\d{2}$/.test(s || ''); }
+function fmtYMD(s){ return isYMD(s) ? s.replace(/-/g, '/') : '—'; }
+function daysUntil(ymd){
+  if(!isYMD(ymd)) return null;
+  return Math.round((new Date(ymd + 'T00:00:00') - new Date(getLocalTodayYMD() + 'T00:00:00')) / 86400000);
+}
+function num2(n){ return Math.round((parseFloat(n) || 0) * 100) / 100; }
+function el(id){ return document.getElementById(id); }
+function openOv(id){ el(id).classList.remove('hidden'); }
+function closeOv(id){ el(id).classList.add('hidden'); }
+function showFormError(id, msg){ const e = el(id); e.textContent = msg || ''; e.classList.toggle('hidden', !msg); }
+function fillDatalist(id, values){
+  el(id).innerHTML = Array.from(new Set(values.filter(Boolean))).map(v => `<option value="${escHTML(v)}"></option>`).join('');
+}
+function statCardsHTML(list){
+  return list.map(s => `<div class="stat-card ${s.cls || ''}"><div class="stat-label kh">${s.kh}</div><div class="stat-value">${s.val}</div><div class="stat-khmer">${s.en}</div></div>`).join('');
+}
+function setBadge(id, n, urgent){
+  const b = el(id); if(!b) return;
+  b.textContent = n > 0 ? n : '';
+  b.classList.toggle('coral', !!urgent && n > 0);
+  b.classList.toggle('amber', !(urgent && n > 0));
+}
+function downloadCSV(filename, headers, rows){
+  const esc = v => { let s = String(v == null ? '' : v).trim(); if(/[",\n\r]/.test(s)) s = '"' + s.replace(/"/g, '""') + '"'; return s; };
+  const csv = '\uFEFF' + [headers].concat(rows).map(r => r.map(esc).join(',')).join('\r\n');
+  const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+function fileStamp(){ return getLocalTodayYMD().replace(/-/g, '_'); }
+
+/* ---------------- LABO ---------------- */
+const LAB_KEY = 'kep_dental_lab_v1';
+const LAB_STATUS = {
+  sent:      { kh: 'ផ្ញើទៅ Lab',     en: 'Sent' },
+  received:  { kh: 'Lab ធ្វើរួច',     en: 'Received' },
+  delivered: { kh: 'ជូនអ្នកជំងឺរួច', en: 'Delivered' }
+};
+const LAB_WORKS = ['Crown PFM','Crown Zirconia','Crown Metal','Crown E.max','Bridge','Veneer','Inlay / Onlay','Post & Core',
+  'Complete Denture','Partial Denture (Acrylic)','Partial Denture (Metal)','Flexible Denture','Retainer','Night Guard','Ortho Appliance'];
+let labOrders = [], labFilter = 'all', labSearchTerm = '', editingLabId = null;
+
+function loadLab(){ try{ const a = JSON.parse(localStorage.getItem(LAB_KEY) || '[]'); labOrders = Array.isArray(a) ? a : []; }catch(e){ labOrders = []; } }
+function saveLab(){ try{ localStorage.setItem(LAB_KEY, JSON.stringify(labOrders)); }catch(e){} }
+function labOverdue(o){ return o.status === 'sent' && isYMD(o.due) && o.due < getLocalTodayYMD(); }
+function stampLabStatus(o){
+  const t = getLocalTodayYMD();
+  if(o.status === 'received' && !o.receivedDate) o.receivedDate = t;
+  if(o.status === 'delivered'){ if(!o.receivedDate) o.receivedDate = t; if(!o.deliveredDate) o.deliveredDate = t; }
+}
+
+function renderLab(){
+  const today = getLocalTodayYMD();
+  const q = labSearchTerm.trim().toLowerCase();
+  const base = q ? labOrders.filter(o => [o.patient, o.work, o.teeth, o.shade, o.lab, o.note].join(' ').toLowerCase().includes(q)) : labOrders.slice();
+
+  const counts = { all: base.length, sent: 0, received: 0, delivered: 0, overdue: 0 };
+  base.forEach(o => { if(counts[o.status] !== undefined) counts[o.status]++; if(labOverdue(o)) counts.overdue++; });
+  document.querySelectorAll('#laboFilters .chip').forEach(ch => {
+    ch.querySelector('.chip-n').textContent = counts[ch.dataset.filter];
+    ch.setAttribute('aria-pressed', ch.dataset.filter === labFilter ? 'true' : 'false');
+  });
+
+  const nSent = labOrders.filter(o => o.status === 'sent').length;
+  const nRecv = labOrders.filter(o => o.status === 'received').length;
+  const nOver = labOrders.filter(labOverdue).length;
+  const monthCost = labOrders.filter(o => (o.sent || o.created || '').slice(0, 7) === today.slice(0, 7)).reduce((s, o) => s + num2(o.cost), 0);
+  el('laboStats').innerHTML = statCardsHTML([
+    { kh: 'កំពុងធ្វើនៅ Lab', en: 'At the lab (Sent)', val: nSent, cls: 'highlight' },
+    { kh: 'ទទួលបានវិញ រង់ចាំដាក់', en: 'Received, not yet fitted', val: nRecv, cls: 'amber' },
+    { kh: 'យឺតជាងកំណត់', en: 'Overdue', val: nOver, cls: 'debt' },
+    { kh: 'ចំណាយ Lab ខែនេះ', en: 'Lab cost this month', val: '$' + monthCost.toFixed(2), cls: 'amber' }
+  ]);
+
+  const shown = base.filter(o => labFilter === 'all' ? true : labFilter === 'overdue' ? labOverdue(o) : o.status === labFilter);
+  shown.sort((a, b) => {
+    const ra = a.status === 'delivered' ? 1 : 0, rb = b.status === 'delivered' ? 1 : 0;
+    if(ra !== rb) return ra - rb;
+    if(ra === 0) return (a.due || '9999').localeCompare(b.due || '9999');
+    return (b.sent || b.created || '').localeCompare(a.sent || a.created || '');
+  });
+
+  el('laboTableBody').innerHTML = shown.map(o => {
+    const st = LAB_STATUS[o.status] ? o.status : 'sent';
+    const od = labOverdue(o);
+    const known = allRecords.some(r => cleanStr(r.name).toLowerCase() === cleanStr(o.patient).toLowerCase());
+    const who = known
+      ? `<span class="pt-link kh" data-act="open" data-name="${encodeURIComponent(o.patient)}">${escHTML(o.patient)}</span>`
+      : `<span class="kh" style="font-weight:700;">${escHTML(o.patient)}</span>`;
+    const late = od ? `<div><span class="badge-mini out kh">យឺត ${-daysUntil(o.due)} ថ្ងៃ</span></div>` : '';
+    const opts = Object.keys(LAB_STATUS).map(k => `<option value="${k}"${k === st ? ' selected' : ''}>${LAB_STATUS[k].en} · ${LAB_STATUS[k].kh}</option>`).join('');
+    return `<tr class="emr-tr lab-row${od ? ' is-overdue' : ''}" data-id="${o.id}">
+      <td data-label="អ្នកជំងឺ">${who}${o.note ? `<div class="cell-sub kh">${escHTML(o.note)}</div>` : ''}</td>
+      <td data-label="ការងារ" class="kh">${escHTML(o.work)}</td>
+      <td data-label="ធ្មេញ · ពណ៌"><span class="mono">${escHTML(o.teeth) || '—'}</span>${o.shade ? ` <span class="cell-sub mono">· ${escHTML(o.shade)}</span>` : ''}</td>
+      <td data-label="Lab" class="kh">${escHTML(o.lab) || '—'}</td>
+      <td data-label="ថ្ងៃផ្ញើ → ថ្ងៃយក"><span class="mono" style="font-size:12px;">${fmtYMD(o.sent)} → <span class="${od ? 'is-bad' : ''}">${fmtYMD(o.due)}</span></span>${late}</td>
+      <td data-label="តម្លៃ" class="mono" style="text-align:right;font-weight:700;">${o.cost === '' || o.cost == null ? '—' : '$' + num2(o.cost).toFixed(2)}</td>
+      <td data-label="ស្ថានភាព"><select class="st-select st-${st}" data-act="status" aria-label="Status">${opts}</select></td>
+      <td><div class="row-actions">
+        <button type="button" class="icon-btn" data-act="edit" title="កែប្រែ Edit">✎</button>
+        <button type="button" class="icon-btn danger" data-act="del" title="លុប Delete">✕</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+
+  const empty = el('laboEmpty');
+  if(shown.length === 0){
+    empty.innerHTML = labOrders.length === 0
+      ? 'មិនទាន់មានបញ្ជា Labo ទេ ចុច “＋ បញ្ជា Labo ថ្មី” ដើម្បីចាប់ផ្តើម<br><span style="opacity:.7">No lab orders yet</span>'
+      : 'មិនមានបញ្ជា Labo ត្រូវនឹងលក្ខខណ្ឌនេះទេ<br><span style="opacity:.7">No orders match this filter</span>';
+    empty.classList.remove('hidden');
+  } else empty.classList.add('hidden');
+
+  updateOpsBadges();
+}
+
+function openLabForm(id){
+  editingLabId = id || null;
+  const o = id ? labOrders.find(x => x.id === id) : null;
+  el('laboFormTitle').textContent = o ? '🧪 កែប្រែបញ្ជា Labo' : '🧪 បញ្ជា Labo ថ្មី';
+  fillDatalist('lab_patient_list', allRecords.map(r => cleanStr(r.name)).sort());
+  fillDatalist('lab_work_list', LAB_WORKS.concat(labOrders.map(x => x.work)));
+  fillDatalist('lab_lab_list', labOrders.map(x => x.lab));
+  el('lab_patient').value = o ? o.patient : '';
+  el('lab_work').value = o ? o.work : '';
+  el('lab_lab').value = o ? (o.lab || '') : (labOrders.length ? (labOrders.slice().sort((a,b)=>(b.created||'').localeCompare(a.created||''))[0].lab || '') : '');
+  el('lab_teeth').value = o ? (o.teeth || '') : '';
+  el('lab_shade').value = o ? (o.shade || '') : '';
+  el('lab_sent').value = o ? (o.sent || '') : getLocalTodayYMD();
+  el('lab_due').value = o ? (o.due || '') : '';
+  el('lab_cost').value = o && o.cost !== '' && o.cost != null ? o.cost : '';
+  el('lab_status').value = o ? o.status : 'sent';
+  el('lab_note').value = o ? (o.note || '') : '';
+  showFormError('labFormError', '');
+  openOv('laboFormOverlay');
+  el('lab_patient').focus();
+}
+
+function saveLabForm(){
+  const patient = el('lab_patient').value.trim();
+  const work = el('lab_work').value.trim();
+  const sent = el('lab_sent').value, due = el('lab_due').value;
+  const costRaw = el('lab_cost').value;
+  if(!patient){ showFormError('labFormError', 'សូមបញ្ចូលឈ្មោះអ្នកជំងឺ'); return; }
+  if(!work){ showFormError('labFormError', 'សូមបញ្ចូលប្រភេទការងារ'); return; }
+  if(sent && due && due < sent){ showFormError('labFormError', 'ថ្ងៃត្រូវយកមិនអាចមុនថ្ងៃផ្ញើបានទេ'); return; }
+  if(costRaw !== '' && (isNaN(parseFloat(costRaw)) || parseFloat(costRaw) < 0)){ showFormError('labFormError', 'តម្លៃមិនត្រឹមត្រូវ'); return; }
+
+  const data = {
+    patient, work, lab: el('lab_lab').value.trim(), teeth: el('lab_teeth').value.trim(), shade: el('lab_shade').value.trim(),
+    sent, due, cost: costRaw === '' ? '' : num2(costRaw), status: el('lab_status').value, note: el('lab_note').value.trim()
+  };
+  if(editingLabId){
+    const o = labOrders.find(x => x.id === editingLabId);
+    if(o){ const prev = o.status; Object.assign(o, data); if(prev !== o.status) stampLabStatus(o); }
+  } else {
+    const o = Object.assign({ id: genCode(), created: getLocalTodayYMD() }, data);
+    stampLabStatus(o);
+    labOrders.push(o);
+  }
+  saveLab();
+  closeOv('laboFormOverlay');
+  renderLab();
+}
+
+function exportLabCSV(){
+  const rows = labOrders.map(o => [o.patient, o.work, o.teeth, o.shade, o.lab, o.sent, o.due, o.receivedDate || '', o.deliveredDate || '',
+    o.cost === '' || o.cost == null ? '' : num2(o.cost).toFixed(2), LAB_STATUS[o.status] ? LAB_STATUS[o.status].en : o.status, o.note]);
+  downloadCSV(`Kep_Dental_Lab_${fileStamp()}.csv`,
+    ['Patient','Work','Teeth','Shade','Lab','Sent','Due','Received','Delivered','Cost ($)','Status','Note'], rows);
+}
+
+/* ---------------- INVENTORY ---------------- */
+const INV_KEY = 'kep_dental_inventory_v1';
+const INV_EXPIRY_WARN_DAYS = 60;
+const INV_LOG_LIMIT = 60;
+const INV_CATEGORIES = [
+  ['Anesthetic',  'ថ្នាំស្ពឹក (Anesthetic)'],
+  ['Restorative', 'ប៉ះធ្មេញ (Restorative)'],
+  ['Endodontic',  'ព្យាបាលធ្មេញ (Endo)'],
+  ['Consumable',  'សម្ភារៈប្រើប្រាស់ (Consumables)'],
+  ['Instrument',  'ឧបករណ៍ (Instruments)'],
+  ['Medication',  'ថ្នាំ (Medication)'],
+  ['Other',       'ផ្សេងៗ (Other)']
+];
+const INV_NAME_HINTS = ['Lidocaine 2% cartridge','Articaine 4% cartridge','Composite A2','Composite A3','GIC (Glass ionomer)','Amalgam capsule',
+  'Bonding agent','Etchant gel','Gutta-percha points','Paper points','K-file / H-file','Sodium hypochlorite (NaOCl)','Calcium hydroxide',
+  'Sealant','Fluoride varnish','Prophy paste','Alginate','Suture','Disposable gloves','Face masks','Disposable syringes','Dental needles',
+  'Cotton rolls','Gauze','Saliva ejectors','Disposable bibs','Disinfectant','Sterilization pouches'];
+const INV_UNIT_HINTS = ['ប្រអប់','កញ្ចប់','ដប','បំពង់','ដុំ','កាទ្រីច','គូ','box','pack','bottle','tube','pcs','cartridge'];
+let invItems = [], invFilter = 'all', invSearchTerm = '', editingInvId = null, adjustCtx = null;
+
+function loadInventory(){ try{ const a = JSON.parse(localStorage.getItem(INV_KEY) || '[]'); invItems = Array.isArray(a) ? a : []; }catch(e){ invItems = []; } }
+function saveInventory(){ try{ localStorage.setItem(INV_KEY, JSON.stringify(invItems)); }catch(e){} }
+function invCatName(key){ const c = INV_CATEGORIES.find(x => x[0] === key); return c ? c[1] : key; }
+function invFlags(it){
+  const f = [], q = num2(it.qty), m = num2(it.min);
+  if(q <= 0) f.push('out'); else if(m > 0 && q <= m) f.push('low');
+  const d = daysUntil(it.expiry);
+  if(d !== null){ if(d < 0) f.push('expired'); else if(d <= INV_EXPIRY_WARN_DAYS) f.push('expiring'); }
+  return f;
+}
+function invSeverity(f){ return (f.includes('out') || f.includes('expired')) ? 2 : (f.length ? 1 : 0); }
+function invLogPush(it, type, qty, note, date){
+  it.log = (it.log || []).concat([{ d: date || getLocalTodayYMD(), t: type, q: num2(qty), bal: num2(it.qty), n: note || '' }]).slice(-INV_LOG_LIMIT);
+}
+
+function renderInventory(){
+  const q = invSearchTerm.trim().toLowerCase();
+  const base = (q ? invItems.filter(it => [it.name, it.note, invCatName(it.category), it.unit].join(' ').toLowerCase().includes(q)) : invItems.slice())
+    .map(it => ({ it, f: invFlags(it) }));
+
+  const has = (r, k) => k === 'expiry' ? (r.f.includes('expired') || r.f.includes('expiring')) : r.f.includes(k);
+  const counts = { all: base.length, low: 0, out: 0, expiry: 0 };
+  base.forEach(r => { ['low', 'out', 'expiry'].forEach(k => { if(has(r, k)) counts[k]++; }); });
+  document.querySelectorAll('#invFilters .chip').forEach(ch => {
+    ch.querySelector('.chip-n').textContent = counts[ch.dataset.filter];
+    ch.setAttribute('aria-pressed', ch.dataset.filter === invFilter ? 'true' : 'false');
+  });
+
+  const all = invItems.map(invFlags);
+  el('invStats').innerHTML = statCardsHTML([
+    { kh: 'បរិក្ខាសរុប', en: 'Items', val: invItems.length, cls: 'highlight' },
+    { kh: 'ជិតអស់', en: 'Low stock', val: all.filter(f => f.includes('low')).length, cls: 'amber' },
+    { kh: 'អស់ស្តុក', en: 'Out of stock', val: all.filter(f => f.includes('out')).length, cls: 'debt' },
+    { kh: 'ផុត / ជិតផុតកំណត់', en: 'Expired / expiring', val: all.filter(f => f.includes('expired') || f.includes('expiring')).length, cls: 'amber' }
+  ]);
+
+  const shown = base.filter(r => invFilter === 'all' ? true : has(r, invFilter));
+  shown.sort((a, b) => invSeverity(b.f) - invSeverity(a.f) || String(a.it.name).localeCompare(String(b.it.name)));
+
+  el('invTableBody').innerHTML = shown.map(({ it, f }) => {
+    const d = daysUntil(it.expiry);
+    const badges = [];
+    if(f.includes('out')) badges.push('<span class="badge-mini out kh">អស់ស្តុក</span>');
+    if(f.includes('low')) badges.push('<span class="badge-mini low kh">ជិតអស់</span>');
+    if(f.includes('expired')) badges.push('<span class="badge-mini expired kh">ផុតកំណត់</span>');
+    if(f.includes('expiring')) badges.push(`<span class="badge-mini expiring kh">ជិតផុត ${d} ថ្ងៃ</span>`);
+    if(!badges.length) badges.push('<span class="badge-mini ok">OK</span>');
+    const expCls = f.includes('expired') ? 'is-bad' : f.includes('expiring') ? 'is-warn' : '';
+    const m = num2(it.min);
+    return `<tr class="emr-tr" data-id="${it.id}">
+      <td data-label="បរិក្ខា"><div class="kh" style="font-weight:700;">${escHTML(it.name)}</div>${it.note ? `<div class="cell-sub kh">${escHTML(it.note)}</div>` : ''}</td>
+      <td data-label="ប្រភេទ" class="kh" style="font-size:12px;">${escHTML(invCatName(it.category))}</td>
+      <td data-label="ក្នុងស្តុក"><span class="qty-big">${num2(it.qty)}</span> <span class="kh cell-sub">${escHTML(it.unit || '')}</span></td>
+      <td data-label="អប្បបរមា" class="mono">${m > 0 ? m : '—'}</td>
+      <td data-label="ផុតកំណត់" class="mono ${expCls}" style="font-size:12px;">${fmtYMD(it.expiry)}</td>
+      <td data-label="ស្ថានភាព">${badges.join('')}</td>
+      <td><div class="row-actions">
+        <button type="button" class="icon-btn" data-act="in" title="ស្តុកចូល Stock in">＋</button>
+        <button type="button" class="icon-btn" data-act="out" title="ប្រើចេញ Use">−</button>
+        <button type="button" class="icon-btn" data-act="history" title="ប្រវត្តិ History">🕘</button>
+        <button type="button" class="icon-btn" data-act="edit" title="កែប្រែ Edit">✎</button>
+        <button type="button" class="icon-btn danger" data-act="del" title="លុប Delete">✕</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+
+  const empty = el('invEmpty');
+  if(shown.length === 0){
+    empty.innerHTML = invItems.length === 0
+      ? 'មិនទាន់មានបរិក្ខាក្នុងឃ្លាំងទេ ចុច “＋ បន្ថែមបរិក្ខា” ដើម្បីចាប់ផ្តើម<br><span style="opacity:.7">No items in stock yet</span>'
+      : 'មិនមានបរិក្ខាត្រូវនឹងលក្ខខណ្ឌនេះទេ<br><span style="opacity:.7">No items match this filter</span>';
+    empty.classList.remove('hidden');
+  } else empty.classList.add('hidden');
+
+  updateOpsBadges();
+}
+
+function openInvForm(id){
+  editingInvId = id || null;
+  const it = id ? invItems.find(x => x.id === id) : null;
+  el('invFormTitle').textContent = it ? '📦 កែប្រែបរិក្ខា' : '📦 បន្ថែមបរិក្ខា';
+  fillDatalist('inv_name_list', INV_NAME_HINTS.concat(invItems.map(x => x.name)));
+  el('inv_name').value = it ? it.name : '';
+  el('inv_cat').value = it ? it.category : 'Consumable';
+  el('inv_unit').value = it ? (it.unit || '') : '';
+  el('inv_qty').value = it ? num2(it.qty) : '';
+  el('inv_min').value = it && num2(it.min) > 0 ? num2(it.min) : '';
+  el('inv_expiry').value = it ? (it.expiry || '') : '';
+  el('inv_note').value = it ? (it.note || '') : '';
+  showFormError('invFormError', '');
+  openOv('invFormOverlay');
+  el('inv_name').focus();
+}
+
+function saveInvForm(){
+  const name = el('inv_name').value.trim();
+  const qtyRaw = el('inv_qty').value, minRaw = el('inv_min').value;
+  if(!name){ showFormError('invFormError', 'សូមបញ្ចូលឈ្មោះបរិក្ខា'); return; }
+  if(qtyRaw !== '' && (isNaN(parseFloat(qtyRaw)) || parseFloat(qtyRaw) < 0)){ showFormError('invFormError', 'ចំនួនមិនត្រឹមត្រូវ'); return; }
+  if(minRaw !== '' && (isNaN(parseFloat(minRaw)) || parseFloat(minRaw) < 0)){ showFormError('invFormError', 'កម្រិតអប្បបរមាមិនត្រឹមត្រូវ'); return; }
+  const dup = invItems.find(x => x.id !== editingInvId && x.name.trim().toLowerCase() === name.toLowerCase());
+  if(dup){ showFormError('invFormError', 'មានបរិក្ខាឈ្មោះនេះរួចហើយ សូមប្រើ ＋ / − ដើម្បីកែចំនួន'); return; }
+
+  const qty = num2(qtyRaw), min = num2(minRaw);
+  const base = { name, category: el('inv_cat').value, unit: el('inv_unit').value.trim(), min, expiry: el('inv_expiry').value, note: el('inv_note').value.trim() };
+  if(editingInvId){
+    const it = invItems.find(x => x.id === editingInvId);
+    if(it){
+      const before = num2(it.qty);
+      Object.assign(it, base);
+      if(qty !== before){ it.qty = qty; invLogPush(it, 'set', qty - before, 'កែតម្រូវចំនួន'); }
+    }
+  } else {
+    const it = Object.assign({ id: genCode(), qty, log: [] }, base);
+    if(qty > 0) invLogPush(it, 'in', qty, 'ស្តុកដំបូង');
+    invItems.push(it);
+  }
+  saveInventory();
+  closeOv('invFormOverlay');
+  renderInventory();
+}
+
+function openInvAdjust(id, type){
+  const it = invItems.find(x => x.id === id); if(!it) return;
+  adjustCtx = { id, type };
+  el('invAdjustTitle').textContent = type === 'in' ? '＋ ស្តុកចូល · Stock in' : '− ប្រើចេញ · Use';
+  el('invAdjustItem').textContent = it.name;
+  el('invAdjustCur').textContent = `ក្នុងស្តុកឥឡូវ៖ ${num2(it.qty)} ${it.unit || ''}`;
+  el('adj_qty').value = '';
+  el('adj_date').value = getLocalTodayYMD();
+  el('adj_note').value = '';
+  showFormError('invAdjustError', '');
+  openOv('invAdjustOverlay');
+  el('adj_qty').focus();
+}
+
+function saveInvAdjust(){
+  if(!adjustCtx) return;
+  const it = invItems.find(x => x.id === adjustCtx.id); if(!it) return;
+  const qty = parseFloat(el('adj_qty').value);
+  if(isNaN(qty) || qty <= 0){ showFormError('invAdjustError', 'សូមបញ្ចូលចំនួនឱ្យបានត្រឹមត្រូវ'); return; }
+  if(adjustCtx.type === 'out' && qty > num2(it.qty)){ showFormError('invAdjustError', `ចំនួនប្រើច្រើនជាងស្តុក (មាន ${num2(it.qty)} ${it.unit || ''})`); return; }
+  it.qty = num2(num2(it.qty) + (adjustCtx.type === 'in' ? qty : -qty));
+  invLogPush(it, adjustCtx.type, qty, el('adj_note').value.trim(), el('adj_date').value);
+  saveInventory();
+  closeOv('invAdjustOverlay');
+  adjustCtx = null;
+  renderInventory();
+}
+
+function openInvHistory(id){
+  const it = invItems.find(x => x.id === id); if(!it) return;
+  el('invHistoryTitle').textContent = '🕘 ' + it.name;
+  const log = (it.log || []).slice().reverse();
+  const typeBadge = t => t === 'in' ? '<span class="badge-mini in kh">＋ ចូល</span>' : t === 'out' ? '<span class="badge-mini out kh">− ចេញ</span>' : '<span class="badge-mini set kh">✎ កែ</span>';
+  el('invHistoryBody').innerHTML = log.length ? `
+    <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+      <table class="med-table" style="width:100%;margin:0;">
+        <thead><tr><th>ថ្ងៃ</th><th>ប្រភេទ</th><th style="text-align:right;">ចំនួន</th><th style="text-align:right;">សល់</th><th>ចំណាំ</th></tr></thead>
+        <tbody>${log.map(l => `<tr>
+          <td class="mono" style="font-size:11.5px;">${fmtYMD(l.d)}</td>
+          <td>${typeBadge(l.t)}</td>
+          <td class="mono" style="text-align:right;">${l.t === 'set' && l.q > 0 ? '+' : ''}${l.q}</td>
+          <td class="mono" style="text-align:right;font-weight:700;">${l.bal}</td>
+          <td class="kh" style="font-size:12px;">${escHTML(l.n) || '—'}</td></tr>`).join('')}</tbody>
+      </table>
+    </div>
+    <div class="cell-sub kh" style="margin-top:8px;">បង្ហាញចលនា ${INV_LOG_LIMIT} ចុងក្រោយ</div>`
+    : '<div class="empty-state kh" style="padding:24px;">មិនទាន់មានចលនាស្តុកទេ</div>';
+  openOv('invHistoryOverlay');
+}
+
+function exportInvCSV(){
+  const rows = invItems.map(it => [it.name, invCatName(it.category), num2(it.qty), it.unit, num2(it.min) || '', it.expiry || '',
+    invFlags(it).join(' / ') || 'OK', it.note]);
+  downloadCSV(`Kep_Dental_Inventory_${fileStamp()}.csv`, ['Item','Category','Quantity','Unit','Min level','Expiry','Alert','Note'], rows);
+}
+
+/* sidebar badges for the two pages */
+function updateOpsBadges(){
+  const open = labOrders.filter(o => o.status !== 'delivered').length;
+  setBadge('nbLabo', open, labOrders.some(labOverdue));
+  const flags = invItems.map(invFlags);
+  setBadge('nbInventory', flags.filter(f => f.length).length, flags.some(f => f.includes('out') || f.includes('expired')));
+}
+
+(function initOps(){
+  loadLab(); loadInventory();
+
+  el('lab_status').innerHTML = Object.keys(LAB_STATUS).map(k => `<option value="${k}">${LAB_STATUS[k].en} · ${LAB_STATUS[k].kh}</option>`).join('');
+  el('inv_cat').innerHTML = INV_CATEGORIES.map(c => `<option value="${c[0]}">${c[1]}</option>`).join('');
+  fillDatalist('inv_unit_list', INV_UNIT_HINTS);
+
+  /* Labo */
+  el('laboAddBtn').addEventListener('click', () => openLabForm());
+  el('laboExportBtn').addEventListener('click', exportLabCSV);
+  el('laboSearch').addEventListener('input', e => { labSearchTerm = e.target.value; renderLab(); });
+  document.querySelectorAll('#laboFilters .chip').forEach(ch => ch.addEventListener('click', () => { labFilter = ch.dataset.filter; renderLab(); }));
+  el('labFormSave').addEventListener('click', saveLabForm);
+  el('labFormCancel').addEventListener('click', () => closeOv('laboFormOverlay'));
+  el('laboFormClose').addEventListener('click', () => closeOv('laboFormOverlay'));
+  el('laboFormOverlay').addEventListener('click', e => { if(e.target.id === 'laboFormOverlay') closeOv('laboFormOverlay'); });
+
+  el('laboTableBody').addEventListener('click', e => {
+    if(e.target.closest('select')) return;
+    const row = e.target.closest('tr[data-id]'); if(!row) return;
+    const id = row.dataset.id;
+    const actEl = e.target.closest('[data-act]');
+    const act = actEl ? actEl.dataset.act : 'edit';
+    if(act === 'open'){ openPatientRecord(decodeURIComponent(actEl.dataset.name)); return; }
+    if(act === 'del'){
+      const o = labOrders.find(x => x.id === id); if(!o) return;
+      showConfirm(`តើអ្នកពិតជាចង់លុបបញ្ជា Labo នេះមែនទេ?\n${o.patient} · ${o.work}`, () => {
+        labOrders = labOrders.filter(x => x.id !== id); saveLab(); renderLab();
+      });
+      return;
+    }
+    openLabForm(id);
+  });
+  el('laboTableBody').addEventListener('change', e => {
+    const sel = e.target.closest('select[data-act="status"]'); if(!sel) return;
+    const o = labOrders.find(x => x.id === sel.closest('tr').dataset.id); if(!o) return;
+    o.status = sel.value; stampLabStatus(o); saveLab(); renderLab();
+  });
+
+  /* Inventory */
+  el('invAddBtn').addEventListener('click', () => openInvForm());
+  el('invExportBtn').addEventListener('click', exportInvCSV);
+  el('invSearch').addEventListener('input', e => { invSearchTerm = e.target.value; renderInventory(); });
+  document.querySelectorAll('#invFilters .chip').forEach(ch => ch.addEventListener('click', () => { invFilter = ch.dataset.filter; renderInventory(); }));
+  el('invFormSave').addEventListener('click', saveInvForm);
+  el('invFormCancel').addEventListener('click', () => closeOv('invFormOverlay'));
+  el('invFormClose').addEventListener('click', () => closeOv('invFormOverlay'));
+  el('invFormOverlay').addEventListener('click', e => { if(e.target.id === 'invFormOverlay') closeOv('invFormOverlay'); });
+  el('invAdjustSave').addEventListener('click', saveInvAdjust);
+  el('adj_qty').addEventListener('keydown', e => { if(e.key === 'Enter') saveInvAdjust(); });
+  el('invAdjustCancel').addEventListener('click', () => closeOv('invAdjustOverlay'));
+  el('invAdjustClose').addEventListener('click', () => closeOv('invAdjustOverlay'));
+  el('invAdjustOverlay').addEventListener('click', e => { if(e.target.id === 'invAdjustOverlay') closeOv('invAdjustOverlay'); });
+  el('invHistoryClose').addEventListener('click', () => closeOv('invHistoryOverlay'));
+  el('invHistoryOverlay').addEventListener('click', e => { if(e.target.id === 'invHistoryOverlay') closeOv('invHistoryOverlay'); });
+
+  el('invTableBody').addEventListener('click', e => {
+    const row = e.target.closest('tr[data-id]'); if(!row) return;
+    const id = row.dataset.id;
+    const actEl = e.target.closest('[data-act]');
+    const act = actEl ? actEl.dataset.act : 'edit';
+    if(act === 'in' || act === 'out'){ openInvAdjust(id, act); return; }
+    if(act === 'history'){ openInvHistory(id); return; }
+    if(act === 'del'){
+      const it = invItems.find(x => x.id === id); if(!it) return;
+      showConfirm(`តើអ្នកពិតជាចង់លុបបរិក្ខានេះមែនទេ?\n${it.name}`, () => {
+        invItems = invItems.filter(x => x.id !== id); saveInventory(); renderInventory();
+      });
+      return;
+    }
+    openInvForm(id);
+  });
+
+  renderLab(); renderInventory();
 })();
 
 let storedUrl = localStorage.getItem('kep_dental_webapp_url');
