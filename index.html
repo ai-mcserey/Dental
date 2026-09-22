@@ -9,21 +9,21 @@
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+Khmer:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#EAF6F3; --surface:#FFFFFF; --surface-2:#F3FBF9;
-    --border:#D9EDE8; --border-soft:#E8F4F1;
-    --ink:#0B3B36; --ink-soft:#4C6864; --ink-dim:#8AA6A2;
-    --primary:#0E9384; --primary-dark:#0B7267; --primary-soft:#D8F3EE; --primary-softer:#EDFAF7;
-    --amber:#E8A33D; --amber-soft:#FBEBD2; --amber-dark:#8A5C16;
+    --bg:#F4FAF6; --surface:#FFFFFF; --surface-2:#EEF8F1;
+    --border:#D8ECDF; --border-soft:#E8F5EC;
+    --ink:#17301F; --ink-soft:#4C6B57; --ink-dim:#8FA99B;
+    --primary:#2F9765; --primary-dark:#21714B; --primary-soft:#D9F0E1; --primary-softer:#EDF8F1;
+    --amber:#F0A202; --amber-soft:#FBEAC0; --amber-dark:#8A5C06;
     --coral:#E4574C; --coral-soft:#FBE1DE; --coral-dark:#A43227;
-    --shadow:0 12px 30px -16px rgba(11,59,54,0.18);
-    --shadow-sm:0 4px 14px -8px rgba(11,59,54,0.16);
+    --shadow:0 12px 30px -16px rgba(23,48,31,0.18);
+    --shadow-sm:0 4px 14px -8px rgba(23,48,31,0.16);
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
     background:
-      radial-gradient(1000px 460px at 8% -8%, rgba(14,147,132,0.08), transparent 55%),
-      radial-gradient(800px 400px at 105% 0%, rgba(232,163,61,0.07), transparent 55%),
+      radial-gradient(1000px 460px at 8% -8%, rgba(33,113,75,0.08), transparent 55%),
+      radial-gradient(800px 400px at 105% 0%, rgba(240,162,2,0.07), transparent 55%),
       var(--bg);
     color:var(--ink);
     font-family:'Inter','Noto Sans Khmer',sans-serif;
@@ -66,7 +66,7 @@
 
   .btn{border:none;cursor:pointer;font-weight:600;font-size:13.5px;padding:9px 15px;border-radius:9px;display:inline-flex;align-items:center;gap:7px;transition:all .13s ease;}
   .btn:active{transform:translateY(1px);}
-  .btn-primary{background:var(--primary);color:#fff;box-shadow:0 6px 16px -6px rgba(14,147,132,0.5);}
+  .btn-primary{background:var(--primary);color:#fff;box-shadow:0 6px 16px -6px rgba(33,113,75,0.5);}
   .btn-primary:hover{background:var(--primary-dark);}
   .btn-outline{background:var(--surface);color:var(--ink);border:1.5px solid var(--border);}
   .btn-outline:hover{border-color:var(--primary);background:var(--primary-softer);}
@@ -168,7 +168,7 @@
     max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     font-size: 11px; font-weight: 700; padding: 4px 9px; border-radius: 7px;
     background: var(--amber-soft); color: var(--amber-dark);
-    border: 1px solid rgba(232,163,61,0.4); text-align: right; flex-shrink: 0;
+    border: 1px solid rgba(240,162,2,0.4); text-align: right; flex-shrink: 0;
   }
 
   @media (max-width: 640px) {
@@ -226,8 +226,8 @@
 
   .record-card.has-active-appt {
     border: 1.8px solid var(--amber) !important;
-    background: linear-gradient(90deg, rgba(232,163,61,0.08) 0%, var(--surface) 40%) !important;
-    box-shadow: 0 4px 14px -6px rgba(232,163,61,0.35) !important;
+    background: linear-gradient(90deg, rgba(240,162,2,0.08) 0%, var(--surface) 40%) !important;
+    box-shadow: 0 4px 14px -6px rgba(240,162,2,0.35) !important;
   }
   .record-card.has-active-appt .appt-time .mono,
   .record-card.has-active-appt .appt-day {
@@ -286,7 +286,7 @@
   .xray-item:hover {
     transform: translateY(-3px);
     border-color: var(--primary);
-    box-shadow: 0 6px 14px -6px rgba(14,147,132,0.4);
+    box-shadow: 0 6px 14px -6px rgba(33,113,75,0.4);
   }
   .xray-item img {
     width: 100%;
@@ -379,14 +379,14 @@
   }
   .tooth-cell.primary-tooth {
     height: 26px; font-size: 10px;
-    background: var(--amber-soft); border-color: rgba(232,163,61,0.3); color: var(--amber-dark);
+    background: var(--amber-soft); border-color: rgba(240,162,2,0.3); color: var(--amber-dark);
   }
   .tooth-cell.invisible { visibility: hidden; pointer-events: none; border: none; background: transparent; }
   .tooth-cell:hover:not(.invisible) { border-color: var(--primary); transform: scale(1.15); z-index: 2; box-shadow: var(--shadow-sm); }
   .tooth-cell.treated {
     background: var(--primary) !important; border-color: var(--primary-dark) !important;
     color: #fff !important; font-weight: 800 !important;
-    box-shadow: 0 4px 10px -3px rgba(14,147,132,0.4); transform: translateY(-2px);
+    box-shadow: 0 4px 10px -3px rgba(33,113,75,0.4); transform: translateY(-2px);
   }
   .tooth-cell.treated:hover:not(.invisible) { transform: scale(1.15) translateY(-2px); background: var(--primary-dark) !important; }
   .arch-label { font-size: 10.5px; text-align: center; color: var(--ink-dim); letter-spacing: .05em; text-transform: uppercase; margin: 10px 0; font-weight: 800; }
@@ -462,20 +462,20 @@
   .cfg-tab-content.active{display:block;}
 
   /* print sheets A4 */
-  .print-sheet{background:#fff;color:#1A2E2B;font-family:'Inter',sans-serif;padding:8mm 2mm;}
+  .print-sheet{background:#fff;color:#17301F;font-family:'Inter',sans-serif;padding:8mm 2mm;}
   .ps-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;border-bottom:2.5px solid var(--primary);padding-bottom:14px;margin-bottom:20px;}
   .ps-clinic{font-family:'Sora',sans-serif;font-size:22px;font-weight:700;color:var(--primary-dark);}
   .ps-sub{font-size:11.5px;color:#6B827F;margin-top:4px;}
   .ps-tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--primary-dark);background:var(--primary-soft);padding:5px 13px;border-radius:999px;}
   .ps-head-right{text-align:right;}
-  .ps-printed{font-size:10.5px;color:#8AA6A2;margin-top:6px;}
+  .ps-printed{font-size:10.5px;color:#8FA99B;margin-top:6px;}
   .ps-info-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px 22px;margin:6px 0 18px;}
-  .ps-info-item .k{font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:#8AA6A2;font-weight:700;}
-  .ps-info-item .v{font-size:13.5px;color:#1A2E2B;margin-top:3px;font-weight:600;}
+  .ps-info-item .k{font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:#8FA99B;font-weight:700;}
+  .ps-info-item .v{font-size:13.5px;color:#17301F;margin-top:3px;font-weight:600;}
   .ps-section-title{font-size:13px;font-weight:700;color:var(--primary-dark);margin:22px 0 10px;padding-bottom:6px;border-bottom:1px solid #E1EEEC;}
-  .ps-foot{text-align:center;font-size:11px;color:#8AA6A2;margin-top:20px;}
+  .ps-foot{text-align:center;font-size:11px;color:#8FA99B;margin-top:20px;}
   .ps-visit-table{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:4px;}
-  .ps-visit-table th{text-align:left;font-size:9.5px;text-transform:uppercase;letter-spacing:.04em;color:#8AA6A2;padding:6px 8px;border-bottom:1.5px solid #1A2E2B;}
+  .ps-visit-table th{text-align:left;font-size:9.5px;text-transform:uppercase;letter-spacing:.04em;color:#8FA99B;padding:6px 8px;border-bottom:1.5px solid #17301F;}
   .ps-visit-table td{padding:6px 8px;border-bottom:1px solid #E9F1F0;color:#33504C;}
   .ps-visit-table td.mono, .ps-visit-table th.mono{font-family:'IBM Plex Mono',monospace;}
 
@@ -547,8 +547,8 @@
      ===================================================================== */
   :root{
     --sb-w:264px; --sb-w-min:76px;
-    --sb-bg:#0B3B36; --sb-ink:#D6ECE8; --sb-dim:#86A8A2;
-    --sb-line:rgba(255,255,255,.09); --sb-hover:rgba(255,255,255,.07); --sb-active:rgba(255,255,255,.13);
+    --sb-bg:#123322; --sb-ink:#E3F2E8; --sb-dim:#8FB39D;
+    --sb-line:rgba(255,255,255,.09); --sb-hover:rgba(255,255,255,.07); --sb-active:rgba(240,162,2,.22);
   }
   .sidebar{
     position:fixed; top:0; left:0; bottom:0; width:var(--sb-w); z-index:50;
@@ -735,13 +735,13 @@
   .icon-btn:hover{ border-color:var(--primary); color:var(--ink); background:var(--primary-softer); }
   .icon-btn.danger:hover{ border-color:#f5b5af; background:var(--coral-soft); color:var(--coral-dark); }
   .icon-btn:focus-visible{ outline:2px solid var(--primary); outline-offset:2px; }
-  .pt-link{ color:var(--primary-dark); cursor:pointer; font-weight:700; text-decoration:underline; text-decoration-color:rgba(14,147,132,.35); text-underline-offset:3px; }
+  .pt-link{ color:var(--primary-dark); cursor:pointer; font-weight:700; text-decoration:underline; text-decoration-color:rgba(33,113,75,.35); text-underline-offset:3px; }
   .qty-big{ font-family:'IBM Plex Mono',monospace; font-weight:800; font-size:15px; color:var(--ink); }
   .form-error{ color:var(--coral-dark); background:var(--coral-soft); border:1px solid #f5b5af; border-radius:8px; padding:8px 10px; font-size:12px; margin-top:12px; }
 
   .st-select{ font-family:inherit; font-size:11.5px; font-weight:700; padding:5px 8px; border-radius:7px; border:1px solid; cursor:pointer; max-width:100%; }
   .st-select.st-sent{ background:#DBEAFE; color:#1D4ED8; border-color:#1D4ED840; }
-  .st-select.st-received{ background:var(--amber-soft); color:var(--amber-dark); border-color:rgba(232,163,61,.5); }
+  .st-select.st-received{ background:var(--amber-soft); color:var(--amber-dark); border-color:rgba(240,162,2,.5); }
   .st-select.st-delivered{ background:#E0F2E9; color:#198754; border-color:#19875440; }
 
   .badge-mini{ display:inline-block; font-size:10.5px; font-weight:700; padding:2px 8px; border-radius:6px; margin:2px 4px 2px 0; white-space:nowrap; }
@@ -1715,7 +1715,7 @@ let allRecords = [];
 let clinicInfo = {name:'KEP Dental Clinic', address:'Kep, Cambodia', phone:''};
 let printContext = { type: null, record: null }; 
 
-const DEFAULT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbwq5olqv4Jn7bstMU4ZBlZJ_xspxcdHUfeSQrMWuHr3XdaDivkR3ioB8JWU_SBCCxFRtA/exec';
+const DEFAULT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbztTTq5JA_XdhgWNyEbZNTXfAPVFARZVslWT0tV4p_PTo0XbHEALditA2abzZCZKhmx9Q/exec';
 let webAppUrl = DEFAULT_WEB_APP_URL;
 
 localStorage.setItem('kep_dental_webapp_url', webAppUrl);
@@ -2253,6 +2253,26 @@ async function fetchFromSheet(isSilent = false){
       
       saveLocalRecords();
       renderAll();
+
+      if(Array.isArray(json.labo)){
+        labOrders = json.labo.map(o => ({
+          ...o,
+          cost: (o.cost === '' || o.cost == null) ? '' : num2(o.cost)
+        }));
+        saveLab();
+      }
+      if(Array.isArray(json.inventory)){
+        invItems = json.inventory.map(it => ({
+          ...it,
+          qty: num2(it.qty),
+          min: (it.min === '' || it.min == null) ? '' : num2(it.min),
+          log: Array.isArray(it.log) ? it.log : []
+        }));
+        saveInventory();
+      }
+      if(typeof renderLab === 'function') renderLab();
+      if(typeof renderInventory === 'function') renderInventory();
+
       badge.textContent = '✓ Sync ជោគជ័យ';
       setTimeout(()=>{ badge.textContent = '🔄 Sync'; }, 2500);
     }
@@ -2373,7 +2393,7 @@ function renderProcRow(item){
         <div class="appt-name kh">${r.name}</div>
         <div class="appt-meta">${formatPhoneDisplay(r.phone)||'គ្មានលេខ'} · <span class="kh">${r.treatment||r.diagnosis||'—'}</span></div>
       </div>
-      <div class="appt-plan-badge kh" style="background:var(--primary-soft);color:var(--primary-dark);border-color:rgba(14,147,132,0.4);" title="Procedure: ${planText}">
+      <div class="appt-plan-badge kh" style="background:var(--primary-soft);color:var(--primary-dark);border-color:rgba(33,113,75,0.4);" title="Procedure: ${planText}">
         📋 ${planText}
       </div>
     </div>`;
@@ -2603,7 +2623,7 @@ function renderListBase(){
     } else if (stateKey === 'planning') {
         badgeStyle = 'background:#EDE9FE; color:#6D28D9; border-color:rgba(109,40,217,0.4);';
     } else {
-        badgeStyle = 'background:var(--primary-soft); color:var(--primary-dark); border-color:rgba(14,147,132,0.4);';
+        badgeStyle = 'background:var(--primary-soft); color:var(--primary-dark); border-color:rgba(33,113,75,0.4);';
     }
 
     return `
@@ -4713,17 +4733,20 @@ function saveLabForm(){
     patient, work, lab: el('lab_lab').value.trim(), teeth: el('lab_teeth').value.trim(), shade: el('lab_shade').value.trim(),
     sent, due, cost: costRaw === '' ? '' : num2(costRaw), status: el('lab_status').value, note: el('lab_note').value.trim()
   };
+  let savedOrder = null;
   if(editingLabId){
     const o = labOrders.find(x => x.id === editingLabId);
-    if(o){ const prev = o.status; Object.assign(o, data); if(prev !== o.status) stampLabStatus(o); }
+    if(o){ const prev = o.status; Object.assign(o, data); if(prev !== o.status) stampLabStatus(o); savedOrder = o; }
   } else {
     const o = Object.assign({ id: genCode(), created: getLocalTodayYMD() }, data);
     stampLabStatus(o);
     labOrders.push(o);
+    savedOrder = o;
   }
   saveLab();
   closeOv('laboFormOverlay');
   renderLab();
+  if(savedOrder) pushToSheet(editingLabId ? 'updateLabo' : 'addLabo', savedOrder);
 }
 
 function exportLabCSV(){
@@ -4858,21 +4881,25 @@ function saveInvForm(){
 
   const qty = num2(qtyRaw), min = num2(minRaw);
   const base = { name, category: el('inv_cat').value, unit: el('inv_unit').value.trim(), min, expiry: el('inv_expiry').value, note: el('inv_note').value.trim() };
+  let savedItem = null;
   if(editingInvId){
     const it = invItems.find(x => x.id === editingInvId);
     if(it){
       const before = num2(it.qty);
       Object.assign(it, base);
       if(qty !== before){ it.qty = qty; invLogPush(it, 'set', qty - before, 'កែតម្រូវចំនួន'); }
+      savedItem = it;
     }
   } else {
     const it = Object.assign({ id: genCode(), qty, log: [] }, base);
     if(qty > 0) invLogPush(it, 'in', qty, 'ស្តុកដំបូង');
     invItems.push(it);
+    savedItem = it;
   }
   saveInventory();
   closeOv('invFormOverlay');
   renderInventory();
+  if(savedItem) pushToSheet(editingInvId ? 'updateInv' : 'addInv', savedItem);
 }
 
 function openInvAdjust(id, type){
@@ -4901,6 +4928,7 @@ function saveInvAdjust(){
   closeOv('invAdjustOverlay');
   adjustCtx = null;
   renderInventory();
+  pushToSheet('updateInv', it);
 }
 
 function openInvHistory(id){
@@ -4967,6 +4995,7 @@ function updateOpsBadges(){
       const o = labOrders.find(x => x.id === id); if(!o) return;
       showConfirm(`តើអ្នកពិតជាចង់លុបបញ្ជា Labo នេះមែនទេ?\n${o.patient} · ${o.work}`, () => {
         labOrders = labOrders.filter(x => x.id !== id); saveLab(); renderLab();
+        pushToSheet('deleteLabo', { id });
       });
       return;
     }
@@ -4976,6 +5005,7 @@ function updateOpsBadges(){
     const sel = e.target.closest('select[data-act="status"]'); if(!sel) return;
     const o = labOrders.find(x => x.id === sel.closest('tr').dataset.id); if(!o) return;
     o.status = sel.value; stampLabStatus(o); saveLab(); renderLab();
+    pushToSheet('updateLabo', o);
   });
 
   /* Inventory */
@@ -5006,6 +5036,7 @@ function updateOpsBadges(){
       const it = invItems.find(x => x.id === id); if(!it) return;
       showConfirm(`តើអ្នកពិតជាចង់លុបបរិក្ខានេះមែនទេ?\n${it.name}`, () => {
         invItems = invItems.filter(x => x.id !== id); saveInventory(); renderInventory();
+        pushToSheet('deleteInv', { id });
       });
       return;
     }
