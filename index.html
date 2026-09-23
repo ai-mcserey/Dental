@@ -411,6 +411,14 @@
 
   /* Form */
   .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .form-tab-btn{
+    padding:9px 16px; border:none; background:transparent; cursor:pointer;
+    font-size:13px; font-weight:700; color:var(--ink-dim);
+    border-bottom:3px solid transparent; margin-bottom:-1.5px;
+    transition:color .12s ease, border-color .12s ease;
+  }
+  .form-tab-btn:hover{ color:var(--ink-soft); }
+  .form-tab-btn.active{ color:var(--primary-dark); border-bottom-color:var(--primary); }
   .form-grid .full{grid-column:1/-1;}
   .field label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-dim);margin-bottom:5px;}
   .field input,.field select,.field textarea{width:100%;background:var(--surface);border:1.5px solid var(--border);color:var(--ink);border-radius:9px;padding:9px 11px;font-size:13.5px;font-family:inherit;}
@@ -801,9 +809,9 @@
     <nav class="sb-nav">
       <div class="sb-section">
         <div class="sb-group kh">ទូទៅ</div>
-        <button type="button" class="sb-item" data-nav="dashboard" title="ផ្ទាំងគ្រប់គ្រង · Dashboard">
+        <button type="button" class="sb-item" data-nav="dashboard" title="ផ្ទាំងសរុប · Dashboard">
           <span class="sb-ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg></span>
-          <span class="sb-label"><span class="sb-kh">ផ្ទាំងគ្រប់គ្រង</span><span class="sb-en">Dashboard</span></span>
+          <span class="sb-label"><span class="sb-kh">ផ្ទាំងសរុប</span><span class="sb-en">Dashboard</span></span>
         </button>
         <button type="button" class="sb-item" data-nav="patients" title="អ្នកជំងឺ · Patients">
           <span class="sb-ico"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
@@ -819,9 +827,9 @@
 
       <div class="sb-section">
         <div class="sb-group kh">ប្រតិបត្តិការ</div>
-        <button type="button" class="sb-item" data-nav="labo" title="Labo ធ្មេញ · Dental Lab">
+        <button type="button" class="sb-item" data-nav="labo" title="ពុម្ភធ្មេញ · Dental Lab">
           <span class="sb-ico"><svg viewBox="0 0 24 24"><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/></svg></span>
-          <span class="sb-label"><span class="sb-kh">Labo ធ្មេញ</span><span class="sb-en">Dental Lab</span></span>
+          <span class="sb-label"><span class="sb-kh">ពុម្ភធ្មេញ</span><span class="sb-en">Dental Lab</span></span>
           <span class="sb-badge amber" id="nbLabo"></span>
         </button>
         <button type="button" class="sb-item" data-nav="inventory" title="ឃ្លាំងបរិក្ខា · Inventory">
@@ -863,7 +871,7 @@
         <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
       </button>
       <div class="topbar-title">
-        <h1 class="kh" id="pageTitle">ផ្ទាំងគ្រប់គ្រង</h1>
+        <h1 class="kh" id="pageTitle">ផ្ទាំងសរុប</h1>
         <div class="sub" id="pageSub">Dashboard</div>
       </div>
       <div class="topbar-actions">
@@ -911,7 +919,7 @@
           <button type="button" class="chip" data-filter="appt" aria-pressed="false"><span class="chip-dot appt"></span>Appt<span class="chip-n">0</span></button>
           <button type="button" class="chip" data-filter="missing" aria-pressed="false"><span class="chip-dot missing"></span>Missing<span class="chip-n">0</span></button>
           <button type="button" class="chip" data-filter="planning" aria-pressed="false"><span class="chip-dot planning"></span>Planning<span class="chip-n">0</span></button>
-          <button type="button" class="chip" data-filter="labo" aria-pressed="false"><span class="chip-dot labo"></span>Labo<span class="chip-n">0</span></button>
+          <button type="button" class="chip" data-filter="labo" aria-pressed="false"><span class="chip-dot labo"></span>ពុម្ភធ្មេញ<span class="chip-n">0</span></button>
           <button type="button" class="chip" data-filter="done" aria-pressed="false"><span class="chip-dot done"></span>Done<span class="chip-n">0</span></button>
         </div>
         <div class="record-list" id="recordList" data-filter="all"></div>
@@ -1151,8 +1159,14 @@
   <div class="modal">
     <div class="modal-head"><h2 class="kh" id="formTitle">កំណត់ត្រាជំងឺមាត់ធ្មេញថ្មី · New Record</h2><button class="x" id="closeForm">✕</button></div>
     <div class="modal-body">
+      <div class="form-tabs" style="display:flex;gap:6px;margin-bottom:14px;border-bottom:1.5px solid var(--border);padding-bottom:0;">
+        <button type="button" class="form-tab-btn kh active" data-tab="clinical" onclick="switchFormTab('clinical')">🩺 ព័ត៌មានព្យាបាល · Clinical</button>
+        <button type="button" class="form-tab-btn kh" data-tab="medication" onclick="switchFormTab('medication')">💊 ចេញថ្នាំ · Medication</button>
+        <button type="button" class="form-tab-btn kh" data-tab="payment" onclick="switchFormTab('payment')">💰 ការបង់ប្រាក់ · Payment</button>
+      </div>
       <div class="form-grid">
         
+        <div class="form-tab-panel" data-tab="clinical" style="display:contents;">
         <div class="row-name-sex-age" id="group_name_sex_age">
           <div class="field">
             <label>ឈ្មោះអ្នកជំងឺ · Patient name</label>
@@ -1246,7 +1260,7 @@
             </label>
             <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;font-size:13px;color:#1D4ED8;text-transform:none;">
               <input type="checkbox" id="f_statusLabo" class="status-check" style="width:17px;height:17px;accent-color:#1D4ED8;">
-              <span><b>🧪 Labo</b></span>
+              <span><b>🧪 ពុម្ភធ្មេញ</b></span>
             </label>
             <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;font-size:13px;color:var(--primary-dark);text-transform:none;">
               <input type="checkbox" id="f_statusDone" class="status-check" style="width:17px;height:17px;accent-color:var(--primary-dark);">
@@ -1265,7 +1279,9 @@
             </div>
           </div>
         </div>
+        </div><!-- /clinical panel -->
 
+        <div class="form-tab-panel" data-tab="medication" style="display:none;">
         <div class="med-table-wrapper">
           <div class="med-table-header">
             <label style="margin:0;">💊 តារាងចេញថ្នាំ · Medication Prescription</label>
@@ -1294,7 +1310,9 @@
             <span class="q-pill" onclick="quickAddMed('Omeprazole 20mg', '10')">Omeprazole (20mg)</span>
           </div>
         </div>
+        </div><!-- /medication panel -->
 
+        <div class="form-tab-panel" data-tab="payment" style="display:none;">
         <!-- ផ្នែកបង់ប្រាក់ Payment Section -->
         <div class="field full" style="margin-top: 6px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px;">
           <label style="margin-bottom: 8px;">💰 ការបង់ប្រាក់ (Payment Ledger)</label>
@@ -1352,6 +1370,7 @@
             </div>
           </div>
         </div>
+        </div><!-- /payment panel -->
 
       </div>
       <div class="modal-actions">
@@ -1541,6 +1560,59 @@
       <button class="x" id="closeInvoice">✕</button>
     </div>
     <div class="modal-body">
+
+      <div style="background: var(--surface-2); border: 1.5px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 16px;">
+        <label class="kh" style="display:block;font-size:13px;font-weight:700;color:var(--ink-soft);margin-bottom:8px;">🧾 បង្កើត / កែវិក្កយបត្រ · Quick Invoice</label>
+
+        <div class="field" style="margin:0 0 10px;">
+          <input type="text" id="inv_patientSearch" class="kh" placeholder="🔍 វាយឈ្មោះអ្នកជំងឺ ដើម្បីស្វែងរក...">
+          <select id="inv_patientSelect" class="kh" style="margin-top:6px;width:100%;">
+            <option value="">- ជ្រើសរើសអ្នកជំងឺ / ករណី -</option>
+          </select>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+          <div>
+            <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">តម្លៃសរុប (Total)</div>
+            <input type="text" id="inv_total" placeholder="$0.00" class="mono">
+          </div>
+          <div>
+            <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">បញ្ចុះតម្លៃ (Discount)</div>
+            <input type="text" id="inv_discount" placeholder="10% ឬ $10" class="mono">
+          </div>
+          <div>
+            <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">បានបង់ (Paid)</div>
+            <input type="text" id="inv_paid" placeholder="$0.00" class="mono" style="color:var(--primary-dark);font-weight:bold;">
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+          <div>
+            <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">នៅខ្វះ (Balance) — Auto</div>
+            <input type="text" id="inv_balance" class="mono" readonly style="color:var(--coral-dark);font-weight:bold;background:var(--surface);">
+          </div>
+          <div>
+            <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">វិធីបង់ប្រាក់ (Method)</div>
+            <select id="inv_method" class="kh">
+              <option value="សាច់ប្រាក់ (Cash)">សាច់ប្រាក់ (Cash)</option>
+              <option value="ABA Bank">ABA Bank</option>
+              <option value="Acleda Bank">Acleda Bank</option>
+              <option value="ផ្សេងៗ (Other)">ផ្សេងៗ (Other)</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">ចំណាំ (Note)</div>
+            <input type="text" id="inv_note" class="kh" placeholder="...">
+          </div>
+        </div>
+
+        <div style="display:flex; gap:8px; justify-content:flex-end; align-items:center; flex-wrap:wrap;">
+          <div id="invFormMsg" class="kh" style="font-size:12px; margin-right:auto; display:none;"></div>
+          <button type="button" class="btn btn-outline kh" id="invSaveOnlyBtn">💾 រក្សាទុក</button>
+          <button type="button" class="btn btn-primary kh" id="invSavePrintBtn">💾🖨 រក្សាទុក & Print</button>
+        </div>
+      </div>
+
       <div style="max-height: 420px; overflow-y: auto; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 14px;">
         <table class="med-table" style="width: 100%; margin: 0;">
           <thead>
@@ -3207,7 +3279,17 @@ function setPrintMode(mode){
   el.textContent = '@page{ size: A4 portrait; margin: 15mm; }';
 }
 
+function switchFormTab(tab){
+  document.querySelectorAll('.form-tab-panel').forEach(p => {
+    p.style.display = (p.dataset.tab === tab) ? 'contents' : 'none';
+  });
+  document.querySelectorAll('.form-tab-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.tab === tab);
+  });
+}
+
 function openForm(editRecord, prefill){
+  switchFormTab('clinical');
   editingIndex = null;
   editingOriginalTimestamp = null;
   editingOriginalRecord = null;
@@ -4232,8 +4314,140 @@ function renderInvoicesTable() {
   grandBalanceDisp.textContent = '$' + sumBalance.toFixed(2);
 }
 
+/* ---------- Quick Invoice panel ---------- */
+function populateInvoicePatientSelect(){
+  const sel = document.getElementById('inv_patientSelect');
+  const sorted = [...allRecords].sort((a,b) => (parseAnyDate(b.timestamp)||0) - (parseAnyDate(a.timestamp)||0));
+  sel.innerHTML = '<option value="">- ជ្រើសរើសអ្នកជំងឺ / ករណី -</option>' +
+    sorted.map(r => {
+      const dateTxt = formatDateDisplay(r.timestamp).split(' ')[0];
+      const label = `${r.name || '—'} — ${r.treatment || r.diagnosis || 'N/A'} (${dateTxt})`;
+      return `<option value="${r._id}">${label}</option>`;
+    }).join('');
+}
+
+document.getElementById('inv_patientSearch').addEventListener('input', (e) => {
+  const q = e.target.value.trim().toLowerCase();
+  const sel = document.getElementById('inv_patientSelect');
+  Array.from(sel.options).forEach(opt => {
+    if(!opt.value){ opt.hidden = false; return; }
+    opt.hidden = q && !opt.textContent.toLowerCase().includes(q);
+  });
+});
+
+function resetInvoiceForm(){
+  document.getElementById('inv_patientSearch').value = '';
+  document.getElementById('inv_patientSelect').value = '';
+  document.getElementById('inv_total').value = '';
+  document.getElementById('inv_discount').value = '';
+  document.getElementById('inv_paid').value = '';
+  document.getElementById('inv_balance').value = '';
+  document.getElementById('inv_method').value = 'សាច់ប្រាក់ (Cash)';
+  document.getElementById('inv_note').value = '';
+  document.getElementById('invFormMsg').style.display = 'none';
+}
+
+document.getElementById('inv_patientSelect').addEventListener('change', (e) => {
+  const r = allRecords.find(x => x._id === e.target.value);
+  const msg = document.getElementById('invFormMsg');
+  msg.style.display = 'none';
+  if(!r){
+    document.getElementById('inv_total').value = '';
+    document.getElementById('inv_discount').value = '';
+    document.getElementById('inv_paid').value = '';
+    document.getElementById('inv_balance').value = '';
+    document.getElementById('inv_note').value = '';
+    return;
+  }
+  document.getElementById('inv_total').value = r.payTotal || '';
+  document.getElementById('inv_discount').value = r.payDiscount || '';
+  document.getElementById('inv_paid').value = r.payPaid || '';
+  document.getElementById('inv_method').value = r.payMethod || 'សាច់ប្រាក់ (Cash)';
+  document.getElementById('inv_note').value = r.payNote || '';
+  calcInvBalance();
+});
+
+function calcInvBalance(){
+  let tot = parseFloat(document.getElementById('inv_total').value.replace(/[^\d.]/g,'')) || 0;
+  let paid = parseFloat(document.getElementById('inv_paid').value.replace(/[^\d.]/g,'')) || 0;
+  let disc = document.getElementById('inv_discount').value.trim();
+  let discVal = 0;
+  if(disc.includes('%')){
+    let p = parseFloat(disc.replace(/[^\d.]/g,'')) || 0;
+    discVal = tot * (p/100);
+  } else {
+    discVal = parseFloat(disc.replace(/[^\d.]/g,'')) || 0;
+  }
+  let bal = tot - discVal - paid;
+  if(bal > 0) document.getElementById('inv_balance').value = '$' + bal.toFixed(2);
+  else if(tot > 0) document.getElementById('inv_balance').value = '$0.00';
+  else document.getElementById('inv_balance').value = '';
+}
+document.getElementById('inv_total').addEventListener('input', calcInvBalance);
+document.getElementById('inv_paid').addEventListener('input', calcInvBalance);
+document.getElementById('inv_discount').addEventListener('input', calcInvBalance);
+
+function saveQuickInvoice(andPrint){
+  const selId = document.getElementById('inv_patientSelect').value;
+  const msg = document.getElementById('invFormMsg');
+  msg.style.display = 'block';
+
+  const idx = allRecords.findIndex(x => x._id === selId);
+  if(idx < 0){
+    msg.style.color = 'var(--coral-dark)';
+    msg.textContent = '⚠️ សូមជ្រើសរើសអ្នកជំងឺ/ករណីជាមុនសិន';
+    return;
+  }
+
+  const original = allRecords[idx];
+  calcInvBalance();
+
+  const updated = {
+    ...original,
+    payDate: original.payDate || getLocalTodayYMD(),
+    payTotal: document.getElementById('inv_total').value.trim(),
+    payDiscount: document.getElementById('inv_discount').value.trim(),
+    payPaid: document.getElementById('inv_paid').value.trim(),
+    payBalance: document.getElementById('inv_balance').value.trim(),
+    payMethod: document.getElementById('inv_method').value.trim(),
+    payNote: document.getElementById('inv_note').value.trim()
+  };
+
+  const payload = {
+    ...updated,
+    original: {
+      code: original.code,
+      timestamp: original.timestamp,
+      name: original.name,
+      teeth: original.teeth,
+      diagnosis: original.diagnosis
+    }
+  };
+
+  allRecords[idx] = updated;
+  saveLocalRecords();
+  renderAll();
+  renderInvoicesTable();
+  populateInvoicePatientSelect();
+
+  try{ pushToSheet('updateRecord', payload); }catch(err){ console.warn('Sync queue error:', err); }
+
+  msg.style.color = 'var(--primary-dark)';
+  msg.textContent = '✓ បានរក្សាទុករួចរាល់';
+
+  if(andPrint){
+    printContext = { type: 'receipt', record: updated };
+    document.getElementById('printSizeModalOverlay').classList.remove('hidden');
+  }
+}
+
+document.getElementById('invSaveOnlyBtn').addEventListener('click', () => saveQuickInvoice(false));
+document.getElementById('invSavePrintBtn').addEventListener('click', () => saveQuickInvoice(true));
+
 document.getElementById('invoiceBtn').addEventListener('click', () => {
   renderInvoicesTable();
+  resetInvoiceForm();
+  populateInvoicePatientSelect();
   document.getElementById('invoiceOverlay').classList.remove('hidden');
 });
 
@@ -4424,11 +4638,11 @@ document.getElementById('printExpenseBtn').addEventListener('click', printExpens
 ======================================================== */
 const SB_COLLAPSED_KEY = 'kep_dental_sidebar_collapsed';
 const VIEW_META = {
-  dashboard:    { kh: 'ផ្ទាំងគ្រប់គ្រង',      en: 'Dashboard' },
+  dashboard:    { kh: 'ផ្ទាំងសរុប',      en: 'Dashboard' },
   patients:     { kh: 'កំណត់ត្រាអ្នកជំងឺ',   en: 'Patient records' },
   appointments: { kh: 'ការណាត់ជួប',          en: 'Appointments' },
   reports:      { kh: 'របាយការណ៍',           en: 'Reports' },
-  labo:         { kh: 'Labo ធ្មេញ',           en: 'Dental Lab orders' },
+  labo:         { kh: 'ពុម្ភធ្មេញ',           en: 'Dental Lab orders' },
   inventory:    { kh: 'ឃ្លាំងបរិក្ខា',        en: 'Inventory' }
 };
 let currentView = 'dashboard';
