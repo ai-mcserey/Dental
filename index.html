@@ -9,20 +9,20 @@
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+Khmer:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#F6FAF8; --surface:#FFFFFF; --surface-2:#EFF6F2;
-    --border:#DCEAE2; --border-soft:#EAF3EE;
-    --ink:#16261D; --ink-soft:#51695C; --ink-dim:#8CA495;
-    --primary:#2E8B62; --primary-dark:#1F6B49; --primary-soft:#D9EFE3; --primary-softer:#EDF7F1;
+    --bg:#F5F9FC; --surface:#FFFFFF; --surface-2:#EDF3FA;
+    --border:#D9E6F2; --border-soft:#E8F1FA;
+    --ink:#132539; --ink-soft:#4C6178; --ink-dim:#8DA0B3;
+    --primary:#2166D6; --primary-dark:#164C9E; --primary-soft:#DCEAFB; --primary-softer:#EEF5FD;
     --amber:#E8A317; --amber-soft:#FBEFCB; --amber-dark:#8A5C16;
     --coral:#E4574C; --coral-soft:#FBE1DE; --coral-dark:#A43227;
-    --shadow:0 12px 30px -16px rgba(22,38,29,0.16);
-    --shadow-sm:0 4px 14px -8px rgba(22,38,29,0.14);
+    --shadow:0 12px 30px -16px rgba(19,37,57,0.16);
+    --shadow-sm:0 4px 14px -8px rgba(19,37,57,0.14);
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
   body{
     background:
-      radial-gradient(1000px 460px at 8% -8%, rgba(31,107,73,0.08), transparent 55%),
+      radial-gradient(1000px 460px at 8% -8%, rgba(22,76,158,0.08), transparent 55%),
       radial-gradient(800px 400px at 105% 0%, rgba(232,163,23,0.07), transparent 55%),
       var(--bg);
     color:var(--ink);
@@ -66,7 +66,7 @@
 
   .btn{border:none;cursor:pointer;font-weight:600;font-size:13.5px;padding:9px 15px;border-radius:9px;display:inline-flex;align-items:center;gap:7px;transition:all .13s ease;}
   .btn:active{transform:translateY(1px);}
-  .btn-primary{background:var(--primary);color:#fff;box-shadow:0 6px 16px -6px rgba(31,107,73,0.5);}
+  .btn-primary{background:var(--primary);color:#fff;box-shadow:0 6px 16px -6px rgba(22,76,158,0.5);}
   .btn-primary:hover{background:var(--primary-dark);}
   .btn-outline{background:var(--surface);color:var(--ink);border:1.5px solid var(--border);}
   .btn-outline:hover{border-color:var(--primary);background:var(--primary-softer);}
@@ -262,8 +262,7 @@
   #printSizeModalOverlay    { z-index: 92 !important; }
   #xrayModalOverlay         { z-index: 95 !important; }
   #xrayGalleryOverlay       { z-index: 96 !important; }
-  #expenseOverlay           { z-index: 99 !important; }
-  #invoiceOverlay           { z-index: 99 !important; }
+  #invoiceDetailOverlay     { z-index: 99 !important; }
   #settingsOverlay          { z-index: 102 !important; }
   #clinicalConfigOverlay    { z-index: 104 !important; background: rgba(11,42,39,0.65) !important; }
   #pinModalOverlay          { z-index: 106 !important; background: rgba(11,42,39,0.65) !important; }
@@ -286,7 +285,7 @@
   .xray-item:hover {
     transform: translateY(-3px);
     border-color: var(--primary);
-    box-shadow: 0 6px 14px -6px rgba(31,107,73,0.4);
+    box-shadow: 0 6px 14px -6px rgba(22,76,158,0.4);
   }
   .xray-item img {
     width: 100%;
@@ -386,7 +385,7 @@
   .tooth-cell.treated {
     background: var(--primary) !important; border-color: var(--primary-dark) !important;
     color: #fff !important; font-weight: 800 !important;
-    box-shadow: 0 4px 10px -3px rgba(31,107,73,0.4); transform: translateY(-2px);
+    box-shadow: 0 4px 10px -3px rgba(22,76,158,0.4); transform: translateY(-2px);
   }
   .tooth-cell.treated:hover:not(.invisible) { transform: scale(1.15) translateY(-2px); background: var(--primary-dark) !important; }
   .arch-label { font-size: 10.5px; text-align: center; color: var(--ink-dim); letter-spacing: .05em; text-transform: uppercase; margin: 10px 0; font-weight: 800; }
@@ -470,20 +469,20 @@
   .cfg-tab-content.active{display:block;}
 
   /* print sheets A4 */
-  .print-sheet{background:#fff;color:#16261D;font-family:'Inter',sans-serif;padding:8mm 2mm;}
+  .print-sheet{background:#fff;color:#132539;font-family:'Inter',sans-serif;padding:8mm 2mm;}
   .ps-head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;border-bottom:2.5px solid var(--primary);padding-bottom:14px;margin-bottom:20px;}
   .ps-clinic{font-family:'Sora',sans-serif;font-size:22px;font-weight:700;color:var(--primary-dark);}
   .ps-sub{font-size:11.5px;color:#6B827F;margin-top:4px;}
   .ps-tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--primary-dark);background:var(--primary-soft);padding:5px 13px;border-radius:999px;}
   .ps-head-right{text-align:right;}
-  .ps-printed{font-size:10.5px;color:#8CA495;margin-top:6px;}
+  .ps-printed{font-size:10.5px;color:#8DA0B3;margin-top:6px;}
   .ps-info-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px 22px;margin:6px 0 18px;}
-  .ps-info-item .k{font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:#8CA495;font-weight:700;}
-  .ps-info-item .v{font-size:13.5px;color:#16261D;margin-top:3px;font-weight:600;}
+  .ps-info-item .k{font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;color:#8DA0B3;font-weight:700;}
+  .ps-info-item .v{font-size:13.5px;color:#132539;margin-top:3px;font-weight:600;}
   .ps-section-title{font-size:13px;font-weight:700;color:var(--primary-dark);margin:22px 0 10px;padding-bottom:6px;border-bottom:1px solid #E1EEEC;}
-  .ps-foot{text-align:center;font-size:11px;color:#8CA495;margin-top:20px;}
+  .ps-foot{text-align:center;font-size:11px;color:#8DA0B3;margin-top:20px;}
   .ps-visit-table{width:100%;border-collapse:collapse;font-size:11.5px;margin-top:4px;}
-  .ps-visit-table th{text-align:left;font-size:9.5px;text-transform:uppercase;letter-spacing:.04em;color:#8CA495;padding:6px 8px;border-bottom:1.5px solid #16261D;}
+  .ps-visit-table th{text-align:left;font-size:9.5px;text-transform:uppercase;letter-spacing:.04em;color:#8DA0B3;padding:6px 8px;border-bottom:1.5px solid #132539;}
   .ps-visit-table td{padding:6px 8px;border-bottom:1px solid #E9F1F0;color:#33504C;}
   .ps-visit-table td.mono, .ps-visit-table th.mono{font-family:'IBM Plex Mono',monospace;}
 
@@ -509,7 +508,7 @@
   @media print{
     body{background:none;}
     .app-shell, .sidebar-scrim, .topbar, .wrap, .fab,
-    #detailOverlay, #formOverlay, #settingsOverlay, #clinicalConfigOverlay, #patientOverlay, #toothHistoryModalOverlay, #printSizeModalOverlay, #expenseOverlay, #invoiceOverlay, #pinModalOverlay, #laboFormOverlay, #invFormOverlay, #invAdjustOverlay, #invHistoryOverlay{ display:none !important; }
+    #detailOverlay, #formOverlay, #settingsOverlay, #clinicalConfigOverlay, #patientOverlay, #toothHistoryModalOverlay, #printSizeModalOverlay, #invoiceDetailOverlay, #xrayGalleryOverlay, #pinModalOverlay, #laboFormOverlay, #invFormOverlay, #invAdjustOverlay, #invHistoryOverlay{ display:none !important; }
     #printOverlay{ position:static !important; inset:auto; background:none !important; backdrop-filter:none !important; padding:0 !important; display:block !important; }
     #printOverlay .modal{ box-shadow:none !important; border:none !important; max-width:100% !important; border-radius:0 !important; background:none !important; margin:0 !important; }
     #printOverlay .modal-head, #printOverlay .modal-actions{ display:none !important; }
@@ -555,7 +554,7 @@
      ===================================================================== */
   :root{
     --sb-w:264px; --sb-w-min:76px;
-    --sb-bg:#132A20; --sb-ink:#EAF3EE; --sb-dim:#8FB3A0;
+    --sb-bg:#0F2540; --sb-ink:#EAF2FA; --sb-dim:#8FB0D3;
     --sb-line:rgba(255,255,255,.08); --sb-hover:rgba(255,255,255,.06); --sb-active:rgba(232,163,23,.16);
   }
   .sidebar{
@@ -743,7 +742,7 @@
   .icon-btn:hover{ border-color:var(--primary); color:var(--ink); background:var(--primary-softer); }
   .icon-btn.danger:hover{ border-color:#f5b5af; background:var(--coral-soft); color:var(--coral-dark); }
   .icon-btn:focus-visible{ outline:2px solid var(--primary); outline-offset:2px; }
-  .pt-link{ color:var(--primary-dark); cursor:pointer; font-weight:700; text-decoration:underline; text-decoration-color:rgba(31,107,73,.35); text-underline-offset:3px; }
+  .pt-link{ color:var(--primary-dark); cursor:pointer; font-weight:700; text-decoration:underline; text-decoration-color:rgba(22,76,158,.35); text-underline-offset:3px; }
   .qty-big{ font-family:'IBM Plex Mono',monospace; font-weight:800; font-size:15px; color:var(--ink); }
   .form-error{ color:var(--coral-dark); background:var(--coral-soft); border:1px solid #f5b5af; border-radius:8px; padding:8px 10px; font-size:12px; margin-top:12px; }
 
@@ -832,36 +831,44 @@
           <span class="sb-label"><span class="sb-kh">ពុម្ភធ្មេញ</span><span class="sb-en">Dental Lab</span></span>
           <span class="sb-badge amber" id="nbLabo"></span>
         </button>
-        <button type="button" class="sb-item" data-nav="inventory" title="ឃ្លាំងបរិក្ខា · Inventory">
+        <button type="button" class="sb-item" data-nav="xray" title="រូបធ្មេញ · Dental X-Ray">
+          <span class="sb-ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-5-5L5 21"/></svg></span>
+          <span class="sb-label"><span class="sb-kh">រូបធ្មេញ</span><span class="sb-en">Dental X-Ray</span></span>
+        </button>
+        <button type="button" class="sb-item" data-nav="medication" title="ថ្នាំធ្មេញ · Medication">
+          <span class="sb-ico"><svg viewBox="0 0 24 24"><path d="m10.5 20.5 10-10a4.95 4.95 0 1 0-7-7l-10 10a4.95 4.95 0 1 0 7 7Z"/><path d="m8.5 8.5 7 7"/></svg></span>
+          <span class="sb-label"><span class="sb-kh">ថ្នាំធ្មេញ</span><span class="sb-en">Medication</span></span>
+        </button>
+        <button type="button" class="sb-item" data-nav="inventory" title="បរិក្ខាធ្មេញ · Inventory">
           <span class="sb-ico"><svg viewBox="0 0 24 24"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></span>
-          <span class="sb-label"><span class="sb-kh">ឃ្លាំងបរិក្ខា</span><span class="sb-en">Inventory</span></span>
+          <span class="sb-label"><span class="sb-kh">បរិក្ខាធ្មេញ</span><span class="sb-en">Inventory</span></span>
           <span class="sb-badge amber" id="nbInventory"></span>
         </button>
       </div>
 
       <div class="sb-section">
         <div class="sb-group kh">គ្រប់គ្រង</div>
-        <button type="button" class="sb-item" id="navInvoices" title="វិក្កយបត្រ · Invoices">
+        <button type="button" class="sb-item" data-nav="invoices" title="វិក្កយបត្រ · Invoices">
           <span class="sb-ico"><svg viewBox="0 0 24 24"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/></svg></span>
           <span class="sb-label"><span class="sb-kh">វិក្កយបត្រ</span><span class="sb-en">Invoices</span></span>
         </button>
-        <button type="button" class="sb-item" id="navExpenses" title="ចំណាយ · Expenses">
+        <button type="button" class="sb-item" data-nav="income-expense" title="ចំណូលចំណាយ · Income &amp; Expense">
           <span class="sb-ico"><svg viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg></span>
-          <span class="sb-label"><span class="sb-kh">ចំណាយ</span><span class="sb-en">Expenses</span></span>
+          <span class="sb-label"><span class="sb-kh">ចំណូលចំណាយ</span><span class="sb-en">Income &amp; Expense</span></span>
         </button>
         <button type="button" class="sb-item" data-nav="reports" title="របាយការណ៍ · Reports">
           <span class="sb-ico"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg></span>
           <span class="sb-label"><span class="sb-kh">របាយការណ៍</span><span class="sb-en">Reports</span></span>
+        </button>
+        <button type="button" class="sb-item" id="settingsBtn" title="ការកំណត់គ្លីនិក · Settings">
+          <span class="sb-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
+          <span class="sb-label"><span class="sb-kh">ការកំណត់</span><span class="sb-en">Settings</span></span>
         </button>
       </div>
     </nav>
 
     <div class="sb-foot">
       <span class="sb-sync" id="syncBadge" role="button" tabindex="0" title="ចុចដើម្បីទាញទិន្នន័យពី Sheet មក App">🔄 Sync</span>
-      <button type="button" class="sb-item" id="settingsBtn" title="ការកំណត់គ្លីនិក · Settings">
-        <span class="sb-ico"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span>
-        <span class="sb-label"><span class="sb-kh">ការកំណត់</span><span class="sb-en">Settings</span></span>
-      </button>
     </div>
   </aside>
 
@@ -1001,6 +1008,182 @@
           </div>
         </div>
         <div class="empty-state kh hidden" id="invEmpty" style="margin-top:12px;"></div>
+      </section>
+
+      <!-- Invoices -->
+      <section class="view" id="view-invoices">
+        <div style="background: var(--surface-2); border: 1.5px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 16px;">
+          <label class="kh" style="display:block;font-size:13px;font-weight:700;color:var(--ink-soft);margin-bottom:8px;">🧾 បង្កើត / កែវិក្កយបត្រ · Quick Invoice</label>
+
+          <div class="field" style="margin:0 0 10px;">
+            <input type="text" id="qi_patientSearch" class="kh" placeholder="🔍 វាយឈ្មោះអ្នកជំងឺ ដើម្បីស្វែងរក...">
+            <select id="qi_patientSelect" class="kh" style="margin-top:6px;width:100%;">
+              <option value="">- ជ្រើសរើសអ្នកជំងឺ / ករណី -</option>
+            </select>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+            <div>
+              <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">តម្លៃសរុប (Total)</div>
+              <input type="text" id="qi_total" placeholder="$0.00" class="mono">
+            </div>
+            <div>
+              <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">បញ្ចុះតម្លៃ (Discount)</div>
+              <input type="text" id="qi_discount" placeholder="10% ឬ $10" class="mono">
+            </div>
+            <div>
+              <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">បានបង់ (Paid)</div>
+              <input type="text" id="qi_paid" placeholder="$0.00" class="mono" style="color:var(--primary-dark);font-weight:bold;">
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 12px;">
+            <div>
+              <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">នៅខ្វះ (Balance) — Auto</div>
+              <input type="text" id="qi_balance" class="mono" readonly style="color:var(--coral-dark);font-weight:bold;background:var(--surface);">
+            </div>
+            <div>
+              <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">វិធីបង់ប្រាក់ (Method)</div>
+              <select id="qi_method" class="kh">
+                <option value="សាច់ប្រាក់ (Cash)">សាច់ប្រាក់ (Cash)</option>
+                <option value="ABA Bank">ABA Bank</option>
+                <option value="Acleda Bank">Acleda Bank</option>
+                <option value="ផ្សេងៗ (Other)">ផ្សេងៗ (Other)</option>
+              </select>
+            </div>
+            <div>
+              <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">ចំណាំ (Note)</div>
+              <input type="text" id="qi_note" class="kh" placeholder="...">
+            </div>
+          </div>
+
+          <div style="display:flex; gap:8px; justify-content:flex-end; align-items:center; flex-wrap:wrap;">
+            <div id="invFormMsg" class="kh" style="font-size:12px; margin-right:auto; display:none;"></div>
+            <button type="button" class="btn btn-outline kh" id="invSaveOnlyBtn">💾 រក្សាទុក</button>
+            <button type="button" class="btn btn-primary kh" id="invSavePrintBtn">💾🖨 រក្សាទុក & Print</button>
+          </div>
+        </div>
+
+        <div class="page-toolbar">
+          <input type="text" class="tb-search kh" id="invoicePatientSearch" placeholder="🔍 ស្វែងរកអ្នកជំងឺ...">
+        </div>
+
+        <div class="emr-notes-section">
+          <div class="emr-table-wrap">
+            <table class="emr-table">
+              <thead><tr>
+                <th>ឈ្មោះអ្នកជំងឺ</th><th>លេខទូរស័ព្ទ</th><th style="text-align:center;">ចំនួនករណី (Cases)</th><th style="text-align:right;">សរុបចំណាយ ($)</th>
+              </tr></thead>
+              <tbody id="invoicePatientTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="empty-state kh hidden" id="invoicePatientEmpty" style="margin-top:12px;"></div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 24px; flex-wrap: wrap; align-items: center; border-top: 2px solid var(--border); background: var(--surface-2); padding: 12px 18px; border-radius: 12px; margin-top: 14px;">
+          <div style="font-size: 13.5px; font-weight: 700; color: var(--primary-dark);">
+            សរុបតម្លៃរួម៖ <span id="invGrandTotalDisplay" class="mono" style="font-size: 17px; font-weight: 800;">$0.00</span>
+          </div>
+          <div style="font-size: 13.5px; font-weight: 700; color: var(--coral-dark);">
+            សរុបនៅខ្វះរួម៖ <span id="invGrandBalanceDisplay" class="mono" style="font-size: 17px; font-weight: 800;">$0.00</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Income & Expense -->
+      <section class="view" id="view-income-expense">
+        <div class="stats2 dash-stats" id="incomeExpenseStats"></div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:14px 0;">
+          <div class="card-type-stats-panel">
+            <div class="card-type-stats-head"><h4 class="kh">ចំណូល vs ចំណាយ · ខែនេះ vs ខែមុន</h4></div>
+            <div id="chartMonthCompare" style="padding:14px;"></div>
+          </div>
+          <div class="card-type-stats-panel">
+            <div class="card-type-stats-head"><h4 class="kh">ចំណូល vs ចំណាយ · ឆ្នាំនេះ vs ឆ្នាំមុន</h4></div>
+            <div id="chartYearCompare" style="padding:14px;"></div>
+          </div>
+        </div>
+
+        <div style="background: var(--surface-2); border: 1.5px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 16px;">
+          <label class="kh" style="display:block;font-size:13px;font-weight:700;color:var(--ink-soft);margin-bottom:8px;">💸 កត់ត្រាចំណាយ · Add Expense</label>
+          <div style="display: grid; grid-template-columns: 1.2fr 1.5fr 1fr auto; gap: 10px; align-items: flex-end;">
+            <div class="field" style="margin:0;">
+              <label>ថ្ងៃខែឆ្នាំ (Date)</label>
+              <input type="date" id="exp_date" class="mono">
+            </div>
+            <div class="field" style="margin:0;">
+              <label>ប្រភេទចំណាយ (Type)</label>
+              <select id="exp_type" class="kh">
+                <option value="Lab">Lab (មន្ទីរពិសោធន៍)</option>
+                <option value="គ្រឿងធ្មេញ">គ្រឿងធ្មេញ (Dental Materials)</option>
+                <option value="ផ្សេងៗ">ផ្សេងៗ (Other)</option>
+              </select>
+            </div>
+            <div class="field" style="margin:0;">
+              <label>តម្លៃ (Cost $)</label>
+              <input type="number" id="exp_amount" step="0.01" placeholder="0.00" class="mono">
+            </div>
+            <button type="button" class="btn btn-primary btn-sm kh" id="addExpenseBtn" style="height: 38px;">＋ បន្ថែម</button>
+          </div>
+          <div class="field" style="margin-top: 8px;">
+            <input type="text" id="exp_desc" class="kh" placeholder="បរិយាយបន្ថែម / Note (ឧ. ថ្លៃផ្ញើធ្មេញធ្វើ Crown របស់ឈ្មោះ...)" style="font-size: 12px; padding: 6px 10px;">
+          </div>
+        </div>
+
+        <div style="max-height: 320px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 14px;">
+          <table class="med-table" style="width: 100%; margin: 0;">
+            <thead>
+              <tr>
+                <th style="width: 110px;">កាលបរិច្ឆេទ</th>
+                <th style="width: 130px;">ប្រភេទ</th>
+                <th>បរិយាយ</th>
+                <th style="width: 95px; text-align: right;">តម្លៃ ($)</th>
+                <th style="width: 40px; text-align: center;">លុប</th>
+              </tr>
+            </thead>
+            <tbody id="expenseTableBody"></tbody>
+          </table>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--border); padding-top: 12px; flex-wrap: wrap; gap: 10px;">
+          <div style="font-size: 14px; font-weight: 700; color: var(--coral-dark);">
+            សរុបចំណាយ៖ <span id="totalExpenseDisplay" class="mono" style="font-size: 17px;">$0.00</span>
+          </div>
+          <button type="button" class="btn btn-primary btn-sm kh" id="printExpenseBtn">🖨 Print របាយការណ៍ចំណាយ</button>
+        </div>
+      </section>
+
+      <!-- Dental X-Ray -->
+      <section class="view" id="view-xray">
+        <div class="page-toolbar">
+          <input type="text" class="tb-search kh" id="xraySearch" placeholder="🔍 ស្វែងរកអ្នកជំងឺ...">
+          <button type="button" class="btn btn-outline btn-sm kh" id="xrayRefreshBtn">🔄 ទាញយកឡើងវិញ</button>
+        </div>
+        <div id="xrayGrid" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:14px;"></div>
+        <div class="empty-state kh hidden" id="xrayEmpty" style="margin-top:12px;"></div>
+      </section>
+
+      <!-- Medication -->
+      <section class="view" id="view-medication">
+        <div class="kh" style="font-size:12.5px; color:var(--ink-soft); margin-bottom:10px;">ស្ថិតិការចេញថ្នាំ ខែនេះ តាមប្រភេទ Treatment</div>
+        <div class="treatment-stats-grid" id="medTreatmentStats"></div>
+
+        <div class="page-toolbar" style="margin-top:16px;">
+          <input type="text" class="tb-search kh" id="medicationSearch" placeholder="🔍 ស្វែងរកអ្នកជំងឺ...">
+        </div>
+
+        <div class="emr-notes-section">
+          <div class="emr-table-wrap">
+            <table class="emr-table">
+              <thead><tr>
+                <th>អ្នកជំងឺ</th><th>ថ្ងៃចេញថ្នាំ</th><th>Antibiotic</th><th>Analgesic</th><th>Other</th>
+              </tr></thead>
+              <tbody id="medicationTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="empty-state kh hidden" id="medicationEmpty" style="margin-top:12px;"></div>
       </section>
 
     </main>
@@ -1553,156 +1736,15 @@
 
 <!-- Modal របាយការណ៍ Report -->
 <!-- Modal បញ្ជីវិក្កយបត្រ (Invoices Modal Overlay) -->
-<div class="overlay hidden" id="invoiceOverlay" style="z-index: 99 !important;">
-  <div class="modal" style="max-width: 900px;">
+<!-- Invoice detail / print drill-in (small overlay, opened by clicking a patient row) -->
+<div class="overlay hidden" id="invoiceDetailOverlay">
+  <div class="modal" style="max-width: 640px;">
     <div class="modal-head">
-      <h2 class="kh">🧾 បញ្ជីវិក្កយបត្រ · Patient Invoices</h2>
-      <button class="x" id="closeInvoice">✕</button>
+      <h2 class="kh" id="invDetailTitle">🧾 វិក្កយបត្រអ្នកជំងឺ</h2>
+      <button class="x" id="closeInvoiceDetail">✕</button>
     </div>
     <div class="modal-body">
-
-      <div style="background: var(--surface-2); border: 1.5px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 16px;">
-        <label class="kh" style="display:block;font-size:13px;font-weight:700;color:var(--ink-soft);margin-bottom:8px;">🧾 បង្កើត / កែវិក្កយបត្រ · Quick Invoice</label>
-
-        <div class="field" style="margin:0 0 10px;">
-          <input type="text" id="inv_patientSearch" class="kh" placeholder="🔍 វាយឈ្មោះអ្នកជំងឺ ដើម្បីស្វែងរក...">
-          <select id="inv_patientSelect" class="kh" style="margin-top:6px;width:100%;">
-            <option value="">- ជ្រើសរើសអ្នកជំងឺ / ករណី -</option>
-          </select>
-        </div>
-
-        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px;">
-          <div>
-            <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">តម្លៃសរុប (Total)</div>
-            <input type="text" id="inv_total" placeholder="$0.00" class="mono">
-          </div>
-          <div>
-            <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">បញ្ចុះតម្លៃ (Discount)</div>
-            <input type="text" id="inv_discount" placeholder="10% ឬ $10" class="mono">
-          </div>
-          <div>
-            <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">បានបង់ (Paid)</div>
-            <input type="text" id="inv_paid" placeholder="$0.00" class="mono" style="color:var(--primary-dark);font-weight:bold;">
-          </div>
-        </div>
-
-        <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 12px;">
-          <div>
-            <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">នៅខ្វះ (Balance) — Auto</div>
-            <input type="text" id="inv_balance" class="mono" readonly style="color:var(--coral-dark);font-weight:bold;background:var(--surface);">
-          </div>
-          <div>
-            <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">វិធីបង់ប្រាក់ (Method)</div>
-            <select id="inv_method" class="kh">
-              <option value="សាច់ប្រាក់ (Cash)">សាច់ប្រាក់ (Cash)</option>
-              <option value="ABA Bank">ABA Bank</option>
-              <option value="Acleda Bank">Acleda Bank</option>
-              <option value="ផ្សេងៗ (Other)">ផ្សេងៗ (Other)</option>
-            </select>
-          </div>
-          <div>
-            <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">ចំណាំ (Note)</div>
-            <input type="text" id="inv_note" class="kh" placeholder="...">
-          </div>
-        </div>
-
-        <div style="display:flex; gap:8px; justify-content:flex-end; align-items:center; flex-wrap:wrap;">
-          <div id="invFormMsg" class="kh" style="font-size:12px; margin-right:auto; display:none;"></div>
-          <button type="button" class="btn btn-outline kh" id="invSaveOnlyBtn">💾 រក្សាទុក</button>
-          <button type="button" class="btn btn-primary kh" id="invSavePrintBtn">💾🖨 រក្សាទុក & Print</button>
-        </div>
-      </div>
-
-      <div style="max-height: 420px; overflow-y: auto; border: 1px solid var(--border); border-radius: 10px; margin-bottom: 14px;">
-        <table class="med-table" style="width: 100%; margin: 0;">
-          <thead>
-            <tr>
-              <th style="width: 160px;">ឈ្មោះអ្នកជំងឺ</th>
-              <th style="width: 80px; text-align: center;">ភេទ/អាយុ</th>
-              <th style="width: 120px;">លេខទូរស័ព្ទ</th>
-              <th style="width: 120px;">ថ្ងៃខែ Invoice</th>
-              <th style="width: 110px; text-align: right;">តម្លៃសរុប ($)</th>
-              <th style="width: 110px; text-align: right;">នៅខ្វះ ($)</th>
-            </tr>
-          </thead>
-          <tbody id="invoiceTableBody"></tbody>
-        </table>
-      </div>
-
-      <div style="display: flex; justify-content: space-between; align-items: center; border-top: 2px solid var(--border); background: var(--surface-2); padding: 12px 18px; border-radius: 12px; flex-wrap: wrap; gap: 12px;">
-        <div style="display: flex; gap: 24px; flex-wrap: wrap; align-items: center;">
-          <div style="font-size: 13.5px; font-weight: 700; color: var(--primary-dark);">
-            សរុបតម្លៃរួម៖ <span id="invGrandTotalDisplay" class="mono" style="font-size: 17px; font-weight: 800;">$0.00</span>
-          </div>
-          <div style="font-size: 13.5px; font-weight: 700; color: var(--coral-dark);">
-            សរុបនៅខ្វះរួម៖ <span id="invGrandBalanceDisplay" class="mono" style="font-size: 17px; font-weight: 800;">$0.00</span>
-          </div>
-        </div>
-        <div>
-          <button type="button" class="btn btn-outline btn-sm kh" id="closeInvoiceBtn">បិទ Close</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Modal កត់ត្រាចំណាយ (Expense Modal Overlay) -->
-<div class="overlay hidden" id="expenseOverlay">
-  <div class="modal" style="max-width: 680px;">
-    <div class="modal-head">
-      <h2 class="kh">💸 កត់ត្រាចំណាយ · Clinic Expenses</h2>
-      <button class="x" id="closeExpense">✕</button>
-    </div>
-    <div class="modal-body">
-      <div style="background: var(--surface-2); border: 1.5px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 16px;">
-        <div style="display: grid; grid-template-columns: 1.2fr 1.5fr 1fr auto; gap: 10px; align-items: flex-end;">
-          <div class="field" style="margin:0;">
-            <label>ថ្ងៃខែឆ្នាំ (Date)</label>
-            <input type="date" id="exp_date" class="mono">
-          </div>
-          <div class="field" style="margin:0;">
-            <label>ប្រភេទចំណាយ (Type)</label>
-            <select id="exp_type" class="kh">
-              <option value="Lab">Lab (មន្ទីរពិសោធន៍)</option>
-              <option value="គ្រឿងធ្មេញ">គ្រឿងធ្មេញ (Dental Materials)</option>
-              <option value="ផ្សេងៗ">ផ្សេងៗ (Other)</option>
-            </select>
-          </div>
-          <div class="field" style="margin:0;">
-            <label>តម្លៃ (Cost $)</label>
-            <input type="number" id="exp_amount" step="0.01" placeholder="0.00" class="mono">
-          </div>
-          <button type="button" class="btn btn-primary btn-sm kh" id="addExpenseBtn" style="height: 38px;">＋ បន្ថែម</button>
-        </div>
-        <div class="field" style="margin-top: 8px;">
-          <input type="text" id="exp_desc" class="kh" placeholder="បរិយាយបន្ថែម / Note (ឧ. ថ្លៃផ្ញើធ្មេញធ្វើ Crown របស់ឈ្មោះ...)" style="font-size: 12px; padding: 6px 10px;">
-        </div>
-      </div>
-
-      <div style="max-height: 280px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 14px;">
-        <table class="med-table" style="width: 100%; margin: 0;">
-          <thead>
-            <tr>
-              <th style="width: 110px;">កាលបរិច្ឆេទ</th>
-              <th style="width: 130px;">ប្រភេទ</th>
-              <th>បរិយាយ</th>
-              <th style="width: 95px; text-align: right;">តម្លៃ ($)</th>
-              <th style="width: 40px; text-align: center;">លុប</th>
-            </tr>
-          </thead>
-          <tbody id="expenseTableBody"></tbody>
-        </table>
-      </div>
-
-      <div style="display: flex; justify-content: space-between; align-items: center; border-top: 1px dashed var(--border); padding-top: 12px; flex-wrap: wrap; gap: 10px;">
-        <div style="font-size: 14px; font-weight: 700; color: var(--coral-dark);">
-          សរុបចំណាយ៖ <span id="totalExpenseDisplay" class="mono" style="font-size: 17px;">$0.00</span>
-        </div>
-        <div style="display: flex; gap: 8px;">
-          <button type="button" class="btn btn-outline btn-sm kh" id="closeExpenseBtn">បិទ Close</button>
-          <button type="button" class="btn btn-primary btn-sm kh" id="printExpenseBtn">🖨 Print របាយការណ៍ចំណាយ</button>
-        </div>
-      </div>
+      <div id="invDetailBody"></div>
     </div>
   </div>
 </div>
@@ -2205,6 +2247,86 @@ function parsePrescriptionString(str){
   return items;
 }
 
+const ANTIBIOTIC_KEYWORDS = ['metronidazole','amoxicillin','augmentin','cephalexin','clindamycin','azithromycin','tetracycline','ampicillin','erythromycin','doxycycline','ciprofloxacin'];
+const ANALGESIC_KEYWORDS = ['ibuprofen','paracetamol','acetaminophen','diclofenac','mefenamic','tramadol','aspirin','naproxen','panadol'];
+
+function classifyMedication(name){
+  const n = (name || '').toLowerCase();
+  if(ANTIBIOTIC_KEYWORDS.some(k => n.includes(k))) return 'antibiotic';
+  if(ANALGESIC_KEYWORDS.some(k => n.includes(k))) return 'analgesic';
+  return 'other';
+}
+
+function medItemHTML(it){
+  const times = [it.m ? 'ព្រឹក' : '', it.n ? 'ថ្ងៃ' : '', it.e ? 'ល្ងាច' : ''].filter(Boolean).join('+');
+  return `<div style="margin-bottom:4px;">
+    <div class="kh" style="font-weight:700; font-size:12px;">${it.name}</div>
+    <div class="mono" style="font-size:10.5px; color:var(--ink-dim);">${times ? 'លេប ' + times : ''} ${it.qty ? '× ' + it.qty : ''}</div>
+  </div>`;
+}
+
+function renderMedicationPage(searchQ){
+  const now = new Date();
+  const curMonth = now.getMonth(), curYear = now.getFullYear();
+
+  const withMed = allRecords.filter(r => cleanStr(r.medication));
+
+  // Cards: this month's medication-issuing records, grouped by treatment type.
+  const treatCounts = {};
+  withMed.forEach(r => {
+    const d = parseAnyDate(r.doingDateTime || r.timestamp);
+    if(!d || d.getFullYear() !== curYear || d.getMonth() !== curMonth) return;
+    const t = cleanStr(r.treatment) || '—';
+    treatCounts[t] = (treatCounts[t] || 0) + 1;
+  });
+  const statsEl = document.getElementById('medTreatmentStats');
+  const sortedTreat = Object.keys(treatCounts).sort((a,b) => treatCounts[b] - treatCounts[a]);
+  if(sortedTreat.length === 0){
+    statsEl.innerHTML = `<div style="grid-column:1/-1;text-align:center;font-size:12px;color:var(--ink-dim);padding:14px;">មិនទាន់មានទិន្នន័យខែនេះទេ</div>`;
+  } else {
+    statsEl.innerHTML = sortedTreat.map(t => `
+      <div class="type-stat-card type-default" style="text-align:left; padding:12px;">
+        <span class="type-stat-name kh" style="justify-content:flex-start; text-align:left; font-size:11.5px; margin-bottom:8px; line-height:1.4; color:var(--ink); min-height:auto;">${t}</span>
+        <div class="type-stat-count" style="color:var(--primary-dark); font-size:17px;">${treatCounts[t]}</div>
+      </div>
+    `).join('');
+  }
+
+  // Table: patients who received medication, filtered to this month, searchable.
+  let rows = withMed.filter(r => {
+    const d = parseAnyDate(r.doingDateTime || r.timestamp);
+    return d && d.getFullYear() === curYear && d.getMonth() === curMonth;
+  });
+  if(searchQ){
+    const q = searchQ.trim().toLowerCase();
+    rows = rows.filter(r => (r.name||'').toLowerCase().includes(q));
+  }
+  rows.sort((a,b) => (parseAnyDate(b.doingDateTime||b.timestamp)||0) - (parseAnyDate(a.doingDateTime||a.timestamp)||0));
+
+  const tbody = document.getElementById('medicationTableBody');
+  const emptyEl = document.getElementById('medicationEmpty');
+  emptyEl.classList.toggle('hidden', rows.length > 0);
+  emptyEl.textContent = 'មិនមានអ្នកជំងឺដែលបានទទួលថ្នាំខែនេះទេ';
+
+  tbody.innerHTML = rows.map(r => {
+    const items = parsePrescriptionString(r.medication);
+    const buckets = { antibiotic: [], analgesic: [], other: [] };
+    items.forEach(it => buckets[classifyMedication(it.name)].push(it));
+    const dateTxt = formatDateDisplay(r.doingDateTime || r.timestamp).split(' ')[0];
+    return `
+      <tr class="emr-tr">
+        <td class="kh" style="font-weight:700;">${r.name || '—'}</td>
+        <td class="mono" style="font-size:12px; color:var(--ink-soft);">${dateTxt}</td>
+        <td>${buckets.antibiotic.map(medItemHTML).join('') || '—'}</td>
+        <td>${buckets.analgesic.map(medItemHTML).join('') || '—'}</td>
+        <td>${buckets.other.map(medItemHTML).join('') || '—'}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+document.getElementById('medicationSearch').addEventListener('input', (e) => renderMedicationPage(e.target.value));
+
 document.getElementById('addMedRowBtn').addEventListener('click', () => addMedicationRow());
 
 function getPendingQueue(){
@@ -2478,7 +2600,7 @@ function renderProcRow(item){
         <div class="appt-name kh">${r.name}</div>
         <div class="appt-meta">${formatPhoneDisplay(r.phone)||'គ្មានលេខ'} · <span class="kh">${r.treatment||r.diagnosis||'—'}</span></div>
       </div>
-      <div class="appt-plan-badge kh" style="background:var(--primary-soft);color:var(--primary-dark);border-color:rgba(31,107,73,0.4);" title="Procedure: ${planText}">
+      <div class="appt-plan-badge kh" style="background:var(--primary-soft);color:var(--primary-dark);border-color:rgba(22,76,158,0.4);" title="Procedure: ${planText}">
         📋 ${planText}
       </div>
     </div>`;
@@ -2708,7 +2830,7 @@ function renderListBase(){
     } else if (stateKey === 'planning') {
         badgeStyle = 'background:#EDE9FE; color:#6D28D9; border-color:rgba(109,40,217,0.4);';
     } else {
-        badgeStyle = 'background:var(--primary-soft); color:var(--primary-dark); border-color:rgba(31,107,73,0.4);';
+        badgeStyle = 'background:var(--primary-soft); color:var(--primary-dark); border-color:rgba(22,76,158,0.4);';
     }
 
     return `
@@ -4130,6 +4252,80 @@ document.getElementById('xrayGalleryOverlay')?.addEventListener('click', (e) => 
   }
 });
 
+/* ---------- X-Ray grid page: patients who have at least one X-ray file ---------- */
+let xrayPatientsCache = [];
+
+async function fetchXrayList(){
+  const grid = document.getElementById('xrayGrid');
+  const emptyEl = document.getElementById('xrayEmpty');
+  grid.innerHTML = `<div class="kh mono" style="grid-column:1/-1; text-align:center; padding:30px; color:var(--ink-dim);">⏳ កំពុងទាញយកបញ្ជីរូបភាព...</div>`;
+  emptyEl.classList.add('hidden');
+
+  try{
+    const urlSeparator = webAppUrl.includes('?') ? '&' : '?';
+    const fetchUrl = `${webAppUrl}${urlSeparator}action=listXrays&t=${Date.now()}`;
+    const response = await fetch(fetchUrl);
+    const result = await response.json();
+
+    if(result.status === 'success' && Array.isArray(result.data)){
+      const byPatient = {};
+      result.data.forEach(f => {
+        const key = (f.patientName || '').trim();
+        if(!key) return;
+        if(!byPatient[key]) byPatient[key] = { name: key, files: [] };
+        byPatient[key].files.push(f);
+      });
+      xrayPatientsCache = Object.values(byPatient).sort((a,b) => a.name.localeCompare(b.name));
+    } else {
+      xrayPatientsCache = [];
+    }
+  }catch(err){
+    console.warn('listXrays fetch error:', err);
+    xrayPatientsCache = [];
+  }
+  renderXrayGrid();
+}
+
+function renderXrayGrid(searchQ){
+  const grid = document.getElementById('xrayGrid');
+  const emptyEl = document.getElementById('xrayEmpty');
+
+  if(!xrayPatientsCache.length && !searchQ){
+    fetchXrayList();
+    return;
+  }
+
+  let list = xrayPatientsCache;
+  if(searchQ){
+    const q = searchQ.trim().toLowerCase();
+    list = list.filter(p => p.name.toLowerCase().includes(q));
+  }
+
+  emptyEl.classList.toggle('hidden', list.length > 0);
+  emptyEl.textContent = 'មិនមានអ្នកជំងឺដែលមានរូបភាព X-Ray ទេ';
+
+  grid.innerHTML = list.map(p => {
+    const first = p.files[0];
+    const fileIdMatch = first && first.url ? first.url.match(/[-\w]{25,}/) : null;
+    const fileId = fileIdMatch ? fileIdMatch[0] : (first ? first.id : '');
+    const thumb = fileId ? `https://drive.google.com/thumbnail?id=${fileId}&sz=w300` : '';
+    return `
+      <div class="stat-card" style="cursor:pointer; padding:0; overflow:hidden;" onclick="openXrayGallery('${p.name.replace(/'/g, "\\'")}')">
+        <div style="width:100%; aspect-ratio:1; background:var(--surface-2); display:flex; align-items:center; justify-content:center; overflow:hidden;">
+          ${thumb ? `<img src="${thumb}" loading="lazy" style="width:100%; height:100%; object-fit:cover;" onerror="this.style.display='none'">` : '🦷'}
+        </div>
+        <div style="padding:10px 12px;">
+          <div class="kh" style="font-weight:700; font-size:13px; color:var(--ink);">${p.name}</div>
+          <div class="mono" style="font-size:11px; color:var(--ink-dim); margin-top:2px;">${p.files.length} រូបភាព</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+document.getElementById('xraySearch')?.addEventListener('input', (e) => renderXrayGrid(e.target.value));
+document.getElementById('xrayRefreshBtn')?.addEventListener('click', () => fetchXrayList());
+
 const XRAY_FOLDER_ID = '1wPtreqtKW2eODRcU8GwXLzgSljCsM7AS';
 let xraySelectedBase64 = null;
 let xraySelectedMime = null;
@@ -4257,55 +4453,56 @@ async function uploadXrayImage(){
 /* ========================================================
    🧾 មុខងារគ្រប់គ្រងវិក្កយបត្រ (INVOICE MANAGEMENT)
 ======================================================== */
-function renderInvoicesTable() {
-  const tbody = document.getElementById('invoiceTableBody');
+function renderInvoicesTable(searchQ) {
+  const tbody = document.getElementById('invoicePatientTableBody');
+  const emptyEl = document.getElementById('invoicePatientEmpty');
   const grandTotalDisp = document.getElementById('invGrandTotalDisplay');
   const grandBalanceDisp = document.getElementById('invGrandBalanceDisplay');
   tbody.innerHTML = '';
 
   const invoiceRecords = allRecords.filter(r => cleanStr(r.payTotal) || cleanStr(r.payBalance) || cleanStr(r.payPaid));
 
-  if (invoiceRecords.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--ink-dim);padding:24px;" class="kh">មិនទាន់មានទិន្នន័យវិក្កយបត្រនៅឡើយទេ</td></tr>`;
-    grandTotalDisp.textContent = '$0.00';
-    grandBalanceDisp.textContent = '$0.00';
-    return;
-  }
-
-  invoiceRecords.sort((a, b) => {
-    const da = parseAnyDate(a.payDate || a.timestamp) || 0;
-    const db = parseAnyDate(b.payDate || b.timestamp) || 0;
-    return db - da;
+  // Group by patient name (case-insensitive, trimmed).
+  const byPatient = {};
+  invoiceRecords.forEach(r => {
+    const key = cleanStr(r.name).toLowerCase();
+    if(!key) return;
+    if(!byPatient[key]) byPatient[key] = { name: r.name, phone: r.phone, cases: [], total: 0, balance: 0 };
+    const totVal = parseFloat(String(r.payTotal || '').replace(/[^\d.]/g, '')) || 0;
+    const balVal = parseFloat(String(r.payBalance || '').replace(/[^\d.]/g, '')) || 0;
+    byPatient[key].cases.push(r);
+    byPatient[key].total += totVal;
+    byPatient[key].balance += balVal;
+    if(!byPatient[key].phone && r.phone) byPatient[key].phone = r.phone;
   });
+
+  let patients = Object.values(byPatient);
+  if(searchQ){
+    const q = searchQ.trim().toLowerCase();
+    patients = patients.filter(p => p.name.toLowerCase().includes(q) || String(p.phone||'').includes(q));
+  }
+  patients.sort((a,b) => b.total - a.total);
+
+  emptyEl.classList.toggle('hidden', patients.length > 0);
+  if(patients.length === 0){
+    emptyEl.textContent = 'មិនទាន់មានទិន្នន័យវិក្កយបត្រនៅឡើយទេ';
+  }
 
   let sumTotal = 0;
   let sumBalance = 0;
 
-  invoiceRecords.forEach(r => {
-    const totVal = parseFloat(String(r.payTotal || '').replace(/[^\d.]/g, '')) || 0;
-    const balVal = parseFloat(String(r.payBalance || '').replace(/[^\d.]/g, '')) || 0;
-
-    sumTotal += totVal;
-    sumBalance += balVal;
-
-    const sexText = String(r.sex || '').toUpperCase() === 'M' ? 'ប្រុស' : (String(r.sex || '').toUpperCase() === 'F' ? 'ស្រី' : '—');
-    const ageText = r.age ? `${r.age}` : '—';
-    const invoiceDate = r.payDate ? r.payDate : formatDateDisplay(r.timestamp).split(' ')[0];
+  patients.forEach(p => {
+    sumTotal += p.total;
+    sumBalance += p.balance;
 
     const tr = document.createElement('tr');
     tr.className = 'emr-tr';
-    tr.onclick = () => {
-      document.getElementById('invoiceOverlay').classList.add('hidden');
-      openDetail(r._id, true);
-    };
-
+    tr.onclick = () => openInvoiceDetail(p);
     tr.innerHTML = `
-      <td class="kh" style="font-weight:700; color:var(--ink);">${r.name || '—'}</td>
-      <td class="kh" style="text-align:center; font-size:12px;">${sexText} / ${ageText}</td>
-      <td class="mono" style="font-size:12px;">${formatPhoneDisplay(r.phone) || '—'}</td>
-      <td class="mono" style="font-size:12px; color:var(--ink-soft);">${invoiceDate}</td>
-      <td class="mono" style="text-align:right; font-weight:700; color:var(--primary-dark);">$${totVal.toFixed(2)}</td>
-      <td class="mono" style="text-align:right; font-weight:700; color:${balVal > 0 ? 'var(--coral-dark)' : 'var(--primary-dark)'};">$${balVal.toFixed(2)}</td>
+      <td class="kh" style="font-weight:700; color:var(--ink);">${p.name || '—'}</td>
+      <td class="mono" style="font-size:12px;">${formatPhoneDisplay(p.phone) || '—'}</td>
+      <td class="mono" style="text-align:center; font-weight:700;">${p.cases.length}</td>
+      <td class="mono" style="text-align:right; font-weight:700; color:var(--primary-dark);">$${p.total.toFixed(2)}</td>
     `;
     tbody.appendChild(tr);
   });
@@ -4314,9 +4511,46 @@ function renderInvoicesTable() {
   grandBalanceDisp.textContent = '$' + sumBalance.toFixed(2);
 }
 
+function openInvoiceDetail(p){
+  document.getElementById('invDetailTitle').textContent = `🧾 ${p.name} — វិក្កយបត្រ`;
+  const sorted = [...p.cases].sort((a,b) => (parseAnyDate(b.payDate||b.timestamp)||0) - (parseAnyDate(a.payDate||a.timestamp)||0));
+  const rows = sorted.map(r => {
+    const totVal = parseFloat(String(r.payTotal || '').replace(/[^\d.]/g, '')) || 0;
+    const balVal = parseFloat(String(r.payBalance || '').replace(/[^\d.]/g, '')) || 0;
+    const dateTxt = r.payDate ? r.payDate : formatDateDisplay(r.timestamp).split(' ')[0];
+    return `
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 0; border-bottom:1px dashed var(--border);">
+        <div>
+          <div class="kh" style="font-weight:700; font-size:13px;">${r.treatment || r.diagnosis || '—'}</div>
+          <div class="mono" style="font-size:11px; color:var(--ink-dim);">${dateTxt}</div>
+        </div>
+        <div style="text-align:right;">
+          <div class="mono" style="font-weight:700; color:var(--primary-dark);">$${totVal.toFixed(2)}</div>
+          ${balVal > 0 ? `<div class="mono" style="font-size:11px; color:var(--coral-dark);">នៅខ្វះ $${balVal.toFixed(2)}</div>` : ''}
+        </div>
+        <button type="button" class="btn btn-outline btn-sm kh" onclick='printInvoiceRecord("${r._id}")'>🖨</button>
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('invDetailBody').innerHTML = `
+    <div style="margin-bottom:10px; font-size:12.5px; color:var(--ink-soft);">📞 ${formatPhoneDisplay(p.phone) || '—'} &nbsp;·&nbsp; ${p.cases.length} ករណី &nbsp;·&nbsp; សរុប <b class="mono" style="color:var(--primary-dark);">$${p.total.toFixed(2)}</b></div>
+    ${rows}
+  `;
+  document.getElementById('invoiceDetailOverlay').classList.remove('hidden');
+}
+
+function printInvoiceRecord(recordId){
+  const r = allRecords.find(x => x._id === recordId);
+  if(!r) return;
+  document.getElementById('invoiceDetailOverlay').classList.add('hidden');
+  printContext = { type: 'receipt', record: r };
+  document.getElementById('printSizeModalOverlay').classList.remove('hidden');
+}
+
 /* ---------- Quick Invoice panel ---------- */
 function populateInvoicePatientSelect(){
-  const sel = document.getElementById('inv_patientSelect');
+  const sel = document.getElementById('qi_patientSelect');
   const sorted = [...allRecords].sort((a,b) => (parseAnyDate(b.timestamp)||0) - (parseAnyDate(a.timestamp)||0));
   sel.innerHTML = '<option value="">- ជ្រើសរើសអ្នកជំងឺ / ករណី -</option>' +
     sorted.map(r => {
@@ -4326,9 +4560,9 @@ function populateInvoicePatientSelect(){
     }).join('');
 }
 
-document.getElementById('inv_patientSearch').addEventListener('input', (e) => {
+document.getElementById('qi_patientSearch').addEventListener('input', (e) => {
   const q = e.target.value.trim().toLowerCase();
-  const sel = document.getElementById('inv_patientSelect');
+  const sel = document.getElementById('qi_patientSelect');
   Array.from(sel.options).forEach(opt => {
     if(!opt.value){ opt.hidden = false; return; }
     opt.hidden = q && !opt.textContent.toLowerCase().includes(q);
@@ -4336,41 +4570,41 @@ document.getElementById('inv_patientSearch').addEventListener('input', (e) => {
 });
 
 function resetInvoiceForm(){
-  document.getElementById('inv_patientSearch').value = '';
-  document.getElementById('inv_patientSelect').value = '';
-  document.getElementById('inv_total').value = '';
-  document.getElementById('inv_discount').value = '';
-  document.getElementById('inv_paid').value = '';
-  document.getElementById('inv_balance').value = '';
-  document.getElementById('inv_method').value = 'សាច់ប្រាក់ (Cash)';
-  document.getElementById('inv_note').value = '';
+  document.getElementById('qi_patientSearch').value = '';
+  document.getElementById('qi_patientSelect').value = '';
+  document.getElementById('qi_total').value = '';
+  document.getElementById('qi_discount').value = '';
+  document.getElementById('qi_paid').value = '';
+  document.getElementById('qi_balance').value = '';
+  document.getElementById('qi_method').value = 'សាច់ប្រាក់ (Cash)';
+  document.getElementById('qi_note').value = '';
   document.getElementById('invFormMsg').style.display = 'none';
 }
 
-document.getElementById('inv_patientSelect').addEventListener('change', (e) => {
+document.getElementById('qi_patientSelect').addEventListener('change', (e) => {
   const r = allRecords.find(x => x._id === e.target.value);
   const msg = document.getElementById('invFormMsg');
   msg.style.display = 'none';
   if(!r){
-    document.getElementById('inv_total').value = '';
-    document.getElementById('inv_discount').value = '';
-    document.getElementById('inv_paid').value = '';
-    document.getElementById('inv_balance').value = '';
-    document.getElementById('inv_note').value = '';
+    document.getElementById('qi_total').value = '';
+    document.getElementById('qi_discount').value = '';
+    document.getElementById('qi_paid').value = '';
+    document.getElementById('qi_balance').value = '';
+    document.getElementById('qi_note').value = '';
     return;
   }
-  document.getElementById('inv_total').value = r.payTotal || '';
-  document.getElementById('inv_discount').value = r.payDiscount || '';
-  document.getElementById('inv_paid').value = r.payPaid || '';
-  document.getElementById('inv_method').value = r.payMethod || 'សាច់ប្រាក់ (Cash)';
-  document.getElementById('inv_note').value = r.payNote || '';
+  document.getElementById('qi_total').value = r.payTotal || '';
+  document.getElementById('qi_discount').value = r.payDiscount || '';
+  document.getElementById('qi_paid').value = r.payPaid || '';
+  document.getElementById('qi_method').value = r.payMethod || 'សាច់ប្រាក់ (Cash)';
+  document.getElementById('qi_note').value = r.payNote || '';
   calcInvBalance();
 });
 
 function calcInvBalance(){
-  let tot = parseFloat(document.getElementById('inv_total').value.replace(/[^\d.]/g,'')) || 0;
-  let paid = parseFloat(document.getElementById('inv_paid').value.replace(/[^\d.]/g,'')) || 0;
-  let disc = document.getElementById('inv_discount').value.trim();
+  let tot = parseFloat(document.getElementById('qi_total').value.replace(/[^\d.]/g,'')) || 0;
+  let paid = parseFloat(document.getElementById('qi_paid').value.replace(/[^\d.]/g,'')) || 0;
+  let disc = document.getElementById('qi_discount').value.trim();
   let discVal = 0;
   if(disc.includes('%')){
     let p = parseFloat(disc.replace(/[^\d.]/g,'')) || 0;
@@ -4379,16 +4613,16 @@ function calcInvBalance(){
     discVal = parseFloat(disc.replace(/[^\d.]/g,'')) || 0;
   }
   let bal = tot - discVal - paid;
-  if(bal > 0) document.getElementById('inv_balance').value = '$' + bal.toFixed(2);
-  else if(tot > 0) document.getElementById('inv_balance').value = '$0.00';
-  else document.getElementById('inv_balance').value = '';
+  if(bal > 0) document.getElementById('qi_balance').value = '$' + bal.toFixed(2);
+  else if(tot > 0) document.getElementById('qi_balance').value = '$0.00';
+  else document.getElementById('qi_balance').value = '';
 }
-document.getElementById('inv_total').addEventListener('input', calcInvBalance);
-document.getElementById('inv_paid').addEventListener('input', calcInvBalance);
-document.getElementById('inv_discount').addEventListener('input', calcInvBalance);
+document.getElementById('qi_total').addEventListener('input', calcInvBalance);
+document.getElementById('qi_paid').addEventListener('input', calcInvBalance);
+document.getElementById('qi_discount').addEventListener('input', calcInvBalance);
 
 function saveQuickInvoice(andPrint){
-  const selId = document.getElementById('inv_patientSelect').value;
+  const selId = document.getElementById('qi_patientSelect').value;
   const msg = document.getElementById('invFormMsg');
   msg.style.display = 'block';
 
@@ -4405,12 +4639,12 @@ function saveQuickInvoice(andPrint){
   const updated = {
     ...original,
     payDate: original.payDate || getLocalTodayYMD(),
-    payTotal: document.getElementById('inv_total').value.trim(),
-    payDiscount: document.getElementById('inv_discount').value.trim(),
-    payPaid: document.getElementById('inv_paid').value.trim(),
-    payBalance: document.getElementById('inv_balance').value.trim(),
-    payMethod: document.getElementById('inv_method').value.trim(),
-    payNote: document.getElementById('inv_note').value.trim()
+    payTotal: document.getElementById('qi_total').value.trim(),
+    payDiscount: document.getElementById('qi_discount').value.trim(),
+    payPaid: document.getElementById('qi_paid').value.trim(),
+    payBalance: document.getElementById('qi_balance').value.trim(),
+    payMethod: document.getElementById('qi_method').value.trim(),
+    payNote: document.getElementById('qi_note').value.trim()
   };
 
   const payload = {
@@ -4444,24 +4678,15 @@ function saveQuickInvoice(andPrint){
 document.getElementById('invSaveOnlyBtn').addEventListener('click', () => saveQuickInvoice(false));
 document.getElementById('invSavePrintBtn').addEventListener('click', () => saveQuickInvoice(true));
 
-document.getElementById('invoiceBtn').addEventListener('click', () => {
-  renderInvoicesTable();
-  resetInvoiceForm();
-  populateInvoicePatientSelect();
-  document.getElementById('invoiceOverlay').classList.remove('hidden');
-});
+document.getElementById('invoiceBtn').addEventListener('click', () => showView('invoices'));
 
-document.getElementById('closeInvoice').addEventListener('click', () => {
-  document.getElementById('invoiceOverlay').classList.add('hidden');
+document.getElementById('closeInvoiceDetail').addEventListener('click', () => {
+  document.getElementById('invoiceDetailOverlay').classList.add('hidden');
 });
-
-document.getElementById('closeInvoiceBtn').addEventListener('click', () => {
-  document.getElementById('invoiceOverlay').classList.add('hidden');
+document.getElementById('invoiceDetailOverlay').addEventListener('click', (e) => {
+  if (e.target.id === 'invoiceDetailOverlay') document.getElementById('invoiceDetailOverlay').classList.add('hidden');
 });
-
-document.getElementById('invoiceOverlay').addEventListener('click', (e) => {
-  if (e.target.id === 'invoiceOverlay') document.getElementById('invoiceOverlay').classList.add('hidden');
-});
+document.getElementById('invoicePatientSearch').addEventListener('input', (e) => renderInvoicesTable(e.target.value));
 
 /* ========================================================
    💸 មុខងារគ្រប់គ្រងការចំណាយ (EXPENSE MANAGEMENT)
@@ -4612,24 +4837,92 @@ function printExpensesReport() {
   document.getElementById('printOverlay').classList.remove('hidden');
 }
 
-// ភ្ជាប់ Event Listeners សម្រាប់ Expense Modal
-document.getElementById('expenseBtn').addEventListener('click', () => {
-  document.getElementById('exp_date').value = getLocalTodayYMD();
-  renderExpensesTable();
-  document.getElementById('expenseOverlay').classList.remove('hidden');
-});
-
-document.getElementById('closeExpense').addEventListener('click', () => {
-  document.getElementById('expenseOverlay').classList.add('hidden');
-});
-document.getElementById('closeExpenseBtn').addEventListener('click', () => {
-  document.getElementById('expenseOverlay').classList.add('hidden');
-});
-document.getElementById('expenseOverlay').addEventListener('click', (e) => {
-  if (e.target.id === 'expenseOverlay') document.getElementById('expenseOverlay').classList.add('hidden');
-});
+// ភ្ជាប់ Event Listener សម្រាប់ Income & Expense page shortcut
+document.getElementById('expenseBtn').addEventListener('click', () => showView('income-expense'));
 
 document.getElementById('addExpenseBtn').addEventListener('click', addExpenseItem);
+function getIncomeExpenseStats(){
+  const now = new Date();
+  const curMonth = now.getMonth(), curYear = now.getFullYear();
+  let lm = curMonth - 1, ly = curYear;
+  if(lm < 0){ lm = 11; ly = curYear - 1; }
+
+  let incomeToday = 0, incomeMonth = 0, incomeYear = 0, incomeLastMonth = 0, incomeLastYear = 0;
+  allRecords.forEach(r => {
+    const paid = parseFloat(String(r.payPaid || '').replace(/[^\d.]/g, '')) || 0;
+    if(!paid) return;
+    const d = parseAnyDate(r.payDate || r.timestamp);
+    if(!d) return;
+    if(d.getFullYear() === curYear && d.getMonth() === curMonth && d.getDate() === now.getDate()) incomeToday += paid;
+    if(d.getFullYear() === curYear && d.getMonth() === curMonth) incomeMonth += paid;
+    if(d.getFullYear() === curYear) incomeYear += paid;
+    if(d.getFullYear() === ly && d.getMonth() === lm) incomeLastMonth += paid;
+    if(d.getFullYear() === curYear - 1) incomeLastYear += paid;
+  });
+
+  let expenseMonth = 0, expenseLastMonth = 0, expenseYear = 0, expenseLastYear = 0;
+  expensesList.forEach(e => {
+    const amt = parseFloat(e.amount) || 0;
+    if(!isYMD(e.date)) return;
+    const d = new Date(e.date + 'T00:00:00');
+    if(d.getFullYear() === curYear && d.getMonth() === curMonth) expenseMonth += amt;
+    if(d.getFullYear() === ly && d.getMonth() === lm) expenseLastMonth += amt;
+    if(d.getFullYear() === curYear) expenseYear += amt;
+    if(d.getFullYear() === curYear - 1) expenseLastYear += amt;
+  });
+
+  return { incomeToday, incomeMonth, incomeYear, incomeLastMonth, incomeLastYear, expenseMonth, expenseLastMonth, expenseYear, expenseLastYear };
+}
+
+function renderCompareChart(containerId, label1, label2, val1Income, val1Expense, val2Income, val2Expense){
+  const maxVal = Math.max(val1Income, val1Expense, val2Income, val2Expense, 1);
+  const W = 320, H = 160, barW = 34, gap = 26, groupGap = 60;
+  const baseY = H - 26;
+  const scale = v => (v / maxVal) * (H - 50);
+
+  function bar(x, val, color){
+    const h = scale(val);
+    return `<rect x="${x}" y="${baseY - h}" width="${barW}" height="${h}" rx="4" fill="${color}"></rect>
+            <text x="${x + barW/2}" y="${baseY - h - 6}" text-anchor="middle" font-size="10.5" font-weight="700" fill="var(--ink-soft)" font-family="monospace">$${val.toFixed(0)}</text>`;
+  }
+
+  const g1x = 30, g2x = g1x + barW*2 + gap + groupGap;
+  const svg = `
+    <svg viewBox="0 0 ${W} ${H}" style="width:100%; height:auto; max-width:340px;">
+      <line x1="10" y1="${baseY}" x2="${W-10}" y2="${baseY}" stroke="var(--border)" stroke-width="1.5"></line>
+      ${bar(g1x, val1Income, 'var(--primary)')}
+      ${bar(g1x + barW + gap, val1Expense, 'var(--coral)')}
+      <text x="${g1x + barW + gap/2}" y="${H-8}" text-anchor="middle" font-size="11" class="kh" fill="var(--ink-soft)">${label1}</text>
+      ${bar(g2x, val2Income, 'var(--primary)')}
+      ${bar(g2x + barW + gap, val2Expense, 'var(--coral)')}
+      <text x="${g2x + barW + gap/2}" y="${H-8}" text-anchor="middle" font-size="11" class="kh" fill="var(--ink-soft)">${label2}</text>
+    </svg>
+    <div style="display:flex; gap:14px; justify-content:center; margin-top:6px; font-size:11px;" class="kh">
+      <span><span style="display:inline-block;width:9px;height:9px;background:var(--primary);border-radius:2px;margin-right:4px;"></span>ចំណូល Income</span>
+      <span><span style="display:inline-block;width:9px;height:9px;background:var(--coral);border-radius:2px;margin-right:4px;"></span>ចំណាយ Expense</span>
+    </div>
+  `;
+  document.getElementById(containerId).innerHTML = svg;
+}
+
+function renderIncomeExpensePage(){
+  loadExpenses();
+  const s = getIncomeExpenseStats();
+
+  document.getElementById('incomeExpenseStats').innerHTML = statCardsHTML([
+    { kh: 'ចំណូលថ្ងៃនេះ', en: 'Income Today', val: '$' + s.incomeToday.toFixed(2), cls: '' },
+    { kh: 'ចំណូលខែនេះ', en: 'Income This Month', val: '$' + s.incomeMonth.toFixed(2), cls: '' },
+    { kh: 'ចំណូលឆ្នាំនេះ', en: 'Income This Year', val: '$' + s.incomeYear.toFixed(2), cls: '' },
+    { kh: 'ចំណាយប្រចាំខែ', en: 'Expense This Month', val: '$' + s.expenseMonth.toFixed(2), cls: 'debt' }
+  ]);
+
+  renderCompareChart('chartMonthCompare', 'ខែមុន', 'ខែនេះ', s.incomeLastMonth, s.expenseLastMonth, s.incomeMonth, s.expenseMonth);
+  renderCompareChart('chartYearCompare', 'ឆ្នាំមុន', 'ឆ្នាំនេះ', s.incomeLastYear, s.expenseLastYear, s.incomeYear, s.expenseYear);
+
+  document.getElementById('exp_date').value = getLocalTodayYMD();
+  renderExpensesTable();
+}
+
 document.getElementById('printExpenseBtn').addEventListener('click', printExpensesReport);
 
 
@@ -4643,7 +4936,11 @@ const VIEW_META = {
   appointments: { kh: 'ការណាត់ជួប',          en: 'Appointments' },
   reports:      { kh: 'របាយការណ៍',           en: 'Reports' },
   labo:         { kh: 'ពុម្ភធ្មេញ',           en: 'Dental Lab orders' },
-  inventory:    { kh: 'ឃ្លាំងបរិក្ខា',        en: 'Inventory' }
+  inventory:    { kh: 'បរិក្ខាធ្មេញ',         en: 'Inventory' },
+  xray:         { kh: 'រូបធ្មេញ',             en: 'Dental X-Ray' },
+  medication:   { kh: 'ថ្នាំធ្មេញ',            en: 'Medication' },
+  invoices:     { kh: 'វិក្កយបត្រ',           en: 'Invoices' },
+  'income-expense': { kh: 'ចំណូលចំណាយ',      en: 'Income & Expense' }
 };
 let currentView = 'dashboard';
 let patientFilter = 'all';
@@ -4722,6 +5019,10 @@ function showView(key){
   currentView = view;
   if(view === 'labo') renderLab();
   if(view === 'inventory') renderInventory();
+  if(view === 'invoices'){ renderInvoicesTable(); resetInvoiceForm(); populateInvoicePatientSelect(); }
+  if(view === 'income-expense') renderIncomeExpensePage();
+  if(view === 'xray') renderXrayGrid();
+  if(view === 'medication') renderMedicationPage();
   document.querySelectorAll('.view').forEach(v=> v.classList.toggle('active', v.id === 'view-' + view));
   syncNav();
   closeSidebarDrawer();
@@ -4783,8 +5084,6 @@ function toggleSidebar(){
   document.querySelectorAll('.sb-item[data-nav]').forEach(b=> b.addEventListener('click', ()=> showView(b.dataset.nav)));
   document.querySelectorAll('#patientFilters .chip').forEach(ch=> ch.addEventListener('click', ()=> setPatientFilter(ch.dataset.filter)));
 
-  document.getElementById('navInvoices').addEventListener('click', ()=>{ closeSidebarDrawer(); document.getElementById('invoiceBtn').click(); });
-  document.getElementById('navExpenses').addEventListener('click', ()=>{ closeSidebarDrawer(); document.getElementById('expenseBtn').click(); });
   document.getElementById('settingsBtn').addEventListener('click', closeSidebarDrawer);
 
   const sync = document.getElementById('syncBadge');
