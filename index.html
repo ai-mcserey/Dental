@@ -1832,6 +1832,12 @@ function saveClinicalConfigs() {
   localStorage.setItem('kep_cfg_diagnosis', JSON.stringify(appDiagnosis));
   localStorage.setItem('kep_cfg_procedures', JSON.stringify(appProcedures));
   populateClinicalSelects();
+
+  try{
+    pushToSheet('updateConfig', { key: 'treatments', value: appTreatments });
+    pushToSheet('updateConfig', { key: 'diagnosis', value: appDiagnosis });
+    pushToSheet('updateConfig', { key: 'procedures', value: appProcedures });
+  }catch(err){ console.warn('Config sync queue error:', err); }
 }
 
 function populateClinicalSelects() {
@@ -2499,6 +2505,22 @@ async function fetchFromSheet(isSilent = false){
       }
       if(typeof renderLab === 'function') renderLab();
       if(typeof renderInventory === 'function') renderInventory();
+
+      if(json.config && typeof json.config === 'object'){
+        if(Array.isArray(json.config.treatments) && json.config.treatments.length){
+          appTreatments = json.config.treatments;
+          localStorage.setItem('kep_cfg_treatments', JSON.stringify(appTreatments));
+        }
+        if(Array.isArray(json.config.diagnosis) && json.config.diagnosis.length){
+          appDiagnosis = json.config.diagnosis;
+          localStorage.setItem('kep_cfg_diagnosis', JSON.stringify(appDiagnosis));
+        }
+        if(Array.isArray(json.config.procedures) && json.config.procedures.length){
+          appProcedures = json.config.procedures;
+          localStorage.setItem('kep_cfg_procedures', JSON.stringify(appProcedures));
+        }
+        populateClinicalSelects();
+      }
 
       badge.textContent = '✓ Sync ជោគជ័យ';
       setTimeout(()=>{ badge.textContent = '🔄 Sync'; }, 2500);
@@ -3186,6 +3208,40 @@ function buildReceiptHTML(record, sizeClass) {
   `;
 }
 
+function buildCombinedReceiptHTML(patientName, records, sizeClass) {
+  const sorted = [...records].sort((a,b) => (parseAnyDate(a.payDate||a.timestamp)||0) - (parseAnyDate(b.payDate||b.timestamp)||0));
+  const num = v => parseFloat(String(v || '').replace(/[^\d.]/g, '')) || 0;
+
+  const rows = sorted.map(r => {
+    const dateTxt = r.payDate ? r.payDate : formatDateDisplay(r.timestamp).split(' ')[0];
+    return `<div class="thermal-row"><span class="lbl kh">${dateTxt} ${r.treatment || r.diagnosis || '—'}</span><span class="val mono">$${num(r.payTotal).toFixed(2)}</span></div>`;
+  }).join('');
+
+  const grandTotal = sorted.reduce((s,r) => s + num(r.payTotal), 0);
+  const grandPaid = sorted.reduce((s,r) => s + num(r.payPaid), 0);
+  const grandBal = sorted.reduce((s,r) => s + num(r.payBalance), 0);
+
+  return `
+    <div class="thermal-receipt ${sizeClass}">
+      <div class="thermal-header">
+        <div class="thermal-clinic-name">${clinicInfo.name}</div>
+        <div class="thermal-sub">${clinicInfo.address}</div>
+        <div class="thermal-sub">${clinicInfo.phone}</div>
+      </div>
+      <div class="thermal-title">Combined Receipt / វិក្កយបត្របូកសរុប</div>
+      <div class="thermal-row"><span class="lbl">Patient:</span><span class="val kh">${patientName}</span></div>
+      <div class="thermal-row"><span class="lbl">Cases:</span><span class="val mono">${sorted.length}</span></div>
+      <div class="thermal-divider"></div>
+      ${rows}
+      <div class="thermal-divider"></div>
+      <div class="thermal-row"><span class="lbl">Grand Total:</span><span class="val mono">$${grandTotal.toFixed(2)}</span></div>
+      <div class="thermal-row"><span class="lbl">Paid:</span><span class="val mono">$${grandPaid.toFixed(2)}</span></div>
+      <div class="thermal-row"><span class="lbl">Balance:</span><span class="val mono">$${grandBal.toFixed(2)}</span></div>
+      <div class="thermal-footer kh">សូមអរគុណ! Thank you!</div>
+    </div>
+  `;
+}
+
 function buildRxHTML(record, sizeClass) {
   const presItems = parsePrescriptionString(record.medication);
   let medHtml = '';
@@ -3313,7 +3369,7 @@ function openPatientRecord(name){
           <button type="button" class="btn btn-primary btn-full kh" id="addVisitBtn">＋ កត់ត្រាព្យាបាលថ្មី (New Visit)</button>
           <button type="button" class="btn btn-outline kh" onclick="openXrayGallery('${safeName}')">📷 មើល X-Ray</button>
           <button type="button" class="btn btn-outline kh" id="printPatientBtn">🖨 បោះពុម្ព (Full)</button>
-          <button type="button" class="btn btn-outline kh" id="printReceiptBtn">🧾 វិក្កយបត្រ (Receipt)</button>
+          <button type="button" class="btn btn-outline kh" id="printReceiptBtn">🧾 វិក្កយបត្រ (Invoices)</button>
           <button type="button" class="btn btn-outline kh" id="printRxBtn">💊 វេជ្ជបញ្ជា (Rx)</button>
           <button type="button" class="btn btn-danger btn-full kh" id="deletePatientBtn" onclick="deletePatient('${safeName}')">🗑 លុបអ្នកជំងឺនេះ</button>
         </div>
@@ -3359,8 +3415,15 @@ function openPatientRecord(name){
   });
 
   document.getElementById('printReceiptBtn').addEventListener('click', ()=>{
-    printContext = { type: 'receipt', record: latest };
-    document.getElementById('printSizeModalOverlay').classList.remove('hidden');
+    const invoiceCases = records.filter(r => cleanStr(r.payTotal) || cleanStr(r.payBalance) || cleanStr(r.payPaid));
+    const num = v => parseFloat(String(v || '').replace(/[^\d.]/g, '')) || 0;
+    const total = invoiceCases.reduce((s,r) => s + num(r.payTotal), 0);
+    const balance = invoiceCases.reduce((s,r) => s + num(r.payBalance), 0);
+    if(invoiceCases.length === 0){
+      alert('អ្នកជំងឺនេះមិនទាន់មានទិន្នន័យវិក្កយបត្រនៅឡើយទេ / No invoice data yet');
+      return;
+    }
+    openInvoiceDetail({ name: latest.name, phone: realPhone, cases: invoiceCases, total, balance });
   });
   document.getElementById('printRxBtn').addEventListener('click', ()=>{
     printContext = { type: 'rx', record: latest };
@@ -4285,6 +4348,9 @@ function handleThermalPrint(size) {
   if(printContext.type === 'receipt') {
       html = buildReceiptHTML(printContext.record, sizeClass);
       document.getElementById('printOverlayTitle').textContent = 'Receipt Print / វិក្កយបត្រ';
+  } else if(printContext.type === 'receipt-combined') {
+      html = buildCombinedReceiptHTML(printContext.patientName, printContext.records, sizeClass);
+      document.getElementById('printOverlayTitle').textContent = 'Combined Receipt / វិក្កយបត្របូកសរុប';
   } else if(printContext.type === 'rx') {
       html = buildRxHTML(printContext.record, sizeClass);
       document.getElementById('printOverlayTitle').textContent = 'Rx Print / វេជ្ជបញ្ជា';
@@ -4701,17 +4767,30 @@ function openInvoiceDetail(p){
   }).join('');
 
   document.getElementById('invDetailBody').innerHTML = `
-    <div style="margin-bottom:10px; font-size:12.5px; color:var(--ink-soft);">📞 ${formatPhoneDisplay(p.phone) || '—'} &nbsp;·&nbsp; ${p.cases.length} ករណី &nbsp;·&nbsp; សរុប <b class="mono" style="color:var(--primary-dark);">$${p.total.toFixed(2)}</b></div>
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px;">
+      <div style="font-size:12.5px; color:var(--ink-soft);">📞 ${formatPhoneDisplay(p.phone) || '—'} &nbsp;·&nbsp; ${p.cases.length} ករណី &nbsp;·&nbsp; សរុប <b class="mono" style="color:var(--primary-dark);">$${p.total.toFixed(2)}</b></div>
+      <button type="button" class="btn btn-primary btn-sm kh" onclick="printCombinedInvoice()">🖨 Print ទាំងអស់ (Combined)</button>
+    </div>
     ${rows}
   `;
+  activeInvoiceDetailPatient = p;
   document.getElementById('invoiceDetailOverlay').classList.remove('hidden');
 }
+
+let activeInvoiceDetailPatient = null;
 
 function printInvoiceRecord(recordId){
   const r = allRecords.find(x => x._id === recordId);
   if(!r) return;
   document.getElementById('invoiceDetailOverlay').classList.add('hidden');
   printContext = { type: 'receipt', record: r };
+  document.getElementById('printSizeModalOverlay').classList.remove('hidden');
+}
+
+function printCombinedInvoice(){
+  if(!activeInvoiceDetailPatient) return;
+  document.getElementById('invoiceDetailOverlay').classList.add('hidden');
+  printContext = { type: 'receipt-combined', patientName: activeInvoiceDetailPatient.name, records: activeInvoiceDetailPatient.cases };
   document.getElementById('printSizeModalOverlay').classList.remove('hidden');
 }
 
