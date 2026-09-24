@@ -332,7 +332,9 @@
     display: flex; flex-direction: column; justify-content: space-between; 
     margin: 0; height: 100%;
   }
-  .emr-avatar { width: 64px; height: 64px; background: var(--primary-soft); color: var(--primary-dark); font-size: 32px; display: flex; align-items: center; justify-content: center; border-radius: 16px; }
+  .emr-avatar { width: 64px; height: 64px; background: var(--primary-soft); color: var(--primary-dark); font-size: 32px; display: flex; align-items: center; justify-content: center; border-radius: 16px; cursor:pointer; position:relative; overflow:hidden; flex-shrink:0; }
+  .emr-avatar img { width:100%; height:100%; object-fit:cover; border-radius:16px; }
+  .emr-avatar .avatar-edit-badge { position:absolute; bottom:-2px; right:-2px; width:22px; height:22px; background:var(--primary); color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; border:2px solid var(--surface); }
   .emr-pat-name { margin: 0; font-size: 22px; font-weight: 800; color: var(--ink); letter-spacing: -0.01em; line-height: 1.2; }
   
   .emr-actions-bar { 
@@ -426,14 +428,19 @@
 
   .row-name-sex-age{ grid-column: 1 / -1; display: grid; grid-template-columns: 2.2fr 1fr 1fr; gap: 10px; }
   @media(max-width:640px){ .row-name-sex-age{ grid-template-columns: 1fr; } }
+  .row-name-sex-age-phone{ grid-column: 1 / -1; display: grid; grid-template-columns: 1.8fr .8fr .7fr 1.2fr; gap: 10px; }
+  @media(max-width:768px){ .row-name-sex-age-phone{ grid-template-columns: 1fr 1fr; } }
+  @media(max-width:480px){ .row-name-sex-age-phone{ grid-template-columns: 1fr; } }
 
   .row-phone-visit-type{ grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
   
-  .row-teeth-diag-idc { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
-  @media(max-width:768px){ .row-teeth-diag-idc { grid-template-columns: 1fr; } }
+  .row-visitdate-teeth { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media(max-width:640px){ .row-visitdate-teeth { grid-template-columns: 1fr; } }
+  .row-diag-idc { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media(max-width:640px){ .row-diag-idc { grid-template-columns: 1fr; } }
 
-  .procedure-datetime-row{ grid-column:1/-1; display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:12px; background:var(--surface); border:1px solid var(--border); padding:12px; border-radius:12px; }
-  @media(max-width:992px){ .procedure-datetime-row{grid-template-columns:1fr 1fr;} }
+  .procedure-datetime-row{ grid-column:1/-1; display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px; background:var(--surface); border:1px solid var(--border); padding:12px; border-radius:12px; }
+  @media(max-width:992px){ .procedure-datetime-row{grid-template-columns:1fr;} }
   @media(max-width:640px){ .procedure-datetime-row{grid-template-columns:1fr;} }
 
   .appointment-box-wrapper{ grid-column: 1 / -1; background: var(--amber-soft); border: 1.5px dashed var(--amber); border-radius: 12px; padding: 12px 14px; transition: all .2s ease; }
@@ -1346,11 +1353,12 @@
         <button type="button" class="form-tab-btn kh active" data-tab="clinical" onclick="switchFormTab('clinical')">🩺 ព័ត៌មានព្យាបាល · Clinical</button>
         <button type="button" class="form-tab-btn kh" data-tab="medication" onclick="switchFormTab('medication')">💊 ចេញថ្នាំ · Medication</button>
         <button type="button" class="form-tab-btn kh" data-tab="payment" onclick="switchFormTab('payment')">💰 ការបង់ប្រាក់ · Payment</button>
+        <button type="button" class="form-tab-btn kh" data-tab="status" onclick="switchFormTab('status')">🗓️ ស្ថានភាព · Status</button>
       </div>
       <div class="form-grid">
         
         <div class="form-tab-panel" data-tab="clinical" style="display:contents;">
-        <div class="row-name-sex-age" id="group_name_sex_age">
+        <div class="row-name-sex-age-phone" id="group_name_sex_age">
           <div class="field">
             <label>ឈ្មោះអ្នកជំងឺ · Patient name</label>
             <input type="text" id="f_name" class="kh" placeholder="ឈ្មោះអ្នកជំងឺ">
@@ -1366,24 +1374,24 @@
             <label>អាយុ · Age</label>
             <input type="number" id="f_age" min="0" max="120" placeholder="23">
           </div>
-        </div>
-
-        <div class="row-phone-visit-type" id="group_phone_visit_type">
           <div class="field">
             <label>លេខទូរស័ព្ទ · Phone</label>
             <input type="text" id="f_phone" placeholder="097xxxxxxx">
           </div>
-          <div class="field">
+        </div>
+
+        <div class="row-visitdate-teeth" id="group_phone_visit_type">
+          <div class="field" style="margin:0;">
             <label>កាលបរិច្ឆេទចូល · Visit Date-Time</label>
             <input type="datetime-local" id="f_visitDateTime" class="mono">
           </div>
-        </div>
-        
-        <div class="row-teeth-diag-idc">
           <div class="field" style="margin:0;">
             <label>លេខធ្មេញ · Teeth</label>
             <input type="text" id="f_teeth" class="mono" placeholder="ឧ. 16, 24, 54, 61">
           </div>
+        </div>
+
+        <div class="row-diag-idc">
           <div class="field" style="margin:0;">
             <label>Diagnosis (Indication)</label>
             <select id="f_diagnosis" class="kh"></select>
@@ -1413,12 +1421,10 @@
           <div class="field" style="margin:0;">
             <label>Treatment</label>
             <select id="f_treatment" class="kh"></select>
-            <input type="text" id="f_treatment_custom" placeholder="សរសេរផ្សេង / type custom" style="margin-top:6px;display:none;">
           </div>
           <div class="field" style="margin:0;">
             <label>នីតិវិធី · Procedures</label>
             <select id="f_procedure_select" class="kh"></select>
-            <textarea id="f_doing" class="kh" placeholder="សរសេរនីតិវិធីលម្អិត / custom procedure..." style="margin-top:6px;display:none;"></textarea>
           </div>
           <div class="field" style="margin:0;">
             <label>ម៉ោងនីតិវិធី · Time</label>
@@ -1426,6 +1432,9 @@
           </div>
         </div>
 
+        </div><!-- /clinical panel -->
+
+        <div class="form-tab-panel" data-tab="status" style="display:none;">
         <div class="appointment-box-wrapper">
           <label class="kh" style="display:block;margin:0 0 10px;font-size:13px;color:var(--ink-soft);text-transform:none;font-weight:700;">🗓️ ស្ថានភាព · Status</label>
           <div class="status-check-row" style="display:flex;gap:18px;flex-wrap:wrap;align-items:center;">
@@ -1462,7 +1471,7 @@
             </div>
           </div>
         </div>
-        </div><!-- /clinical panel -->
+        </div><!-- /status panel -->
 
         <div class="form-tab-panel" data-tab="medication" style="display:none;">
         <div class="med-table-wrapper">
@@ -1651,21 +1660,17 @@
     <div class="modal-body">
       <!-- Tabs Selector -->
       <div class="cfg-tabs">
-        <button class="cfg-tab-btn active kh" data-tab="tabTreatments">💉 Treatments (រួមទាំងតម្លៃ $)</button>
+        <button class="cfg-tab-btn active kh" data-tab="tabTreatments">💉 Treatments</button>
         <button class="cfg-tab-btn kh" data-tab="tabDiagnosis">🩺 Diagnosis</button>
-        <button class="cfg-tab-btn kh" data-tab="tabProcedures">🛠 Procedures</button>
+        <button class="cfg-tab-btn kh" data-tab="tabProcedures">🛠 Procedures (រួមទាំងតម្លៃ $)</button>
       </div>
 
-      <!-- Tab 1: Treatments (ឈ្មោះ + តម្លៃ) -->
+      <!-- Tab 1: Treatments -->
       <div class="cfg-tab-content active" id="tabTreatments">
         <div style="display:flex;gap:8px;margin-bottom:12px;align-items:flex-end;">
-          <div style="flex:2;">
+          <div style="flex:1;">
             <div style="font-size:11px;font-weight:700;color:var(--ink-dim);margin-bottom:4px;">ឈ្មោះ Treatment ថ្មី</div>
             <input type="text" id="new_tx_name" class="kh" placeholder="ឧ. ប៉ះធ្មេញ Composite, ដកធ្មេញ...">
-          </div>
-          <div style="flex:1;">
-            <div style="font-size:11px;font-weight:700;color:var(--ink-dim);margin-bottom:4px;">តម្លៃ ($ USD)</div>
-            <input type="number" id="new_tx_price" class="mono" placeholder="25.00" step="0.5">
           </div>
           <button type="button" class="btn btn-primary btn-sm kh" id="addTxBtn" style="height:38px;">＋ បន្ថែម</button>
         </div>
@@ -1674,7 +1679,6 @@
             <thead>
               <tr>
                 <th>ឈ្មោះ Treatment</th>
-                <th style="width:110px;text-align:right;">តម្លៃ ($)</th>
                 <th style="width:45px;text-align:center;">លុប</th>
               </tr>
             </thead>
@@ -1705,12 +1709,16 @@
         </div>
       </div>
 
-      <!-- Tab 3: Procedures -->
+      <!-- Tab 3: Procedures (រួមទាំងតម្លៃ $) -->
       <div class="cfg-tab-content" id="tabProcedures">
         <div style="display:flex;gap:8px;margin-bottom:12px;align-items:flex-end;">
-          <div style="flex:1;">
+          <div style="flex:2;">
             <div style="font-size:11px;font-weight:700;color:var(--ink-dim);margin-bottom:4px;">ឈ្មោះ Procedure ថ្មី</div>
             <input type="text" id="new_proc_name" class="kh" placeholder="ឧ. Crown cementation, Scaling...">
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:11px;font-weight:700;color:var(--ink-dim);margin-bottom:4px;">តម្លៃ ($ USD)</div>
+            <input type="number" id="new_proc_price" class="mono" placeholder="25.00" step="0.5">
           </div>
           <button type="button" class="btn btn-primary btn-sm kh" id="addProcBtn" style="height:38px;">＋ បន្ថែម</button>
         </div>
@@ -1718,7 +1726,9 @@
           <table class="med-table" style="margin:0;width:100%;">
             <thead>
               <tr>
+                <th style="width:60px;text-align:center;">លំដាប់</th>
                 <th>ឈ្មោះ Procedure</th>
+                <th style="width:110px;text-align:right;">តម្លៃ ($)</th>
                 <th style="width:45px;text-align:center;">លុប</th>
               </tr>
             </thead>
@@ -1757,23 +1767,23 @@ const LOWER = ["48","47","46","45","44","43","42","41","31","32","33","34","35",
 
 /* --- បញ្ជីលំនាំដើម & Configuration Storage --- */
 const DEFAULT_TREATMENTS = [
-  { name: 'វះកាត់ ចង់ថ្គាម', price: '' },
-  { name: 'វះកាត់ វះបួស', price: '' },
-  { name: 'វះកាត់ ផ្សេងៗ', price: '' },
-  { name: 'ដកធ្មេញ ព្រៃ', price: '10' },
-  { name: 'ដកធ្មេញ ស្រុក', price: '5' },
-  { name: 'ប៉ះធ្មេញ GIC', price: '15' },
-  { name: 'ប៉ះធ្មេញ Amalgam', price: '15' },
-  { name: 'ប៉ះធ្មេញ Composite', price: '20' },
-  { name: 'ប៉ះធ្មេញ ផ្សេងៗ', price: '' },
-  { name: 'ថតធ្មេញ X-ray', price: '5' },
-  { name: 'ព្យាបាលធ្មេញ (RCT)', price: '60' },
-  { name: 'សំអាតកំបោរ Scaling', price: '15' },
-  { name: 'បិតការពារ Sealant', price: '10' },
-  { name: 'ភ្លុយអរ Varnish or Gel', price: '10' },
-  { name: 'ដាក់ធ្មេញ ជាប់', price: '' },
-  { name: 'ដាក់ធ្មេញ ដោះ', price: '' },
-  { name: 'ពិគ្រោះជំងឺ', price: '0' }
+  { name: 'វះកាត់ ចង់ថ្គាម' },
+  { name: 'វះកាត់ វះបួស' },
+  { name: 'វះកាត់ ផ្សេងៗ' },
+  { name: 'ដកធ្មេញ ព្រៃ' },
+  { name: 'ដកធ្មេញ ស្រុក' },
+  { name: 'ប៉ះធ្មេញ GIC' },
+  { name: 'ប៉ះធ្មេញ Amalgam' },
+  { name: 'ប៉ះធ្មេញ Composite' },
+  { name: 'ប៉ះធ្មេញ ផ្សេងៗ' },
+  { name: 'ថតធ្មេញ X-ray' },
+  { name: 'ព្យាបាលធ្មេញ (RCT)' },
+  { name: 'សំអាតកំបោរ Scaling' },
+  { name: 'បិតការពារ Sealant' },
+  { name: 'ភ្លុយអរ Varnish or Gel' },
+  { name: 'ដាក់ធ្មេញ ជាប់' },
+  { name: 'ដាក់ធ្មេញ ដោះ' },
+  { name: 'ពិគ្រោះជំងឺ' }
 ];
 
 const DEFAULT_DIAGNOSIS = [
@@ -1781,10 +1791,19 @@ const DEFAULT_DIAGNOSIS = [
 ];
 
 const DEFAULT_PROCEDURES = [
-  "Opening", "Dressing Calcium", "Obturation", "Scaling upper/lower",
-  "Irrigation with NaOCl", "Working length measurement", "Tooth Extraction",
-  "Suture", "Composite Restoration", "GIC Filling", "Crown preparation",
-  "Impression taking", "Crown cementation"
+  { name: 'Opening', price: '' },
+  { name: 'Dressing Calcium', price: '' },
+  { name: 'Obturation', price: '' },
+  { name: 'Scaling upper/lower', price: '15' },
+  { name: 'Irrigation with NaOCl', price: '' },
+  { name: 'Working length measurement', price: '' },
+  { name: 'Tooth Extraction', price: '5' },
+  { name: 'Suture', price: '' },
+  { name: 'Composite Restoration', price: '20' },
+  { name: 'GIC Filling', price: '15' },
+  { name: 'Crown preparation', price: '' },
+  { name: 'Impression taking', price: '' },
+  { name: 'Crown cementation', price: '' }
 ];
 
 let appTreatments = [];
@@ -1799,6 +1818,8 @@ function loadClinicalConfigs() {
     appDiagnosis = dg ? JSON.parse(dg) : DEFAULT_DIAGNOSIS;
     const pr = localStorage.getItem('kep_cfg_procedures');
     appProcedures = pr ? JSON.parse(pr) : DEFAULT_PROCEDURES;
+    // Migrate legacy plain-string procedures (pre price-on-procedures) to {name, price}.
+    appProcedures = appProcedures.map(p => typeof p === 'string' ? { name: p, price: '' } : p);
   } catch(e) {
     appTreatments = DEFAULT_TREATMENTS;
     appDiagnosis = DEFAULT_DIAGNOSIS;
@@ -1814,11 +1835,17 @@ function saveClinicalConfigs() {
 }
 
 function populateClinicalSelects() {
-  // Treatment Select
+  // Treatment Select — locked to the fixed list (no custom entry). Editable only via Settings.
   const txSel = document.getElementById('f_treatment');
   const curTx = txSel.value;
-  txSel.innerHTML = appTreatments.map(t => `<option value="${t.name}" data-price="${t.price || ''}">${t.name}${t.price ? ` ($${t.price})` : ''}</option>`).join('') + '<option value="custom">ផ្សេងទៀត / Custom…</option>';
-  if(curTx) txSel.value = curTx;
+  let txOptions = appTreatments.map(t => `<option value="${t.name}">${t.name}</option>`).join('');
+  // Safety: if editing a record whose treatment isn't in the current list (legacy/custom value),
+  // keep it selectable so re-saving doesn't silently change it.
+  if(curTx && curTx !== 'custom' && !appTreatments.some(t => t.name === curTx)){
+    txOptions += `<option value="${curTx}">${curTx} (legacy)</option>`;
+  }
+  txSel.innerHTML = txOptions;
+  if(curTx && curTx !== 'custom') txSel.value = curTx;
 
   // Diagnosis Select
   const dgSel = document.getElementById('f_diagnosis');
@@ -1826,11 +1853,15 @@ function populateClinicalSelects() {
   dgSel.innerHTML = appDiagnosis.map(d => `<option value="${d}">${d}</option>`).join('') + '<option value="custom">ផ្សេងទៀត / Custom…</option>';
   if(curDg) dgSel.value = curDg;
 
-  // Procedures Select
+  // Procedures Select — locked to the fixed list (no custom entry). Editable only via Settings.
   const prSel = document.getElementById('f_procedure_select');
   const curPr = prSel.value;
-  prSel.innerHTML = appProcedures.map(p => `<option value="${p}">${p}</option>`).join('') + '<option value="custom">ផ្សេងទៀត / Custom…</option>';
-  if(curPr) prSel.value = curPr;
+  let prOptions = appProcedures.map(p => `<option value="${p.name}" data-price="${p.price || ''}">${p.name}${p.price ? ` ($${p.price})` : ''}</option>`).join('');
+  if(curPr && curPr !== 'custom' && !appProcedures.some(p => p.name === curPr)){
+    prOptions += `<option value="${curPr}">${curPr} (legacy)</option>`;
+  }
+  prSel.innerHTML = prOptions;
+  if(curPr && curPr !== 'custom') prSel.value = curPr;
 }
 
 loadClinicalConfigs();
@@ -2063,16 +2094,6 @@ function patientKey(r){
 }
 
 const procSelect = document.getElementById('f_procedure_select');
-const procDoing = document.getElementById('f_doing');
-procSelect.addEventListener('change', (e) => {
-  if(e.target.value === 'custom'){
-    procDoing.style.display = 'block';
-    procDoing.focus();
-  } else {
-    procDoing.style.display = 'none';
-    procDoing.value = e.target.value;
-  }
-});
 
 const apptFields = document.getElementById('appointmentFields');
 const statusChecks = {
@@ -2137,10 +2158,9 @@ document.getElementById('f_payTotal').addEventListener('input', calcBal);
 document.getElementById('f_payPaid').addEventListener('input', calcBal);
 document.getElementById('f_payDiscount').addEventListener('input', calcBal);
 
-// Auto-fill price ពេលជ្រើសរើស Treatment
-document.getElementById('f_treatment').addEventListener('change', (e) => {
+// Auto-fill price ពេលជ្រើសរើស Procedure
+document.getElementById('f_procedure_select').addEventListener('change', (e) => {
   const isCustom = e.target.value === 'custom';
-  document.getElementById('f_treatment_custom').style.display = isCustom ? 'block' : 'none';
   if(!isCustom){
     const selectedOpt = e.target.selectedOptions[0];
     const price = selectedOpt ? selectedOpt.getAttribute('data-price') : '';
@@ -3242,9 +3262,22 @@ function openPatientRecord(name){
       <div class="emr-header-panel">
         <div>
           <div style="display:flex; align-items:center; gap:14px; margin-bottom:18px;">
-            <div class="emr-avatar">👤</div>
-            <div>
-              <h2 class="emr-pat-name kh" style="${nameColorStyle}">${latest.name}</h2>
+            <div class="emr-avatar" id="patAvatarBox" onclick="document.getElementById('patAvatarFileInput').click()" title="ចុចដើម្បីដាក់រូប · Click to add photo">
+              <span id="patAvatarPlaceholder">👤</span>
+              <img id="patAvatarImg" class="hidden">
+              <span class="avatar-edit-badge">📷</span>
+            </div>
+            <input type="file" id="patAvatarFileInput" accept="image/*" class="hidden">
+            <div style="flex:1;">
+              <div id="patNameDisplay" style="display:flex; align-items:center; gap:8px; cursor:pointer;" onclick="startEditPatientName()" title="ចុចដើម្បីកែឈ្មោះ · Click to edit name">
+                <h2 class="emr-pat-name kh" style="${nameColorStyle} margin:0;">${latest.name}</h2>
+                <span style="font-size:13px; color:var(--ink-dim);">✏️</span>
+              </div>
+              <div id="patNameEditRow" style="display:none; align-items:center; gap:8px;">
+                <input type="text" id="patNameEditInput" class="kh" style="font-size:15px; font-weight:700; padding:6px 10px; border:1.5px solid var(--primary); border-radius:8px;" value="${latest.name}">
+                <button type="button" class="btn btn-primary btn-sm" onclick="saveEditPatientName()">✓</button>
+                <button type="button" class="btn btn-outline btn-sm" onclick="cancelEditPatientName()">✕</button>
+              </div>
               <div class="mono" style="font-size:11px; color:var(--ink-soft); margin-top:2px;">ID: ${latest.code || 'N/A'}</div>
             </div>
           </div>
@@ -3336,6 +3369,136 @@ function openPatientRecord(name){
 
   activePatientContext = latest.name;
   document.getElementById('patientOverlay').classList.remove('hidden');
+  showPatientAvatar(latest.name);
+}
+
+const PATIENT_PHOTO_CACHE_KEY = 'kep_dental_patient_photos_v1';
+function getPatientPhotoCache(){
+  try{ return JSON.parse(localStorage.getItem(PATIENT_PHOTO_CACHE_KEY) || '{}'); }catch(e){ return {}; }
+}
+function setPatientPhotoCache(name, dataUrl){
+  const cache = getPatientPhotoCache();
+  cache[name.toLowerCase()] = dataUrl;
+  try{ localStorage.setItem(PATIENT_PHOTO_CACHE_KEY, JSON.stringify(cache)); }catch(e){}
+}
+
+function applyAvatarSrc(src){
+  const img = document.getElementById('patAvatarImg');
+  const ph = document.getElementById('patAvatarPlaceholder');
+  if(!img || !ph) return;
+  if(src){
+    img.src = src;
+    img.classList.remove('hidden');
+    ph.classList.add('hidden');
+  } else {
+    img.classList.add('hidden');
+    img.src = '';
+    ph.classList.remove('hidden');
+  }
+}
+
+function showPatientAvatar(name){
+  const cache = getPatientPhotoCache();
+  applyAvatarSrc(cache[name.toLowerCase()] || '');
+  fetchPatientPhoto(name);
+}
+
+async function fetchPatientPhoto(name){
+  if(!webAppUrl) return;
+  try{
+    const urlSeparator = webAppUrl.includes('?') ? '&' : '?';
+    const fetchUrl = `${webAppUrl}${urlSeparator}action=getPatientPhoto&patientName=${encodeURIComponent(name)}&t=${Date.now()}`;
+    const response = await fetch(fetchUrl);
+    const result = await response.json();
+    if(activePatientContext !== name) return;
+    if(result.status === 'success' && result.url){
+      const fileIdMatch = result.url.match(/[-\w]{25,}/);
+      const fileId = fileIdMatch ? fileIdMatch[0] : result.id;
+      const thumb = fileId ? `https://drive.google.com/thumbnail?id=${fileId}&sz=w300` : result.url;
+      applyAvatarSrc(thumb);
+      setPatientPhotoCache(name, thumb);
+    }
+  }catch(err){ console.warn('fetchPatientPhoto error:', err); }
+}
+
+document.addEventListener('change', function(e){
+  if(!e.target || e.target.id !== 'patAvatarFileInput') return;
+  const file = e.target.files && e.target.files[0];
+  if(!file || !file.type.startsWith('image/')){ e.target.value = ''; return; }
+  compressImageToBase64(file, function(base64, mime){
+    const dataUrl = 'data:' + mime + ';base64,' + base64;
+    applyAvatarSrc(dataUrl);
+    const name = activePatientContext;
+    if(name){
+      setPatientPhotoCache(name, dataUrl);
+      uploadPatientPhoto(name, base64, mime);
+    }
+  });
+  e.target.value = '';
+});
+
+async function uploadPatientPhoto(name, base64, mime){
+  const payload = {
+    action: 'uploadPatientPhoto',
+    data: { folderId: XRAY_FOLDER_ID, patientName: name, mimeType: mime, base64: base64 },
+    timestamp: Date.now()
+  };
+  try{
+    if(navigator.onLine && webAppUrl){
+      await fetch(webAppUrl, {
+        method:'POST', mode:'no-cors',
+        headers:{'Content-Type':'text/plain;charset=utf-8'},
+        body: JSON.stringify(payload)
+      });
+    } else {
+      const queue = getPendingQueue();
+      queue.push(payload);
+      savePendingQueue(queue);
+    }
+  }catch(err){ console.warn('uploadPatientPhoto error:', err); }
+}
+
+function startEditPatientName(){
+  document.getElementById('patNameDisplay').style.display = 'none';
+  const row = document.getElementById('patNameEditRow');
+  row.style.display = 'flex';
+  const input = document.getElementById('patNameEditInput');
+  input.focus();
+  input.select();
+  input.onkeydown = (e) => {
+    if(e.key === 'Enter') saveEditPatientName();
+    if(e.key === 'Escape') cancelEditPatientName();
+  };
+}
+
+function cancelEditPatientName(){
+  document.getElementById('patNameDisplay').style.display = 'flex';
+  document.getElementById('patNameEditRow').style.display = 'none';
+}
+
+function saveEditPatientName(){
+  const newName = cleanStr(document.getElementById('patNameEditInput').value);
+  const oldName = activePatientContext;
+  if(!newName){ cancelEditPatientName(); return; }
+  if(newName === oldName){ cancelEditPatientName(); return; }
+
+  const oldKey = oldName.toLowerCase();
+  let count = 0;
+  allRecords.forEach(r => {
+    if(cleanStr(r.name).toLowerCase() === oldKey){
+      r.name = newName;
+      count++;
+    }
+  });
+
+  if(count > 0){
+    saveLocalRecords();
+    renderAll();
+    activePatientContext = newName;
+    try{ pushToSheet('renamePatient', { oldName, newName }); }catch(err){ console.warn('Sync queue error:', err); }
+  }
+
+  openPatientRecord(newName);
 }
 
 function buildPatientPrintHTML(latest, records, treatedTeethSet, realPhone, realSex, realAge){
@@ -3453,33 +3616,31 @@ function openForm(editRecord, prefill){
       document.getElementById('f_diagnosis_custom').value = editRecord.diagnosis||'';
     }
 
-    const txMatch = appTreatments.find(t => t.name === editRecord.treatment);
-    if(txMatch){
-      document.getElementById('f_treatment').value = editRecord.treatment;
-      document.getElementById('f_treatment_custom').style.display='none';
-      document.getElementById('f_treatment_custom').value='';
-    } else {
-      document.getElementById('f_treatment').value = 'custom';
-      document.getElementById('f_treatment_custom').style.display='block';
-      document.getElementById('f_treatment_custom').value = editRecord.treatment||'';
+    const txSelEdit = document.getElementById('f_treatment');
+    txSelEdit.value = editRecord.treatment || '';
+    if(editRecord.treatment && txSelEdit.value !== editRecord.treatment){
+      const legacyOpt = document.createElement('option');
+      legacyOpt.value = editRecord.treatment;
+      legacyOpt.textContent = editRecord.treatment + ' (legacy)';
+      txSelEdit.appendChild(legacyOpt);
+      txSelEdit.value = editRecord.treatment;
     }
 
     if(editRecord.idc10){ document.getElementById('f_idc10').value = editRecord.idc10; }
     document.getElementById('f_teeth').value = editRecord.teeth||'';
 
     const currentDoing = editRecord.doing || '';
-    if(appProcedures.includes(currentDoing)){
+    if(currentDoing){
       procSelect.value = currentDoing;
-      procDoing.style.display = 'none';
-      procDoing.value = currentDoing;
-    } else if(currentDoing) {
-      procSelect.value = 'custom';
-      procDoing.style.display = 'block';
-      procDoing.value = currentDoing;
+      if(procSelect.value !== currentDoing){
+        const legacyProcOpt = document.createElement('option');
+        legacyProcOpt.value = currentDoing;
+        legacyProcOpt.textContent = currentDoing + ' (legacy)';
+        procSelect.appendChild(legacyProcOpt);
+        procSelect.value = currentDoing;
+      }
     } else {
-      procSelect.value = appProcedures[0] || 'custom';
-      procDoing.style.display = 'none';
-      procDoing.value = appProcedures[0] || '';
+      procSelect.value = appProcedures[0] ? appProcedures[0].name : '';
     }
     
     const recDT = editRecord.doingDateTime ? dateToYMDTime(editRecord.doingDateTime) : nowDateTime;
@@ -3518,19 +3679,16 @@ function openForm(editRecord, prefill){
     document.getElementById('f_visitDateTime').value = nowDateTime;
     document.getElementById('f_diagnosis').value = appDiagnosis[0] || 'custom';
     
-    const defTx = appTreatments[0] || { name: 'custom', price: '' };
+    const defTx = appTreatments[0] || { name: '' };
     document.getElementById('f_treatment').value = defTx.name;
-    document.getElementById('f_treatment_custom').style.display = 'none'; 
-    document.getElementById('f_treatment_custom').value = '';
 
     document.getElementById('f_idc10').value = 'K04-ជំងឺលើបណ្តូលធ្មេញ (Pulp)';
     document.getElementById('f_diagnosis_custom').style.display = 'none';
     document.getElementById('f_diagnosis_custom').value = '';
     document.getElementById('f_teeth').value = prefill.teeth || ''; 
     
-    procSelect.value = appProcedures[0] || 'custom';
-    procDoing.style.display = 'none';
-    procDoing.value = appProcedures[0] || '';
+    const defProc = appProcedures[0] || { name: '', price: '' };
+    procSelect.value = defProc.name || '';
 
     document.getElementById('f_doingDateTime').value = nowDateTime;
     setStatusCheckbox('Appt');
@@ -3538,7 +3696,7 @@ function openForm(editRecord, prefill){
     document.getElementById('f_planDo').value = '';
 
     document.getElementById('f_payDate').value = todayDateOnly;
-    document.getElementById('f_payTotal').value = defTx.price ? ('$' + parseFloat(defTx.price).toFixed(2)) : '';
+    document.getElementById('f_payTotal').value = defProc.price ? ('$' + parseFloat(defProc.price).toFixed(2)) : '';
     document.getElementById('f_payDiscount').value = '';
     document.getElementById('f_payPaid').value = '';
     document.getElementById('f_payStage').value = '';
@@ -3560,18 +3718,15 @@ function openForm(editRecord, prefill){
 
     document.getElementById('f_visitDateTime').value = nowDateTime;
     document.getElementById('f_diagnosis').value = appDiagnosis[0] || 'custom';
-    const defTx = appTreatments[0] || { name: 'custom', price: '' };
+    const defTx = appTreatments[0] || { name: '' };
     document.getElementById('f_treatment').value = defTx.name;
     document.getElementById('f_idc10').value = 'K04-ជំងឺលើបណ្តូលធ្មេញ (Pulp)';
     document.getElementById('f_diagnosis_custom').style.display = 'none'; 
     document.getElementById('f_diagnosis_custom').value = '';
-    document.getElementById('f_treatment_custom').style.display = 'none'; 
-    document.getElementById('f_treatment_custom').value = '';
     document.getElementById('f_teeth').value = ''; 
     
-    procSelect.value = appProcedures[0] || 'custom';
-    procDoing.style.display = 'none';
-    procDoing.value = appProcedures[0] || '';
+    const defProc2 = appProcedures[0] || { name: '', price: '' };
+    procSelect.value = defProc2.name || '';
 
     document.getElementById('f_doingDateTime').value = nowDateTime;
     setStatusCheckbox('Appt');
@@ -3579,7 +3734,7 @@ function openForm(editRecord, prefill){
     document.getElementById('f_planDo').value = '';
 
     document.getElementById('f_payDate').value = todayDateOnly;
-    document.getElementById('f_payTotal').value = defTx.price ? ('$' + parseFloat(defTx.price).toFixed(2)) : '';
+    document.getElementById('f_payTotal').value = defProc2.price ? ('$' + parseFloat(defProc2.price).toFixed(2)) : '';
     document.getElementById('f_payDiscount').value = '';
     document.getElementById('f_payPaid').value = '';
     document.getElementById('f_payStage').value = '';
@@ -3623,8 +3778,7 @@ function saveRecord(){
     const diagSel = document.getElementById('f_diagnosis').value;
     const diagnosis = diagSel === 'custom' ? document.getElementById('f_diagnosis_custom').value.trim() : diagSel;
 
-    const treatSel = document.getElementById('f_treatment').value;
-    const treatment = treatSel === 'custom' ? document.getElementById('f_treatment_custom').value.trim() : treatSel;
+    const treatment = document.getElementById('f_treatment').value;
 
     const idc10 = document.getElementById('f_idc10').value;
     
@@ -3632,8 +3786,7 @@ function saveRecord(){
     const doingDateTimeVal = document.getElementById('f_doingDateTime').value;
     const statusVal = getCheckedStatus();
     
-    const procSelVal = procSelect.value;
-    const doingVal = procSelVal === 'custom' ? procDoing.value.trim() : procSelVal;
+    const doingVal = procSelect.value;
 
     const hasApptChecked = (statusChecks.Appt && statusChecks.Appt.checked) || 
                            (statusChecks.Labo && statusChecks.Labo.checked) || 
@@ -3974,7 +4127,6 @@ function renderClinicalConfigTables() {
   txTbody.innerHTML = appTreatments.map((t, idx) => `
     <tr>
       <td class="kh"><b>${t.name}</b></td>
-      <td class="mono" style="text-align:right;color:var(--primary-dark);font-weight:700;">${t.price ? '$' + parseFloat(t.price).toFixed(2) : '—'}</td>
       <td style="text-align:center;">
         <button type="button" class="btn btn-danger btn-sm" style="padding:2px 6px;font-size:10px;" onclick="deleteTreatmentItem(${idx})">✕</button>
       </td>
@@ -3992,17 +4144,32 @@ function renderClinicalConfigTables() {
     </tr>
   `).join('');
 
-  // 3. Render Procedures
+  // 3. Render Procedures (now carries price + reorder controls)
   const prTbody = document.getElementById('procedureConfigTbody');
   prTbody.innerHTML = appProcedures.map((p, idx) => `
     <tr>
-      <td class="kh"><b>${p}</b></td>
+      <td style="text-align:center; white-space:nowrap;">
+        <button type="button" class="btn btn-outline btn-sm" style="padding:2px 6px;font-size:10px;" onclick="moveProcedureItem(${idx},-1)" ${idx===0?'disabled':''}>▲</button>
+        <button type="button" class="btn btn-outline btn-sm" style="padding:2px 6px;font-size:10px;" onclick="moveProcedureItem(${idx},1)" ${idx===appProcedures.length-1?'disabled':''}>▼</button>
+      </td>
+      <td class="kh"><b>${p.name}</b></td>
+      <td class="mono" style="text-align:right;color:var(--primary-dark);font-weight:700;">${p.price ? '$' + parseFloat(p.price).toFixed(2) : '—'}</td>
       <td style="text-align:center;">
         <button type="button" class="btn btn-danger btn-sm" style="padding:2px 6px;font-size:10px;" onclick="deleteProcedureItem(${idx})">✕</button>
       </td>
     </tr>
   `).join('');
 }
+
+window.moveProcedureItem = function(index, dir){
+  const target = index + dir;
+  if(target < 0 || target >= appProcedures.length) return;
+  const tmp = appProcedures[index];
+  appProcedures[index] = appProcedures[target];
+  appProcedures[target] = tmp;
+  saveClinicalConfigs();
+  renderClinicalConfigTables();
+};
 
 window.deleteTreatmentItem = function(index) {
   if(confirm('តើអ្នកពិតជាចង់លុប Treatment នេះមែនទេ?')) {
@@ -4030,15 +4197,12 @@ window.deleteProcedureItem = function(index) {
 
 document.getElementById('addTxBtn').addEventListener('click', () => {
   const nameInput = document.getElementById('new_tx_name');
-  const priceInput = document.getElementById('new_tx_price');
   const name = nameInput.value.trim();
-  const price = priceInput.value.trim();
   if(!name){ alert('សូមបញ្ចូលឈ្មោះ Treatment!'); return; }
-  appTreatments.push({ name, price });
+  appTreatments.push({ name });
   saveClinicalConfigs();
   renderClinicalConfigTables();
   nameInput.value = '';
-  priceInput.value = '';
 });
 
 document.getElementById('addDiagBtn').addEventListener('click', () => {
@@ -4053,12 +4217,15 @@ document.getElementById('addDiagBtn').addEventListener('click', () => {
 
 document.getElementById('addProcBtn').addEventListener('click', () => {
   const nameInput = document.getElementById('new_proc_name');
+  const priceInput = document.getElementById('new_proc_price');
   const name = nameInput.value.trim();
+  const price = priceInput.value.trim();
   if(!name){ alert('សូមបញ្ចូលឈ្មោះ Procedure!'); return; }
-  appProcedures.push(name);
+  appProcedures.push({ name, price });
   saveClinicalConfigs();
   renderClinicalConfigTables();
   nameInput.value = '';
+  priceInput.value = '';
 });
 
 // Tab switching
