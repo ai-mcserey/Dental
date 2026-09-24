@@ -2464,14 +2464,16 @@ function savePendingQueue(queue){
 let isFlushingQueue = false;
 async function flushPendingQueue(){
   if(isFlushingQueue || !navigator.onLine || !webAppUrl) return;
-  const queue = getPendingQueue();
-  if(queue.length === 0) return;
-
   isFlushingQueue = true;
   const badge = document.getElementById('syncBadge');
-  badge.textContent = `⏳ កំពុង Sync (${queue.length})...`;
 
-  while(queue.length > 0){
+  while(true){
+    // Re-read from localStorage on every iteration (not a stale snapshot) — this way,
+    // items pushed by other pushToSheet() calls WHILE this loop is mid-flight (e.g. saving
+    // Treatments/Diagnosis/Procedures back-to-back) are never silently overwritten/lost.
+    const queue = getPendingQueue();
+    if(queue.length === 0) break;
+    badge.textContent = `⏳ កំពុង Sync (${queue.length})...`;
     const item = queue[0];
     try{
       await fetch(webAppUrl, {
@@ -2480,8 +2482,9 @@ async function flushPendingQueue(){
         headers:{'Content-Type':'text/plain;charset=utf-8'},
         body: JSON.stringify(item)
       });
-      queue.shift();
-      savePendingQueue(queue);
+      const freshQueue = getPendingQueue();
+      freshQueue.shift();
+      savePendingQueue(freshQueue);
     } catch(err){
       break;
     }
