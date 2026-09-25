@@ -1518,11 +1518,11 @@
         <div class="form-tab-panel" data-tab="payment" style="display:none;">
         <!-- ផ្នែកបង់ប្រាក់ Payment Section -->
         <div class="field full" style="margin-top: 6px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px;">
-          <label style="margin-bottom: 8px;">💰 ការបង់ប្រាក់ (Payment Ledger)</label>
-          
+          <label style="margin-bottom: 8px;">💰 វិក្កយបត្រ (Invoice)</label>
+
           <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px;">
             <div>
-              <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">ថ្ងៃខែឆ្នាំបង់ប្រាក់ (Date)</div>
+              <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">ថ្ងៃខែឆ្នាំចេញវិក្កយបត្រ</div>
               <input type="date" id="f_payDate" class="mono">
             </div>
             <div>
@@ -1534,30 +1534,23 @@
               <input type="text" id="f_payDiscount" placeholder="10% ឬ $10" class="mono">
             </div>
           </div>
-          
-          <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
             <div>
-              <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">បានបង់ (Paid Amount)</div>
-              <input type="text" id="f_payPaid" placeholder="$0.00" class="mono" style="color:var(--primary-dark); font-weight:bold;">
+              <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">បានបង់សរុប (Paid) — Auto</div>
+              <input type="text" id="f_payPaid" class="mono" readonly style="color:var(--primary-dark); font-weight:bold; background:var(--surface-2);">
             </div>
             <div>
-              <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">ដំណាក់កាលបង់ (Stage)</div>
-              <select id="f_payStage" class="kh">
-                <option value="">- ជ្រើសរើស -</option>
-                <option value="បង់ផ្តាច់ (Full)">បង់ផ្តាច់ (Full Payment)</option>
-                <option value="បង់លើកទី១ (1st)">បង់លើកទី១ (1st Installment)</option>
-                <option value="បង់លើកទី២ (2nd)">បង់លើកទី២ (2nd Installment)</option>
-                <option value="បង់លើកទី៣ (3rd)">បង់លើកទី៣ (3rd Installment)</option>
-                <option value="បង់បង្គ្រប់ (Final)">បង់បង្គ្រប់ (Final Payment)</option>
-              </select>
-            </div>
-            <div>
-              <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">នៅខ្វះ (Balance)</div>
-              <input type="text" id="f_payBalance" placeholder="$0.00" class="mono" style="color:var(--coral-dark); font-weight:bold;">
+              <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">នៅខ្វះ (Balance) — Auto</div>
+              <input type="text" id="f_payBalance" class="mono" readonly style="color:var(--coral-dark); font-weight:bold; background:var(--surface-2);">
             </div>
           </div>
 
-          <div style="display:grid; grid-template-columns: 1fr 2fr; gap: 10px;">
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+            <div>
+              <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">ដំណាក់កាលបង់ (Stage)</div>
+              <input type="text" id="f_payStage" class="kh" placeholder="ឧ. លើកទី១, បង់ពេញ...">
+            </div>
             <div>
               <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">វិធីបង់ប្រាក់ (Method)</div>
               <select id="f_payMethod" class="kh">
@@ -1567,9 +1560,36 @@
                 <option value="ផ្សេងៗ (Other)">ផ្សេងៗ (Other)</option>
               </select>
             </div>
-            <div>
-              <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">ចំណាំ (Note)</div>
-              <input type="text" id="f_payNote" placeholder="ចំណាំផ្សេងៗបន្ថែម..." class="kh">
+          </div>
+          <div class="field" style="margin:0;">
+            <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">ចំណាំ (Note)</div>
+            <input type="text" id="f_payNote" class="kh" placeholder="ចំណាំផ្សេងៗបន្ថែម...">
+          </div>
+        </div>
+
+        <!-- ប្រវត្តិការបង់ប្រាក់ Payment History (installments) -->
+        <div class="field full" style="margin-top: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 12px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <label style="margin:0;">💵 ប្រវត្តិការបង់ប្រាក់ (Payment History)</label>
+            <button type="button" class="btn btn-outline btn-sm kh" id="addPaymentBtn">➕ បន្ថែមការបង់ប្រាក់</button>
+          </div>
+
+          <div id="paymentHistoryList" class="kh" style="font-size:12.5px; color:var(--ink-dim);">មិនទាន់មានការបង់ប្រាក់នៅឡើយទេ</div>
+
+          <div id="addPaymentRow" style="display:none; margin-top:10px; padding-top:10px; border-top:1px dashed var(--border);">
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+              <div>
+                <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">ថ្ងៃខែឆ្នាំ</div>
+                <input type="date" id="np_date" class="mono">
+              </div>
+              <div>
+                <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">ចំនួនទឹកប្រាក់ ($)</div>
+                <input type="text" id="np_amount" placeholder="0.00" class="mono">
+              </div>
+            </div>
+            <div style="display:flex; gap:8px; justify-content:flex-end;">
+              <button type="button" class="btn btn-outline btn-sm kh" id="cancelPaymentBtn">បោះបង់</button>
+              <button type="button" class="btn btn-primary btn-sm kh" id="confirmPaymentBtn">✓ បញ្ជាក់</button>
             </div>
           </div>
         </div>
@@ -1879,6 +1899,7 @@ function loadClinicalConfigs() {
 }
 
 function saveClinicalConfigs() {
+  console.log('[SYNC] saveClinicalConfigs() start');
   localStorage.setItem('kep_cfg_treatments', JSON.stringify(appTreatments));
   localStorage.setItem('kep_cfg_diagnosis', JSON.stringify(appDiagnosis));
   localStorage.setItem('kep_cfg_procedures', JSON.stringify(appProcedures));
@@ -1888,7 +1909,8 @@ function saveClinicalConfigs() {
     pushToSheet('updateConfig', { key: 'treatments', value: appTreatments });
     pushToSheet('updateConfig', { key: 'diagnosis', value: appDiagnosis });
     pushToSheet('updateConfig', { key: 'procedures', value: appProcedures });
-  }catch(err){ console.warn('Config sync queue error:', err); }
+  }catch(err){ console.warn('[SYNC] Config sync queue error:', err); }
+  console.log('[SYNC] saveClinicalConfigs() end (pushes queued above)');
 }
 
 function populateClinicalSelects() {
@@ -2237,6 +2259,55 @@ function calcBal() {
   else document.getElementById('f_payBalance').value = '';
 }
 
+let currentPayments = [];
+
+function renderPaymentHistory(){
+  const listEl = document.getElementById('paymentHistoryList');
+  if(currentPayments.length === 0){
+    listEl.innerHTML = 'មិនទាន់មានការបង់ប្រាក់នៅឡើយទេ';
+    return;
+  }
+  const withIdx = currentPayments.map((p, idx) => ({...p, idx}));
+  withIdx.sort((a,b) => (b.date||'').localeCompare(a.date||''));
+  listEl.innerHTML = withIdx.map(p => `
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px dashed var(--border-soft);">
+      <span class="mono" style="color:var(--ink-soft);">${fmtYMD(p.date)}</span>
+      <span class="mono" style="font-weight:700; color:var(--primary-dark);">$${(parseFloat(p.amount)||0).toFixed(2)}</span>
+      <button type="button" class="icon-btn danger" style="padding:2px 6px;" onclick="deletePaymentEntry(${p.idx})">✕</button>
+    </div>
+  `).join('');
+}
+
+function updatePaidFromPayments(){
+  const sum = currentPayments.reduce((s,p) => s + (parseFloat(p.amount) || 0), 0);
+  document.getElementById('f_payPaid').value = sum > 0 ? '$' + sum.toFixed(2) : '';
+  calcBal();
+}
+
+function deletePaymentEntry(idx){
+  currentPayments.splice(idx, 1);
+  renderPaymentHistory();
+  updatePaidFromPayments();
+}
+
+document.getElementById('addPaymentBtn').addEventListener('click', () => {
+  document.getElementById('np_date').value = getLocalTodayYMD();
+  document.getElementById('np_amount').value = '';
+  document.getElementById('addPaymentRow').style.display = 'block';
+});
+document.getElementById('cancelPaymentBtn').addEventListener('click', () => {
+  document.getElementById('addPaymentRow').style.display = 'none';
+});
+document.getElementById('confirmPaymentBtn').addEventListener('click', () => {
+  const date = document.getElementById('np_date').value || getLocalTodayYMD();
+  const amount = parseFloat(document.getElementById('np_amount').value.replace(/[^\d.]/g,'')) || 0;
+  if(amount <= 0){ alert('សូមបញ្ចូលចំនួនទឹកប្រាក់ត្រឹមត្រូវ'); return; }
+  currentPayments.push({ date, amount });
+  renderPaymentHistory();
+  updatePaidFromPayments();
+  document.getElementById('addPaymentRow').style.display = 'none';
+});
+
 document.getElementById('f_payTotal').addEventListener('input', calcBal);
 document.getElementById('f_payPaid').addEventListener('input', calcBal);
 document.getElementById('f_payDiscount').addEventListener('input', calcBal);
@@ -2463,8 +2534,11 @@ function savePendingQueue(queue){
 
 let isFlushingQueue = false;
 async function flushPendingQueue(){
-  if(isFlushingQueue || !navigator.onLine || !webAppUrl) return;
+  if(isFlushingQueue){ console.log('[SYNC] flush skipped — already flushing'); return; }
+  if(!navigator.onLine){ console.log('[SYNC] flush skipped — offline'); return; }
+  if(!webAppUrl){ console.log('[SYNC] flush skipped — no webAppUrl set'); return; }
   isFlushingQueue = true;
+  console.log('[SYNC] flush started');
   const badge = document.getElementById('syncBadge');
 
   while(true){
@@ -2472,9 +2546,10 @@ async function flushPendingQueue(){
     // items pushed by other pushToSheet() calls WHILE this loop is mid-flight (e.g. saving
     // Treatments/Diagnosis/Procedures back-to-back) are never silently overwritten/lost.
     const queue = getPendingQueue();
-    if(queue.length === 0) break;
+    if(queue.length === 0){ console.log('[SYNC] queue empty, stopping'); break; }
     badge.textContent = `⏳ កំពុង Sync (${queue.length})...`;
     const item = queue[0];
+    console.log('[SYNC] sending:', item.action, JSON.stringify(item.data).slice(0,120));
     try{
       await fetch(webAppUrl, {
         method:'POST',
@@ -2482,15 +2557,18 @@ async function flushPendingQueue(){
         headers:{'Content-Type':'text/plain;charset=utf-8'},
         body: JSON.stringify(item)
       });
+      console.log('[SYNC] sent OK:', item.action);
       const freshQueue = getPendingQueue();
       freshQueue.shift();
       savePendingQueue(freshQueue);
     } catch(err){
+      console.log('[SYNC] send FAILED:', item.action, err);
       break;
     }
   }
 
   isFlushingQueue = false;
+  console.log('[SYNC] flush finished');
   badge.textContent = '✓ ស្វ័យប្រវត្តិរួចរាល់';
   setTimeout(()=>{ badge.textContent = '🔄 Sync'; }, 2000);
 }
@@ -2500,6 +2578,7 @@ function pushToSheet(action, data){
   const queue = getPendingQueue();
   queue.push(payload);
   savePendingQueue(queue);
+  console.log('[SYNC] queued:', action, '| queue length now:', queue.length);
   flushPendingQueue();
 }
 
@@ -2539,6 +2618,20 @@ async function fetchFromSheet(isSilent = false){
         let payMethod = cleanStr(r['payMethod'] || r[22] || '');  
         let payNote = cleanStr(r['payNote'] || r[23] || '');      
 
+        let doneDate = cleanStr(r['doneDate'] || r[24] || '');
+        let missDate = cleanStr(r['missDate'] || r[25] || '');
+        let labDate = cleanStr(r['labDate'] || r[26] || '');
+        let labDo = cleanStr(r['labDo'] || r[27] || '');
+        let planningDate = cleanStr(r['planningDate'] || r[28] || '');
+        let planningDo = cleanStr(r['planningDo'] || r[29] || '');
+        let doingStatusDate = cleanStr(r['doingStatusDate'] || r[30] || '');
+        let payments = [];
+        try {
+          const rawPayments = r['payments'] || r[31] || '';
+          payments = rawPayments ? JSON.parse(rawPayments) : [];
+          if(!Array.isArray(payments)) payments = [];
+        } catch(e) { payments = []; }
+
         let timestamp = cleanStr(r['timestamp'] || r[0] || '');
         let code = cleanStr(r['code'] || r[1] || '') || ('row_' + i);
 
@@ -2548,6 +2641,7 @@ async function fetchFromSheet(isSilent = false){
           ...r,
           code, name, sex, age, phone, diagnosis, idc10, treatment, teeth, doing, doingDateTime, timeLast, planDo, medication, status, timestamp, 
           payDate, payTotal, payDiscount, payPaid, payStage, payBalance, payMethod, payNote,
+          doneDate, missDate, labDate, labDo, planningDate, planningDo, doingStatusDate, payments,
           _id: code || ('rec_' + i)
         };
       });
@@ -3868,6 +3962,17 @@ function openForm(editRecord, prefill){
     document.getElementById('f_payBalance').value = editRecord.payBalance || '';
     document.getElementById('f_payMethod').value = editRecord.payMethod || 'សាច់ប្រាក់ (Cash)';
     document.getElementById('f_payNote').value = editRecord.payNote || '';
+
+    if(Array.isArray(editRecord.payments) && editRecord.payments.length > 0){
+      currentPayments = editRecord.payments.map(p => ({...p}));
+    } else {
+      const legacyPaid = parseFloat(String(editRecord.payPaid || '').replace(/[^\d.]/g, '')) || 0;
+      currentPayments = legacyPaid > 0 ? [{ date: editRecord.payDate || todayDateOnly, amount: legacyPaid }] : [];
+    }
+    document.getElementById('addPaymentRow').style.display = 'none';
+    renderPaymentHistory();
+    updatePaidFromPayments();
+
     updateProcedurePriceTotal();
 
     const parsedMeds = parsePrescriptionString(editRecord.medication);
@@ -3911,6 +4016,9 @@ function openForm(editRecord, prefill){
     document.getElementById('f_labDo').value = '';
     document.getElementById('f_planningDate').value = '';
     document.getElementById('f_planningDo').value = '';
+    currentPayments = [];
+    document.getElementById('addPaymentRow').style.display = 'none';
+    renderPaymentHistory();
 
     document.getElementById('f_payDate').value = todayDateOnly;
     document.getElementById('f_payDiscount').value = '';
@@ -3956,6 +4064,9 @@ function openForm(editRecord, prefill){
     document.getElementById('f_labDo').value = '';
     document.getElementById('f_planningDate').value = '';
     document.getElementById('f_planningDo').value = '';
+    currentPayments = [];
+    document.getElementById('addPaymentRow').style.display = 'none';
+    renderPaymentHistory();
 
     document.getElementById('f_payDate').value = todayDateOnly;
     document.getElementById('f_payDiscount').value = '';
@@ -4064,6 +4175,7 @@ function saveRecord(){
       labDo: labDoVal,
       planningDate: planningDateVal,
       planningDo: planningDoVal,
+      payments: currentPayments,
       payDate: document.getElementById('f_payDate').value.trim(),
       payTotal: document.getElementById('f_payTotal').value.trim(),
       payDiscount: document.getElementById('f_payDiscount').value.trim(),
@@ -4074,7 +4186,7 @@ function saveRecord(){
       payNote: document.getElementById('f_payNote').value.trim()
     };
 
-    const payload = {...rec};
+    const payload = {...rec, payments: JSON.stringify(currentPayments)};
     if(wasEditing && editingOriginalRecord){
       payload.original = {
         code: editingOriginalRecord.code,
