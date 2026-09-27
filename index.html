@@ -517,7 +517,7 @@
   @media print{
     body{background:none;}
     .app-shell, .sidebar-scrim, .topbar, .wrap, .fab,
-    #detailOverlay, #formOverlay, #settingsOverlay, #clinicalConfigOverlay, #patientOverlay, #toothHistoryModalOverlay, #printSizeModalOverlay, #invoiceDetailOverlay, #laboPatientDetailOverlay, #rxDetailOverlay, #xrayGalleryOverlay, #pinModalOverlay, #laboFormOverlay, #invFormOverlay, #invAdjustOverlay, #invHistoryOverlay{ display:none !important; }
+    #detailOverlay, #formOverlay, #settingsOverlay, #clinicalConfigOverlay, #patientOverlay, #toothHistoryModalOverlay, #printSizeModalOverlay, #invoiceDetailOverlay, #laboPatientDetailOverlay, #rxDetailOverlay, #procedureStepsOverlay, #xrayGalleryOverlay, #pinModalOverlay, #laboFormOverlay, #invFormOverlay, #invAdjustOverlay, #invHistoryOverlay{ display:none !important; }
     #printOverlay{ position:static !important; inset:auto; background:none !important; backdrop-filter:none !important; padding:0 !important; display:block !important; }
     #printOverlay .modal{ box-shadow:none !important; border:none !important; max-width:100% !important; border-radius:0 !important; background:none !important; margin:0 !important; }
     #printOverlay .modal-head, #printOverlay .modal-actions{ display:none !important; }
@@ -906,17 +906,17 @@
           <h2 class="kh">សង្ខេបថ្ងៃនេះ & ថ្ងៃម្សិល · Today & Yesterday at a glance</h2>
           <span class="kh" id="dashDate" style="font-size:12px;color:var(--ink-dim)"></span>
         </div>
-        <div class="stats2 dash-stats" id="demoStatsRow"></div>
+        <div class="kh" style="font-size:12px; font-weight:700; color:var(--ink-dim); margin-bottom:6px;">👥 អ្នកជំងឺ · Patients</div>
+        <div class="stats2 dash-stats" id="demoStatsRowPatients" style="margin-bottom:16px;"></div>
+
+        <div class="kh" style="font-size:12px; font-weight:700; color:var(--ink-dim); margin-bottom:6px;">💰 ចំណូលចំណាយ · Income &amp; Expense</div>
+        <div class="stats2 dash-stats" id="demoStatsRowMoney" style="margin-bottom:16px;"></div>
+
+        <div class="kh" style="font-size:12px; font-weight:700; color:var(--ink-dim); margin-bottom:6px;">🗓️ ណាត់ជួប & ពុម្ភធ្មេញ · Appointments &amp; Dental Lab</div>
+        <div class="stats2 dash-stats" id="demoStatsRowOps" style="margin-bottom:16px;"></div>
 
         <div class="appt-grid">
-          <div class="appt-panel">
-            <div class="appt-panel-head">
-              <h3 class="kh">ការណាត់ជួប · Appointments</h3>
-              <span class="count-pill" id="apptTodayCount">0</span>
-            </div>
-            <div id="apptTodayBody"></div>
-          </div>
-          <div class="appt-panel">
+          <div class="appt-panel" style="grid-column: 1 / -1;">
             <div class="appt-panel-head">
               <h3 class="kh">ការព្យាបាល · Procedures</h3>
               <span class="count-pill" id="procTodayCount">0</span>
@@ -1412,94 +1412,6 @@
           </div>
         </div>
 
-        <div class="appointment-box-wrapper">
-          <label class="kh" style="display:block;margin:0 0 10px;font-size:13px;color:var(--ink-soft);text-transform:none;font-weight:700;">🗓️ ស្ថានភាព · Status</label>
-          <div class="kh" style="font-size:11px; color:var(--ink-dim); margin-bottom:10px;">ស្លាកសញ្ញារួមរបស់ករណីនេះ នឹងយកតាមស្ថានភាពដែលមានកាលបរិច្ឆេទថ្មីបំផុត</div>
-
-          <div class="status-row" data-row="done" style="border:1px solid var(--border); border-radius:10px; padding:10px 12px; margin-bottom:8px; background:var(--surface);">
-            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;font-size:13px;color:var(--primary-dark);text-transform:none;">
-              <input type="checkbox" id="f_statusDone" class="status-check" style="width:17px;height:17px;accent-color:var(--primary-dark);">
-              <span><b>✅ Done</b></span>
-            </label>
-            <div id="doneFields" class="field" style="margin:8px 0 0; display:none;">
-              <label>ថ្ងៃខែឆ្នាំ Done</label>
-              <input type="date" id="f_doneDate" class="mono">
-            </div>
-          </div>
-
-          <div class="status-row" data-row="doing" style="border:1px solid var(--border); border-radius:10px; padding:10px 12px; margin-bottom:8px; background:var(--surface);">
-            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;font-size:13px;color:var(--amber-dark);text-transform:none;">
-              <input type="checkbox" id="f_statusDoing" class="status-check" style="width:17px;height:17px;accent-color:var(--amber-dark);">
-              <span><b>⚙️ Doing</b></span>
-            </label>
-            <div id="doingStatusFields" class="field" style="margin:8px 0 0; display:none;">
-              <label>ថ្ងៃខែឆ្នាំ Doing</label>
-              <input type="date" id="f_doingStatusDate" class="mono">
-            </div>
-          </div>
-
-          <div class="status-row" data-row="missing" style="border:1px solid var(--border); border-radius:10px; padding:10px 12px; margin-bottom:8px; background:var(--surface);">
-            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;font-size:13px;color:var(--coral-dark);text-transform:none;">
-              <input type="checkbox" id="f_statusMissing" class="status-check" style="width:17px;height:17px;accent-color:var(--coral-dark);">
-              <span><b>⏳ Missing</b></span>
-            </label>
-            <div id="missFields" class="field" style="margin:8px 0 0; display:none;">
-              <label>ថ្ងៃខែឆ្នាំ Miss</label>
-              <input type="date" id="f_missDate" class="mono">
-            </div>
-          </div>
-
-          <div class="status-row" data-row="appt" style="border:1px solid var(--border); border-radius:10px; padding:10px 12px; margin-bottom:8px; background:var(--surface);">
-            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;font-size:13px;color:var(--amber-dark);text-transform:none;">
-              <input type="checkbox" id="f_statusAppt" class="status-check" style="width:17px;height:17px;accent-color:var(--amber-dark);">
-              <span><b>🔄 Appointment</b></span>
-            </label>
-            <div id="apptFields" class="appointment-fields-grid" style="display:none;margin-top:8px;">
-              <div class="field" style="margin:0;">
-                <label>ថ្ងៃខែឆ្នាំ និងម៉ោងណាត់</label>
-                <input type="datetime-local" id="f_apptDateTime" class="mono">
-              </div>
-              <div class="field" style="margin:0;">
-                <label>Do</label>
-                <input type="text" id="f_planDo" class="kh" placeholder="ឧ. Obturation, Luting crown, Remove suture...">
-              </div>
-            </div>
-          </div>
-
-          <div class="status-row" data-row="labo" style="border:1px solid var(--border); border-radius:10px; padding:10px 12px; margin-bottom:8px; background:var(--surface);">
-            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;font-size:13px;color:#1D4ED8;text-transform:none;">
-              <input type="checkbox" id="f_statusLabo" class="status-check" style="width:17px;height:17px;accent-color:#1D4ED8;">
-              <span><b>🧪 ពុម្ភធ្មេញ</b></span>
-            </label>
-            <div id="laboFields" class="appointment-fields-grid" style="display:none;margin-top:8px;">
-              <div class="field" style="margin:0;">
-                <label>ថ្ងៃខែឆ្នាំ ផ្ញើ Lab</label>
-                <input type="date" id="f_labDate" class="mono">
-              </div>
-              <div class="field" style="margin:0;">
-                <label>Do</label>
-                <input type="text" id="f_labDo" class="kh" placeholder="ឧ. Crown, Bridge...">
-              </div>
-            </div>
-          </div>
-
-          <div class="status-row" data-row="planning" style="border:1px solid var(--border); border-radius:10px; padding:10px 12px; background:var(--surface);">
-            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;font-size:13px;color:#6D28D9;text-transform:none;">
-              <input type="checkbox" id="f_statusPlanning" class="status-check" style="width:17px;height:17px;accent-color:#6D28D9;">
-              <span><b>📝 Planning</b></span>
-            </label>
-            <div id="planningFields" class="appointment-fields-grid" style="display:none;margin-top:8px;">
-              <div class="field" style="margin:0;">
-                <label>ថ្ងៃខែឆ្នាំ Plan</label>
-                <input type="date" id="f_planningDate" class="mono">
-              </div>
-              <div class="field" style="margin:0;">
-                <label>Do</label>
-                <input type="text" id="f_planningDo" class="kh" placeholder="ឧ. RCT, Extraction...">
-              </div>
-            </div>
-          </div>
-        </div>
         </div><!-- /clinical panel -->
 
         <div class="form-tab-panel" data-tab="medication" style="display:none;">
@@ -1633,11 +1545,11 @@
       <div id="xrayPreviewArea" style="border:2px dashed var(--border);border-radius:14px;min-height:220px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:var(--surface-2);cursor:pointer;overflow:hidden;padding:14px;text-align:center;" onclick="document.getElementById('xrayFileInput').click()">
         <div id="xrayPlaceholder" class="kh" style="color:var(--ink-dim);font-size:13px;">
           <div style="font-size:32px;margin-bottom:6px;">🦷📷</div>
-          មិនទាន់មានរូបភាពទេ<br>ចុចទីនេះដើម្បីជ្រើសរើសរូបពី Computer / កាមេរ៉ា
+          មិនទាន់មានរូបភាពទេ<br>ចុចទីនេះដើម្បីជ្រើសរើសរូបច្រើនក្នុងពេលតែមួយបាន (Computer / កាមេរ៉ា)
         </div>
-        <img id="xrayPreviewImg" class="hidden" style="max-width:100%;max-height:320px;border-radius:10px;object-fit:contain;">
+        <div id="xrayPreviewGrid" class="hidden" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(90px,1fr)); gap:8px; width:100%;"></div>
       </div>
-      <input type="file" id="xrayFileInput" accept="image/*" capture="environment" class="hidden">
+      <input type="file" id="xrayFileInput" accept="image/*" capture="environment" multiple class="hidden">
       <div id="xrayFileName" class="mono" style="font-size:11px;color:var(--ink-dim);margin-top:8px;text-align:center;"></div>
       <div id="xrayStatus" class="kh" style="font-size:12.5px;text-align:center;margin-top:10px;min-height:16px;color:var(--primary-dark);font-weight:600;"></div>
       <div class="modal-actions" style="margin-top:16px;">
@@ -1825,6 +1737,126 @@
 
 <!-- Modal របាយការណ៍ Report -->
 <!-- Modal បញ្ជីវិក្កយបត្រ (Invoices Modal Overlay) -->
+<!-- Procedure Steps popup (opened by clicking a TX row in Clinical Notes) -->
+<div class="overlay hidden" id="procedureStepsOverlay">
+  <div class="modal" style="max-width: 620px;">
+    <div class="modal-head">
+      <h2 class="kh" id="procStepsTitle">🦷 ជំហាននីតិវិធី · Procedure Steps</h2>
+      <button class="x" id="closeProcSteps">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="procStepsInfo" class="kh" style="font-size:12.5px; color:var(--ink-soft); margin-bottom:14px;"></div>
+        <div class="appointment-box-wrapper">
+          <label class="kh" style="display:block;margin:0 0 10px;font-size:13px;color:var(--ink-soft);text-transform:none;font-weight:700;">🗓️ ស្ថានភាព · Status</label>
+          <div class="kh" style="font-size:11px; color:var(--ink-dim); margin-bottom:10px;">ស្លាកសញ្ញារួមរបស់ករណីនេះ នឹងយកតាមស្ថានភាពដែលមានកាលបរិច្ឆេទថ្មីបំផុត</div>
+
+          <div class="status-row" data-row="done" style="border:1px solid var(--border); border-radius:10px; padding:10px 12px; margin-bottom:8px; background:var(--surface);">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;font-size:13px;color:var(--primary-dark);text-transform:none;">
+              <input type="checkbox" id="f_statusDone" class="status-check" style="width:17px;height:17px;accent-color:var(--primary-dark);">
+              <span><b>✅ Done</b></span>
+            </label>
+            <div id="doneFields" class="field" style="margin:8px 0 0; display:none;">
+              <label>ថ្ងៃខែឆ្នាំ Done</label>
+              <input type="date" id="f_doneDate" class="mono">
+            </div>
+          </div>
+
+          <div class="status-row" data-row="doing" style="border:1px solid var(--border); border-radius:10px; padding:10px 12px; margin-bottom:8px; background:var(--surface);">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;font-size:13px;color:var(--amber-dark);text-transform:none;">
+              <input type="checkbox" id="f_statusDoing" class="status-check" style="width:17px;height:17px;accent-color:var(--amber-dark);">
+              <span><b>⚙️ Doing</b></span>
+            </label>
+            <div id="doingStatusFields" class="field" style="margin:8px 0 0; display:none;">
+              <label>ថ្ងៃខែឆ្នាំ Doing</label>
+              <input type="date" id="f_doingStatusDate" class="mono">
+            </div>
+          </div>
+
+          <div class="status-row" data-row="missing" style="border:1px solid var(--border); border-radius:10px; padding:10px 12px; margin-bottom:8px; background:var(--surface);">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;font-size:13px;color:var(--coral-dark);text-transform:none;">
+              <input type="checkbox" id="f_statusMissing" class="status-check" style="width:17px;height:17px;accent-color:var(--coral-dark);">
+              <span><b>⏳ Missing</b></span>
+            </label>
+            <div id="missFields" class="field" style="margin:8px 0 0; display:none;">
+              <label>ថ្ងៃខែឆ្នាំ Miss</label>
+              <input type="date" id="f_missDate" class="mono">
+            </div>
+          </div>
+
+          <div class="status-row" data-row="appt" style="border:1px solid var(--border); border-radius:10px; padding:10px 12px; margin-bottom:8px; background:var(--surface);">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;font-size:13px;color:var(--amber-dark);text-transform:none;">
+              <input type="checkbox" id="f_statusAppt" class="status-check" style="width:17px;height:17px;accent-color:var(--amber-dark);">
+              <span><b>🔄 Appointment</b></span>
+            </label>
+            <div id="apptFields" class="appointment-fields-grid" style="display:none;margin-top:8px;">
+              <div class="field" style="margin:0;">
+                <label>ថ្ងៃខែឆ្នាំ និងម៉ោងណាត់</label>
+                <input type="datetime-local" id="f_apptDateTime" class="mono">
+              </div>
+              <div class="field" style="margin:0;">
+                <label>Do</label>
+                <input type="text" id="f_planDo" class="kh" placeholder="ឧ. Obturation, Luting crown, Remove suture...">
+              </div>
+            </div>
+          </div>
+
+          <div class="status-row" data-row="labo" style="border:1px solid var(--border); border-radius:10px; padding:10px 12px; margin-bottom:8px; background:var(--surface);">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;font-size:13px;color:#1D4ED8;text-transform:none;">
+              <input type="checkbox" id="f_statusLabo" class="status-check" style="width:17px;height:17px;accent-color:#1D4ED8;">
+              <span><b>🧪 ពុម្ភធ្មេញ</b></span>
+            </label>
+            <div id="laboFields" class="appointment-fields-grid" style="display:none;margin-top:8px;">
+              <div class="field" style="margin:0;">
+                <label>ថ្ងៃខែឆ្នាំ ផ្ញើ Lab</label>
+                <input type="date" id="f_labDate" class="mono">
+              </div>
+              <div class="field" style="margin:0;">
+                <label>Do</label>
+                <input type="text" id="f_labDo" class="kh" placeholder="ឧ. Crown, Bridge...">
+              </div>
+            </div>
+          </div>
+
+          <div class="status-row" data-row="planning" style="border:1px solid var(--border); border-radius:10px; padding:10px 12px; background:var(--surface);">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;font-size:13px;color:#6D28D9;text-transform:none;">
+              <input type="checkbox" id="f_statusPlanning" class="status-check" style="width:17px;height:17px;accent-color:#6D28D9;">
+              <span><b>📝 Planning</b></span>
+            </label>
+            <div id="planningFields" class="appointment-fields-grid" style="display:none;margin-top:8px;">
+              <div class="field" style="margin:0;">
+                <label>ថ្ងៃខែឆ្នាំ Plan</label>
+                <input type="date" id="f_planningDate" class="mono">
+              </div>
+              <div class="field" style="margin:0;">
+                <label>Do</label>
+                <input type="text" id="f_planningDo" class="kh" placeholder="ឧ. RCT, Extraction...">
+              </div>
+            </div>
+          </div>
+        </div>
+
+<div style="border-top:1px dashed var(--border); margin-bottom:14px;"></div>
+
+<label class="kh" style="display:block; font-size:12px; font-weight:700; color:var(--ink-soft); margin-bottom:8px;">📜 ជំហាននីតិវិធី · Procedure Steps</label>
+      <div id="procStepsCards" style="margin-bottom:18px;"></div>
+      <div style="border-top:1px dashed var(--border); padding-top:14px;">
+        <label class="kh" style="display:block; font-size:12px; font-weight:700; color:var(--ink-soft); margin-bottom:8px;">＋ បន្ថែមជំហានថ្មី · Add Step</label>
+        <div style="display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap; margin-bottom:8px;">
+          <div class="field" style="margin:0; flex:1; min-width:160px;">
+            <select id="procStepSelect" class="kh"></select>
+            <input type="text" id="procStepCustomInput" class="kh" placeholder="សរសេរជំហានផ្សេង..." style="display:none; margin-top:6px;">
+          </div>
+          <div class="field" style="margin:0; width:140px;">
+            <input type="date" id="procStepDate" class="mono">
+          </div>
+          <button type="button" class="btn btn-primary btn-sm kh" id="addProcStepBtn" style="height:38px;">＋ បន្ថែម</button>
+        </div>
+        <input type="text" id="procStepNote" class="kh" placeholder="ចំណាំ (Note) — ស្រេចចិត្ត..." style="width:100%; box-sizing:border-box;">
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Rx list drill-in (small overlay, opened from Full Dental Record's 💊 វេជ្ជបញ្ជា button) -->
 <div class="overlay hidden" id="rxDetailOverlay">
   <div class="modal" style="max-width: 720px;">
@@ -2289,6 +2321,83 @@ function getCheckedStatus(){
   return computeOverallStatus();
 }
 
+function populateStatusFieldsFromRecord(editRecord){
+  const nowDateTime = getLocalNowDateTime();
+  const legacyStatus = editRecord.status;
+  const hasNewStatusData = !!(editRecord.doneDate || editRecord.doingStatusDate || editRecord.missDate || editRecord.labDate || editRecord.planningDate);
+
+  if(hasNewStatusData){
+    statusChecks.Done.checked = !!editRecord.doneDate;
+    document.getElementById('f_doneDate').value = editRecord.doneDate || '';
+
+    statusChecks.Doing.checked = !!editRecord.doingStatusDate;
+    document.getElementById('f_doingStatusDate').value = editRecord.doingStatusDate || '';
+
+    statusChecks.Missing.checked = !!editRecord.missDate;
+    document.getElementById('f_missDate').value = editRecord.missDate || '';
+
+    statusChecks.Appt.checked = !!editRecord.timeLast;
+    document.getElementById('f_apptDateTime').value = editRecord.timeLast ? dateToYMDTime(editRecord.timeLast) : '';
+    document.getElementById('f_planDo').value = editRecord.planDo || '';
+
+    statusChecks.Labo.checked = !!editRecord.labDate;
+    document.getElementById('f_labDate').value = editRecord.labDate || '';
+    document.getElementById('f_labDo').value = editRecord.labDo || '';
+
+    statusChecks.Planning.checked = !!editRecord.planningDate;
+    document.getElementById('f_planningDate').value = editRecord.planningDate || '';
+    document.getElementById('f_planningDo').value = editRecord.planningDo || '';
+  } else {
+    // Legacy record (saved before per-status dates existed): route its single old status/date to the matching row.
+    statusChecks.Done.checked = legacyStatus === 'Done';
+    document.getElementById('f_doneDate').value = statusChecks.Done.checked ? (dateToYMDTime(editRecord.timestamp || '').slice(0,10) || getLocalTodayYMD()) : '';
+
+    statusChecks.Doing.checked = legacyStatus === 'Doing';
+    document.getElementById('f_doingStatusDate').value = statusChecks.Doing.checked ? (dateToYMDTime(editRecord.timestamp || '').slice(0,10) || getLocalTodayYMD()) : '';
+
+    statusChecks.Missing.checked = legacyStatus === 'Missing' || !legacyStatus;
+    document.getElementById('f_missDate').value = statusChecks.Missing.checked ? getLocalTodayYMD() : '';
+
+    statusChecks.Appt.checked = legacyStatus === 'Appt';
+    document.getElementById('f_apptDateTime').value = statusChecks.Appt.checked ? (editRecord.timeLast ? dateToYMDTime(editRecord.timeLast) : nowDateTime) : '';
+    document.getElementById('f_planDo').value = statusChecks.Appt.checked ? (editRecord.planDo || '') : '';
+
+    statusChecks.Labo.checked = legacyStatus === 'Labo';
+    document.getElementById('f_labDate').value = statusChecks.Labo.checked ? (editRecord.timeLast ? dateToYMDTime(editRecord.timeLast).slice(0,10) : getLocalTodayYMD()) : '';
+    document.getElementById('f_labDo').value = statusChecks.Labo.checked ? (editRecord.planDo || '') : '';
+
+    statusChecks.Planning.checked = legacyStatus === 'Planning';
+    document.getElementById('f_planningDate').value = statusChecks.Planning.checked ? (editRecord.timeLast ? dateToYMDTime(editRecord.timeLast).slice(0,10) : getLocalTodayYMD()) : '';
+    document.getElementById('f_planningDo').value = statusChecks.Planning.checked ? (editRecord.planDo || '') : '';
+  }
+  ['Done','Doing','Missing','Appt','Labo','Planning'].forEach(updateStatusRowVisibility);
+}
+
+function saveStatusForActiveRecord(){
+  // Status now lives only in the Procedure Steps popup — only save when that popup is actually open.
+  if(!activeProcStepsRecordId) return;
+  const r = allRecords.find(x => x._id === activeProcStepsRecordId);
+  if(!r) return;
+
+  r.status = computeOverallStatus();
+  r.doneDate = (statusChecks.Done && statusChecks.Done.checked) ? document.getElementById('f_doneDate').value : '';
+  r.doingStatusDate = (statusChecks.Doing && statusChecks.Doing.checked) ? document.getElementById('f_doingStatusDate').value : '';
+  r.missDate = (statusChecks.Missing && statusChecks.Missing.checked) ? document.getElementById('f_missDate').value : '';
+  const apptRaw = (statusChecks.Appt && statusChecks.Appt.checked) ? document.getElementById('f_apptDateTime').value : '';
+  r.timeLast = apptRaw ? formatDateDisplay(apptRaw) : '';
+  r.planDo = (statusChecks.Appt && statusChecks.Appt.checked) ? document.getElementById('f_planDo').value.trim() : '';
+  r.labDate = (statusChecks.Labo && statusChecks.Labo.checked) ? document.getElementById('f_labDate').value : '';
+  r.labDo = (statusChecks.Labo && statusChecks.Labo.checked) ? document.getElementById('f_labDo').value.trim() : '';
+  r.planningDate = (statusChecks.Planning && statusChecks.Planning.checked) ? document.getElementById('f_planningDate').value : '';
+  r.planningDo = (statusChecks.Planning && statusChecks.Planning.checked) ? document.getElementById('f_planningDo').value.trim() : '';
+
+  saveLocalRecords();
+  const payload = {...r, payments: JSON.stringify(r.payments || []), procedureStepsJSON: JSON.stringify(r.procedureSteps || [])};
+  try{ pushToSheet('updateRecord', payload); }catch(err){ console.warn('Sync queue error:', err); }
+
+  autoSyncLabFromStatus(r);
+}
+
 Object.keys(statusChecks).forEach(key => {
   if(!statusChecks[key]) return;
   statusChecks[key].addEventListener('change', (e) => {
@@ -2297,7 +2406,13 @@ Object.keys(statusChecks).forEach(key => {
       const dateEl = document.getElementById(STATUS_ROW_DATE_ID[key]);
       dateEl.value = (dateEl.type === 'date') ? getLocalTodayYMD() : getLocalNowDateTime();
     }
+    saveStatusForActiveRecord();
   });
+});
+
+['f_doneDate','f_doingStatusDate','f_missDate','f_apptDateTime','f_planDo','f_labDate','f_labDo','f_planningDate','f_planningDo'].forEach(id => {
+  const el = document.getElementById(id);
+  if(el) el.addEventListener('change', saveStatusForActiveRecord);
 });
 
 function calcBal() {
@@ -2705,6 +2820,12 @@ async function fetchFromSheet(isSilent = false){
           payments = rawPayments ? JSON.parse(rawPayments) : [];
           if(!Array.isArray(payments)) payments = [];
         } catch(e) { payments = []; }
+        let procedureSteps = [];
+        try {
+          const rawSteps = r['procedureStepsJSON'] || r[32] || '';
+          procedureSteps = rawSteps ? JSON.parse(rawSteps) : [];
+          if(!Array.isArray(procedureSteps)) procedureSteps = [];
+        } catch(e) { procedureSteps = []; }
 
         let timestamp = cleanStr(r['timestamp'] || r[0] || '');
         let code = cleanStr(r['code'] || r[1] || '') || ('row_' + i);
@@ -2715,7 +2836,7 @@ async function fetchFromSheet(isSilent = false){
           ...r,
           code, name, sex, age, phone, diagnosis, idc10, treatment, teeth, doing, doingDateTime, timeLast, planDo, medication, status, timestamp, 
           payDate, payTotal, payDiscount, payPaid, payStage, payBalance, payMethod, payNote,
-          doneDate, missDate, labDate, labDo, planningDate, planningDo, doingStatusDate, payments,
+          doneDate, missDate, labDate, labDo, planningDate, planningDo, doingStatusDate, payments, procedureSteps,
           _id: code || ('rec_' + i)
         };
       });
@@ -2915,22 +3036,15 @@ function renderProcRow(item){
 }
 
 function renderAppointments(){
-  const {todayList, todayProcList} = getAppointments();
-  
-  document.getElementById('apptTodayCount').textContent = todayList.length;
+  const {todayProcList} = getAppointments();
+
   document.getElementById('procTodayCount').textContent = todayProcList.length;
-  
-  const todayBody = document.getElementById('apptTodayBody');
   const procBody = document.getElementById('procTodayBody');
-  
-  todayBody.innerHTML = todayList.length
-    ? todayList.map(renderApptRow).join('')
-    : `<div class="empty-state kh" style="padding:20px;font-size:12px;">មិនមានការណាត់ជួបក្នុងចន្លោះ ៣ ថ្ងៃនេះទេ<br><span style="opacity:.7">No appointments (yesterday - tomorrow)</span></div>`;
-    
+
   procBody.innerHTML = todayProcList.length
     ? todayProcList.map(renderProcRow).join('')
     : `<div class="empty-state kh" style="padding:20px;font-size:12px;">មិនមានការព្យាបាលក្នុងចន្លោះ ៣ ថ្ងៃនេះទេ<br><span style="opacity:.7">No procedures (yesterday - tomorrow)</span></div>`;
-    
+
   document.querySelectorAll('.appt-row').forEach(el=>{
     el.addEventListener('click', ()=> openPatientRecord(decodeURIComponent(el.dataset.name)));
   });
@@ -3055,18 +3169,26 @@ function computeDayStats(targetDate){
   return { apptCount, newPatientsCount, patientsTodayCount: patientsToday.size, male, female, children, income, expense, laboCount };
 }
 
-function buildCompareStatCards(todayStats, yestStats){
-  const metrics = [
-    { kh: 'ណាត់ជួប', en: 'Appointments', key: 'apptCount', fmt: v => v },
+const DASH_METRIC_GROUPS = {
+  patients: [
     { kh: 'ជំងឺថ្មី', en: 'New Patients', key: 'newPatientsCount', fmt: v => v },
     { kh: 'ចំនួនជំងឺ', en: 'Patients', key: 'patientsTodayCount', fmt: v => v },
     { kh: 'ប្រុស', en: 'Male', key: 'male', fmt: v => v },
     { kh: 'ស្រី', en: 'Female', key: 'female', fmt: v => v },
-    { kh: 'ក្មេង (១៥ចុះ)', en: 'Children ≤15', key: 'children', fmt: v => v },
+    { kh: 'ក្មេង (១៥ចុះ)', en: 'Children ≤15', key: 'children', fmt: v => v }
+  ],
+  money: [
     { kh: 'ចំណូល', en: 'Income', key: 'income', fmt: v => '$' + v.toFixed(2) },
-    { kh: 'ចំណាយ', en: 'Expense', key: 'expense', fmt: v => '$' + v.toFixed(2) },
+    { kh: 'ចំណាយ', en: 'Expense', key: 'expense', fmt: v => '$' + v.toFixed(2) }
+  ],
+  ops: [
+    { kh: 'ណាត់ជួប', en: 'Appointments', key: 'apptCount', fmt: v => v },
     { kh: 'ពុម្ភធ្មេញ', en: 'Dental Lab', key: 'laboCount', fmt: v => v }
-  ];
+  ]
+};
+
+function buildCompareStatCards(todayStats, yestStats, groupKey){
+  const metrics = DASH_METRIC_GROUPS[groupKey];
   return metrics.map(m => `
     <div class="stat-card" style="padding:12px;">
       <div class="stat-label kh" style="margin-bottom:8px;">${m.kh}</div>
@@ -3089,9 +3211,15 @@ function buildCompareStatCards(todayStats, yestStats){
 function renderDashboardDayStats(){
   const today = new Date();
   const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
+  const todayStats = computeDayStats(today);
+  const yestStats = computeDayStats(yesterday);
 
-  const todayEl = document.getElementById('demoStatsRow');
-  if(todayEl) todayEl.innerHTML = buildCompareStatCards(computeDayStats(today), computeDayStats(yesterday));
+  const patientsEl = document.getElementById('demoStatsRowPatients');
+  const moneyEl = document.getElementById('demoStatsRowMoney');
+  const opsEl = document.getElementById('demoStatsRowOps');
+  if(patientsEl) patientsEl.innerHTML = buildCompareStatCards(todayStats, yestStats, 'patients');
+  if(moneyEl) moneyEl.innerHTML = buildCompareStatCards(todayStats, yestStats, 'money');
+  if(opsEl) opsEl.innerHTML = buildCompareStatCards(todayStats, yestStats, 'ops');
 }
 
 function renderTreatmentStats(){
@@ -3181,19 +3309,7 @@ function buildPatientGroups(filterFn){
   return patients;
 }
 
-function renderListBase(){
-  const now = new Date();
-  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
-  const patients = buildPatientGroups(r=>matchesSearch(r, searchTerm));
-
-  document.getElementById('listCount').textContent = patients.length + ' patients';
-  const list = document.getElementById('recordList');
-  if(patients.length===0){ 
-    list.innerHTML = `<div class="empty-state kh">មិនមានកំណត់ត្រា ត្រូវនឹងលក្ខខណ្ឌនេះទេ<br><span style="opacity:.7">No records match this filter</span></div>`; 
-    return; 
-  }
-  
-  list.innerHTML = patients.map(p=>{
+function buildPatientRowHTML(p, startOfToday){
     const nameKey = encodeURIComponent(p.latest.name);
     
     let dStr = "—", tStr = "—";
@@ -3273,7 +3389,40 @@ function renderListBase(){
         <div style="font-size:10px; margin-top:3px; opacity:0.9;">🦷 ធ្មេញ៖ ${allTeethStr}</div>
       </div>
     </div>`;
-  }).join('');
+}
+
+function renderListBase(){
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+  const startOfTomorrow = new Date(startOfToday); startOfTomorrow.setDate(startOfTomorrow.getDate() + 1);
+  const patients = buildPatientGroups(r=>matchesSearch(r, searchTerm));
+
+  document.getElementById('listCount').textContent = patients.length + ' patients';
+  const list = document.getElementById('recordList');
+  if(patients.length===0){ 
+    list.innerHTML = `<div class="empty-state kh">មិនមានកំណត់ត្រា ត្រូវនឹងលក្ខខណ្ឌនេះទេ<br><span style="opacity:.7">No records match this filter</span></div>`; 
+    return; 
+  }
+
+  const isToday = (p) => {
+    if(!p.lastVisitVal) return false;
+    const d = parseAnyDate(p.lastVisitVal);
+    return d && d >= startOfToday && d < startOfTomorrow;
+  };
+  const todayPatients = patients.filter(isToday);
+  const otherPatients = patients.filter(p => !isToday(p));
+
+  let html = '';
+  if(todayPatients.length > 0){
+    html += `<div class="section-title" style="margin:0 0 10px;"><h2 class="kh" style="font-size:14px;">ថ្ងៃនេះ · Today <span class="mono" style="font-size:11px;color:var(--ink-dim);font-weight:400;">(${todayPatients.length})</span></h2></div>`;
+    html += todayPatients.map(p => buildPatientRowHTML(p, startOfToday)).join('');
+    if(otherPatients.length > 0){
+      html += `<div class="section-title" style="margin:18px 0 10px;"><h2 class="kh" style="font-size:14px;">អ្នកជំងឺផ្សេងទៀត · Other Patients</h2></div>`;
+    }
+  }
+  html += otherPatients.map(p => buildPatientRowHTML(p, startOfToday)).join('');
+
+  list.innerHTML = html;
 
   document.querySelectorAll('.record-card').forEach(el=> el.addEventListener('click', ()=>{
     openPatientRecord(decodeURIComponent(el.dataset.name));
@@ -3525,38 +3674,30 @@ function renderClinicalNotesHTML(records) {
         <thead>
           <tr>
             <th style="width:90px;">កាលបរិច្ឆេទ<br>(Date)</th>
-            <th style="width:60px;">ធ្មេញ<br>(Tooth)</th>
-            <th style="width:160px;">ការធ្វើរោគវិនិច្ឆ័យ<br>(Diagnosis / Tx)</th>
-            <th>កំណត់ត្រាគ្លីនិក & នីតិវិធី<br>(Clinical Notes & Proc)</th>
-            <th style="width:120px;">ការណាត់បន្ទាប់<br>(Next Plan)</th>
+            <th style="width:70px;">ធ្មេញ<br>(Tooth)</th>
+            <th>ការព្យាបាល<br>(Treatment)</th>
+            <th style="width:150px;">ចូលចុងក្រោយ / ការណាត់<br>(Last Visit / Appt)</th>
             <th style="width:85px;text-align:center;">ស្ថានភាព<br>(Status)</th>
           </tr>
         </thead>
         <tbody>
-          ${rows.map(r => `
-            <tr class="emr-tr" onclick="openDetail('${r._id}', true)">
+          ${rows.map(r => {
+            const lastOrAppt = r.timeLast
+              ? `<span class="mono" style="color:var(--amber-dark);font-weight:700;">🗓️ ${formatDateDisplay(r.timeLast).split(' ')[0]}</span>`
+              : (r.doingDateTime ? `<span class="mono" style="color:var(--ink-soft);">${formatDateDisplay(r.doingDateTime).split(' ')[0]}</span>` : '<span style="color:var(--ink-dim);">—</span>');
+            return `
+            <tr class="emr-tr">
               <td data-label="កាលបរិច្ឆេទ (Date)" class="mono" style="font-size:11.5px;color:var(--ink-soft);font-weight:600;">${formatDateDisplay(r.timestamp).split(' ')[0]}</td>
               <td data-label="ធ្មេញ (Tooth)" class="mono" style="font-weight:800;color:var(--primary-dark);font-size:13px;">${r.teeth || '—'}</td>
-              <td data-label="ការធ្វើរោគវិនិច្ឆ័យ (Diagnosis / Tx)" class="kh">
-                <div style="font-weight:700;color:var(--ink);font-size:13px;">${r.treatment || '—'}</div>
-                <div style="font-size:10.5px;color:var(--ink-dim);margin-top:4px;">${r.diagnosis || '—'}</div>
-              </td>
-              <td data-label="កំណត់ត្រាគ្លីនិក & នីតិវិធី (Clinical Notes & Proc)" class="kh">
-                <div style="margin-bottom:6px;font-size:12.5px;"><b>DO:</b> ${r.doing || '—'} ${r.doingDateTime ? `<span class="mono" style="font-size:10.5px;color:#888;margin-left:4px;">[🕒 ${formatDateDisplay(r.doingDateTime)}]</span>` : ''}</div>
-                ${r.medication ? `<div style="font-size:11.5px;color:var(--primary-dark);border-top:1px dashed var(--border-soft);padding-top:6px;">💊 <b>Rx:</b> ${r.medication}</div>` : ''}
-                ${r.payTotal || r.payPaid ? `<div class="mono" style="font-size:11px;color:var(--amber-dark);margin-top:4px;">💰 <b>Total:</b> ${r.payTotal||'-'} | <b>Paid:</b> ${r.payPaid||'-'} ${r.payStage ? `<span class="kh">(${r.payStage})</span>` : ''} ${r.payBalance && r.payBalance !== '0' && r.payBalance !== '$0' ? `<span style="color:var(--coral-dark);">| <b>Bal:</b> ${r.payBalance}</span>` : ''}</div>` : ''}
-              </td>
-              <td data-label="ការណាត់បន្ទាប់ (Next Plan)" class="kh" style="font-size:12px;">
-                ${r.timeLast ? `<div class="mono" style="color:var(--amber-dark);font-weight:700;margin-bottom:4px;">🗓️ ${formatDateDisplay(r.timeLast).split(' ')[0]}</div>` : '<div style="color:var(--ink-dim);">—</div>'}
-                ${r.planDo ? `<div style="color:var(--ink-soft);line-height:1.4;">📋 ${r.planDo}</div>` : ''}
-              </td>
+              <td data-label="ការព្យាបាល (Treatment)" class="kh" style="font-weight:700;color:var(--primary-dark);cursor:pointer;text-decoration:underline;text-decoration-style:dotted;" onclick="openProcedureStepsModal('${r._id}')">${r.treatment || r.diagnosis || '—'}</td>
+              <td data-label="ចូលចុងក្រោយ / ការណាត់ (Last Visit / Appt)" style="font-size:12px;">${lastOrAppt}</td>
               <td data-label="ស្ថានភាព (Status)" style="text-align:center;">
                 <div class="emr-status ${r.status==='Done'?'done':(r.status==='Planning'?'planning':(r.status==='Labo'?'labo':(r.status==='Appt'||r.status==='Doing'?'doing':'missing')))}">
                   ${r.status === 'Doing' ? 'Appt' : (r.status || 'Missing')}
                 </div>
               </td>
             </tr>
-          `).join('')}
+          `;}).join('')}
         </tbody>
       </table>
     </div>
@@ -4113,54 +4254,6 @@ function openForm(editRecord, prefill){
     
     const recDT = editRecord.doingDateTime ? dateToYMDTime(editRecord.doingDateTime) : nowDateTime;
     document.getElementById('f_doingDateTime').value = recDT;
-    const legacyStatus = editRecord.status;
-    const hasNewStatusData = !!(editRecord.doneDate || editRecord.doingStatusDate || editRecord.missDate || editRecord.labDate || editRecord.planningDate);
-
-    if(hasNewStatusData){
-      statusChecks.Done.checked = !!editRecord.doneDate;
-      document.getElementById('f_doneDate').value = editRecord.doneDate || '';
-
-      statusChecks.Doing.checked = !!editRecord.doingStatusDate;
-      document.getElementById('f_doingStatusDate').value = editRecord.doingStatusDate || '';
-
-      statusChecks.Missing.checked = !!editRecord.missDate;
-      document.getElementById('f_missDate').value = editRecord.missDate || '';
-
-      statusChecks.Appt.checked = !!editRecord.timeLast;
-      document.getElementById('f_apptDateTime').value = editRecord.timeLast ? dateToYMDTime(editRecord.timeLast) : '';
-      document.getElementById('f_planDo').value = editRecord.planDo || '';
-
-      statusChecks.Labo.checked = !!editRecord.labDate;
-      document.getElementById('f_labDate').value = editRecord.labDate || '';
-      document.getElementById('f_labDo').value = editRecord.labDo || '';
-
-      statusChecks.Planning.checked = !!editRecord.planningDate;
-      document.getElementById('f_planningDate').value = editRecord.planningDate || '';
-      document.getElementById('f_planningDo').value = editRecord.planningDo || '';
-    } else {
-      // Legacy record (saved before per-status dates existed): route its single old status/date to the matching row.
-      statusChecks.Done.checked = legacyStatus === 'Done';
-      document.getElementById('f_doneDate').value = statusChecks.Done.checked ? (dateToYMDTime(editRecord.timestamp || '').slice(0,10) || getLocalTodayYMD()) : '';
-
-      statusChecks.Doing.checked = legacyStatus === 'Doing';
-      document.getElementById('f_doingStatusDate').value = statusChecks.Doing.checked ? (dateToYMDTime(editRecord.timestamp || '').slice(0,10) || getLocalTodayYMD()) : '';
-
-      statusChecks.Missing.checked = legacyStatus === 'Missing' || !legacyStatus;
-      document.getElementById('f_missDate').value = statusChecks.Missing.checked ? getLocalTodayYMD() : '';
-
-      statusChecks.Appt.checked = legacyStatus === 'Appt';
-      document.getElementById('f_apptDateTime').value = statusChecks.Appt.checked ? (editRecord.timeLast ? dateToYMDTime(editRecord.timeLast) : nowDateTime) : '';
-      document.getElementById('f_planDo').value = statusChecks.Appt.checked ? (editRecord.planDo || '') : '';
-
-      statusChecks.Labo.checked = legacyStatus === 'Labo';
-      document.getElementById('f_labDate').value = statusChecks.Labo.checked ? (editRecord.timeLast ? dateToYMDTime(editRecord.timeLast).slice(0,10) : getLocalTodayYMD()) : '';
-      document.getElementById('f_labDo').value = statusChecks.Labo.checked ? (editRecord.planDo || '') : '';
-
-      statusChecks.Planning.checked = legacyStatus === 'Planning';
-      document.getElementById('f_planningDate').value = statusChecks.Planning.checked ? (editRecord.timeLast ? dateToYMDTime(editRecord.timeLast).slice(0,10) : getLocalTodayYMD()) : '';
-      document.getElementById('f_planningDo').value = statusChecks.Planning.checked ? (editRecord.planDo || '') : '';
-    }
-    ['Done','Doing','Missing','Appt','Labo','Planning'].forEach(updateStatusRowVisibility);
 
     // Payment fields pre-fill
     document.getElementById('f_payDate').value = editRecord.payDate || todayDateOnly;
@@ -4328,26 +4421,27 @@ function saveRecord(){
     
     const visitDateTimeVal = document.getElementById('f_visitDateTime').value;
     const doingDateTimeVal = document.getElementById('f_doingDateTime').value;
-    const statusVal = getCheckedStatus();
     
     const doingVal = procSelect.value;
 
-    const isDoneChecked = statusChecks.Done && statusChecks.Done.checked;
-    const isDoingChecked = statusChecks.Doing && statusChecks.Doing.checked;
-    const isMissChecked = statusChecks.Missing && statusChecks.Missing.checked;
-    const isApptChecked = statusChecks.Appt && statusChecks.Appt.checked;
-    const isLaboChecked = statusChecks.Labo && statusChecks.Labo.checked;
-    const isPlanningChecked = statusChecks.Planning && statusChecks.Planning.checked;
-
-    const doneDateVal = isDoneChecked ? document.getElementById('f_doneDate').value : '';
-    const doingStatusDateVal = isDoingChecked ? document.getElementById('f_doingStatusDate').value : '';
-    const missDateVal = isMissChecked ? document.getElementById('f_missDate').value : '';
-    const apptDateTimeVal = isApptChecked ? document.getElementById('f_apptDateTime').value : '';
-    const planDoVal = isApptChecked ? document.getElementById('f_planDo').value.trim() : '';
-    const labDateVal = isLaboChecked ? document.getElementById('f_labDate').value : '';
-    const labDoVal = isLaboChecked ? document.getElementById('f_labDo').value.trim() : '';
-    const planningDateVal = isPlanningChecked ? document.getElementById('f_planningDate').value : '';
-    const planningDoVal = isPlanningChecked ? document.getElementById('f_planningDo').value.trim() : '';
+    // Status is managed exclusively via the Procedure Steps popup (opened from Clinical Notes) now —
+    // the Case form no longer shows these fields, so preserve whatever the record already has rather
+    // than reading stale/unrelated values out of DOM elements that now belong to that other popup.
+    const preservedStatus = (wasEditing && editingOriginalRecord) ? {
+      status: editingOriginalRecord.status || 'Missing',
+      timeLast: editingOriginalRecord.timeLast || '',
+      planDo: editingOriginalRecord.planDo || '',
+      doneDate: editingOriginalRecord.doneDate || '',
+      doingStatusDate: editingOriginalRecord.doingStatusDate || '',
+      missDate: editingOriginalRecord.missDate || '',
+      labDate: editingOriginalRecord.labDate || '',
+      labDo: editingOriginalRecord.labDo || '',
+      planningDate: editingOriginalRecord.planningDate || '',
+      planningDo: editingOriginalRecord.planningDo || ''
+    } : {
+      status: 'Missing', timeLast: '', planDo: '', doneDate: '', doingStatusDate: '',
+      missDate: '', labDate: '', labDo: '', planningDate: '', planningDo: ''
+    };
 
     const medItems = getPrescriptionData();
     const medicationString = stringifyPrescription(medItems);
@@ -4371,19 +4465,19 @@ function saveRecord(){
       idc10: idc10,          
       treatment: treatment, 
       teeth: document.getElementById('f_teeth').value.trim(), 
-      timeLast: apptDateTimeVal ? formatDateDisplay(apptDateTimeVal) : '', 
-      planDo: planDoVal, 
+      timeLast: preservedStatus.timeLast, 
+      planDo: preservedStatus.planDo, 
       doing: doingVal, 
       doingDateTime: doingDateTimeVal ? formatDateDisplay(doingDateTimeVal) : '', 
       medication: medicationString, 
-      status: statusVal,
-      doneDate: doneDateVal,
-      doingStatusDate: doingStatusDateVal,
-      missDate: missDateVal,
-      labDate: labDateVal,
-      labDo: labDoVal,
-      planningDate: planningDateVal,
-      planningDo: planningDoVal,
+      status: preservedStatus.status,
+      doneDate: preservedStatus.doneDate,
+      doingStatusDate: preservedStatus.doingStatusDate,
+      missDate: preservedStatus.missDate,
+      labDate: preservedStatus.labDate,
+      labDo: preservedStatus.labDo,
+      planningDate: preservedStatus.planningDate,
+      planningDo: preservedStatus.planningDo,
       payments: currentPayments,
       payDate: document.getElementById('f_payDate').value.trim(),
       payTotal: document.getElementById('f_payTotal').value.trim(),
@@ -4419,38 +4513,6 @@ function saveRecord(){
       pushToSheet(wasEditing ? 'updateRecord' : 'addRecord', payload);
     } catch(syncErr) {
       console.warn('Sync queue error:', syncErr);
-    }
-
-    // Auto-sync to Dental Lab (ពុម្ភធ្មេញ) when the Lab status row is ticked with a date.
-    if(isLaboChecked && labDateVal){
-      const existingLabOrder = labOrders.find(o => o.sourceRecordId === code);
-      if(existingLabOrder){
-        existingLabOrder.patient = name;
-        existingLabOrder.work = labDoVal || treatment;
-        existingLabOrder.teeth = document.getElementById('f_teeth').value.trim();
-        existingLabOrder.sent = labDateVal;
-        stampLabStatus(existingLabOrder);
-        saveLab();
-        pushToSheet('updateLabo', existingLabOrder);
-      } else {
-        const workName = labDoVal || treatment;
-        const priceMatch = appLabPrices.find(p => p.name === workName);
-        const teethForLab = document.getElementById('f_teeth').value.trim();
-        const autoCost = priceMatch && priceMatch.price ? (parseFloat(priceMatch.price) * (countTeeth(teethForLab) || 1)) : '';
-        const newLabOrder = {
-          id: genCode(), created: getLocalTodayYMD(), sourceRecordId: code,
-          patient: name, work: workName, lab: '',
-          teeth: teethForLab, shade: '',
-          sent: labDateVal, due: '', receivedDate: '', deliveredDate: '',
-          cost: autoCost, status: 'sent', note: 'Auto (from Case ' + code + ')'
-        };
-        stampLabStatus(newLabOrder);
-        labOrders.push(newLabOrder);
-        saveLab();
-        pushToSheet('addLabo', newLabOrder);
-        upsertAutoLabExpense(newLabOrder, true);
-      }
-      if(typeof renderLab === 'function') renderLab();
     }
 
     document.getElementById('formOverlay').classList.add('hidden');
@@ -5150,9 +5212,7 @@ document.getElementById('xraySearch')?.addEventListener('input', (e) => renderXr
 document.getElementById('xrayRefreshBtn')?.addEventListener('click', () => fetchXrayList());
 
 const XRAY_FOLDER_ID = '1ehbxiMk32GNai2-RvvTxMwryAudSODlt';
-let xraySelectedBase64 = null;
-let xraySelectedMime = null;
-let xraySelectedExt = 'jpg';
+let xraySelectedFiles = []; // [{base64, mime, ext}]
 
 function openXrayModal(){
   resetXrayModal();
@@ -5163,10 +5223,10 @@ function closeXrayModal(){
   resetXrayModal();
 }
 function resetXrayModal(){
-  xraySelectedBase64 = null; xraySelectedMime = null;
+  xraySelectedFiles = [];
   document.getElementById('xrayFileInput').value = '';
-  document.getElementById('xrayPreviewImg').classList.add('hidden');
-  document.getElementById('xrayPreviewImg').src = '';
+  document.getElementById('xrayPreviewGrid').innerHTML = '';
+  document.getElementById('xrayPreviewGrid').classList.add('hidden');
   document.getElementById('xrayPlaceholder').classList.remove('hidden');
   document.getElementById('xrayFileName').textContent = '';
   const status = document.getElementById('xrayStatus');
@@ -5175,23 +5235,43 @@ function resetXrayModal(){
   document.getElementById('xrayAddBtn').disabled = true;
 }
 
+function renderXrayPreviewGrid(){
+  const grid = document.getElementById('xrayPreviewGrid');
+  if(xraySelectedFiles.length === 0){
+    grid.classList.add('hidden');
+    document.getElementById('xrayPlaceholder').classList.remove('hidden');
+    document.getElementById('xrayFileName').textContent = '';
+    document.getElementById('xrayAddBtn').disabled = true;
+    return;
+  }
+  document.getElementById('xrayPlaceholder').classList.add('hidden');
+  grid.classList.remove('hidden');
+  grid.innerHTML = xraySelectedFiles.map((f, idx) => `
+    <div style="position:relative; aspect-ratio:1; border-radius:8px; overflow:hidden; border:1px solid var(--border);">
+      <img src="data:${f.mime};base64,${f.base64}" style="width:100%; height:100%; object-fit:cover; display:block;">
+      <button type="button" onclick="removeXrayPreview(${idx})" style="position:absolute; top:2px; right:2px; width:20px; height:20px; border-radius:50%; background:rgba(0,0,0,0.6); color:#fff; border:none; cursor:pointer; font-size:11px; line-height:1;">✕</button>
+    </div>
+  `).join('');
+  document.getElementById('xrayFileName').textContent = `${xraySelectedFiles.length} រូបភាពបានជ្រើសរើស`;
+  document.getElementById('xrayAddBtn').disabled = false;
+}
+
+function removeXrayPreview(idx){
+  xraySelectedFiles.splice(idx, 1);
+  renderXrayPreviewGrid();
+}
+
 document.getElementById('xrayFileInput').addEventListener('change', function(e){
-  const file = e.target.files && e.target.files[0];
-  if(!file) return;
-  if(!file.type.startsWith('image/')){
+  const files = Array.from(e.target.files || []).filter(f => f.type.startsWith('image/'));
+  if(files.length === 0){
     document.getElementById('xrayStatus').textContent = '⚠️ សូមជ្រើសរើសឯកសាររូបភាព';
     return;
   }
-  document.getElementById('xrayFileName').textContent = file.name;
-  compressImageToBase64(file, function(base64, mime){
-    xraySelectedBase64 = base64;
-    xraySelectedMime = mime;
-    xraySelectedExt = mime === 'image/png' ? 'png' : 'jpg';
-    const img = document.getElementById('xrayPreviewImg');
-    img.src = 'data:' + mime + ';base64,' + base64;
-    img.classList.remove('hidden');
-    document.getElementById('xrayPlaceholder').classList.add('hidden');
-    document.getElementById('xrayAddBtn').disabled = false;
+  files.forEach(file => {
+    compressImageToBase64(file, function(base64, mime){
+      xraySelectedFiles.push({ base64, mime, ext: mime === 'image/png' ? 'png' : 'jpg' });
+      renderXrayPreviewGrid();
+    });
   });
 });
 
@@ -5223,52 +5303,66 @@ document.getElementById('xrayModalOverlay').addEventListener('click', (e)=>{ if(
 document.getElementById('xrayAddBtn').addEventListener('click', uploadXrayImage);
 
 async function uploadXrayImage(){
-  if(!xraySelectedBase64) return;
+  if(xraySelectedFiles.length === 0) return;
   const btn = document.getElementById('xrayAddBtn');
   const status = document.getElementById('xrayStatus');
   btn.disabled = true;
   status.style.color = 'var(--primary-dark)';
-  status.textContent = '⏳ កំពុងបង្ហោះទៅ Drive...';
 
   const patientName = cleanStr(document.getElementById('f_name').value) || 'Unknown';
   const recordCode = (editingIndex !== null && allRecords[editingIndex]) ? (allRecords[editingIndex].code || '') : '';
-  const stamp = new Date().toISOString().replace(/[:.]/g,'-');
-  const filename = `${patientName}${recordCode ? '_'+recordCode : ''}_XRAY_${stamp}.${xraySelectedExt}`;
+  const total = xraySelectedFiles.length;
+  const online = navigator.onLine && webAppUrl;
+  let failed = false;
 
-  const payload = {
-    action: 'uploadXray',
-    data: {
-      folderId: XRAY_FOLDER_ID,
-      filename: filename,
-      mimeType: xraySelectedMime,
-      base64: xraySelectedBase64,
-      patientName: patientName,
-      recordCode: recordCode
-    },
-    timestamp: Date.now()
-  };
+  for(let i = 0; i < total; i++){
+    const f = xraySelectedFiles[i];
+    status.textContent = `⏳ កំពុងបង្ហោះទៅ Drive (${i+1}/${total})...`;
+    const stamp = new Date().toISOString().replace(/[:.]/g,'-') + '_' + i;
+    const filename = `${patientName}${recordCode ? '_'+recordCode : ''}_XRAY_${stamp}.${f.ext}`;
 
-  try{
-    if(navigator.onLine && webAppUrl){
-      await fetch(webAppUrl, {
-        method:'POST',
-        mode:'no-cors',
-        headers:{'Content-Type':'text/plain;charset=utf-8'},
-        body: JSON.stringify(payload)
-      });
-      status.textContent = '✓ បានបញ្ជូនទៅ Drive រួចរាល់';
-      setTimeout(closeXrayModal, 1200);
-    } else {
-      const queue = getPendingQueue();
-      queue.push(payload);
-      savePendingQueue(queue);
-      status.textContent = '📶 គ្មានអ៊ីនធឺណិត — រក្សាទុកសម្រាប់ Sync ពេលក្រោយ';
-      setTimeout(closeXrayModal, 1500);
+    const payload = {
+      action: 'uploadXray',
+      data: {
+        folderId: XRAY_FOLDER_ID,
+        filename: filename,
+        mimeType: f.mime,
+        base64: f.base64,
+        patientName: patientName,
+        recordCode: recordCode
+      },
+      timestamp: Date.now()
+    };
+
+    try{
+      if(online){
+        await fetch(webAppUrl, {
+          method:'POST',
+          mode:'no-cors',
+          headers:{'Content-Type':'text/plain;charset=utf-8'},
+          body: JSON.stringify(payload)
+        });
+      } else {
+        const queue = getPendingQueue();
+        queue.push(payload);
+        savePendingQueue(queue);
+      }
+    }catch(err){
+      failed = true;
     }
-  }catch(err){
+  }
+
+  if(failed){
     status.style.color = 'var(--coral-dark)';
-    status.textContent = '⚠️ មានបញ្ហា សូមព្យាយាមម្តងទៀត';
+    status.textContent = '⚠️ រូបខ្លះមានបញ្ហា សូមព្យាយាមម្តងទៀត';
     btn.disabled = false;
+  } else if(online){
+    status.style.color = 'var(--primary-dark)';
+    status.textContent = `✓ បានបញ្ជូនរូបភាព ${total} ទៅ Drive រួចរាល់`;
+    setTimeout(closeXrayModal, 1200);
+  } else {
+    status.textContent = `📶 គ្មានអ៊ីនធឺណិត — រក្សាទុករូបភាព ${total} សម្រាប់ Sync ពេលក្រោយ`;
+    setTimeout(closeXrayModal, 1500);
   }
 }
 
@@ -5359,6 +5453,116 @@ function renderInvoicesTable(searchQ) {
     { kh: 'សរុបប្រាក់នៅមិនទាន់បង់', en: 'Total Outstanding', val: '$' + sumBalance.toFixed(2), cls: 'debt' }
   ]);
 }
+
+let activeProcStepsRecordId = null;
+
+function openProcedureStepsModal(recordId){
+  const r = allRecords.find(x => x._id === recordId);
+  if(!r) return;
+  activeProcStepsRecordId = recordId;
+
+  if(!Array.isArray(r.procedureSteps) || r.procedureSteps.length === 0){
+    // Migrate legacy comma-separated `doing` string into structured steps.
+    const legacy = cleanStr(r.doing);
+    const legacyDate = r.doingDateTime ? formatDateDisplay(r.doingDateTime).split(' ')[0] : '';
+    r.procedureSteps = legacy ? legacy.split(',').map(s => s.trim()).filter(Boolean).map(s => ({ step: s, date: legacyDate })) : [];
+  }
+
+  document.getElementById('procStepsTitle').textContent = `🦷 ${r.treatment || r.diagnosis || 'Procedure'} — ${r.name}`;
+  document.getElementById('procStepsInfo').textContent = `ធ្មេញ៖ ${r.teeth || '—'} · ${formatDateDisplay(r.timestamp).split(' ')[0]}`;
+
+  populateStatusFieldsFromRecord(r);
+
+  const sel = document.getElementById('procStepSelect');
+  sel.innerHTML = appProcedures.map(p => `<option value="${p.name}">${p.name}</option>`).join('') + '<option value="custom">ផ្សេងទៀត / Custom…</option>';
+  document.getElementById('procStepCustomInput').style.display = 'none';
+  document.getElementById('procStepCustomInput').value = '';
+  document.getElementById('procStepDate').value = getLocalTodayYMD();
+
+  renderProcedureStepsCards();
+  document.getElementById('procedureStepsOverlay').classList.remove('hidden');
+}
+
+function renderProcedureStepsCards(){
+  const r = allRecords.find(x => x._id === activeProcStepsRecordId);
+  if(!r) return;
+  const cardsEl = document.getElementById('procStepsCards');
+  if(!r.procedureSteps || r.procedureSteps.length === 0){
+    cardsEl.innerHTML = `<div class="kh" style="text-align:center;color:var(--ink-dim);padding:20px;">មិនទាន់មានជំហាននៅឡើយទេ</div>`;
+    return;
+  }
+  // Show progression in chronological order (oldest first); keep original array index for delete.
+  const withIdx = r.procedureSteps.map((s, idx) => ({...s, idx}));
+  withIdx.sort((a,b) => (a.date||'').localeCompare(b.date||''));
+
+  cardsEl.innerHTML = withIdx.map((s, i) => {
+    const isLast = i === withIdx.length - 1;
+    return `
+      <div style="display:flex; gap:12px; position:relative;">
+        <div style="display:flex; flex-direction:column; align-items:center; flex-shrink:0;">
+          <div style="width:28px; height:28px; border-radius:50%; background:${isLast ? 'var(--primary)' : 'var(--primary-soft)'}; color:${isLast ? '#fff' : 'var(--primary-dark)'}; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px;">${i+1}</div>
+          ${!isLast ? '<div style="width:2px; flex:1; min-height:22px; background:var(--border); margin:2px 0;"></div>' : ''}
+        </div>
+        <div style="flex:1; padding-bottom:${isLast ? '0' : '18px'};">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+            <div class="kh" style="font-weight:700; font-size:13.5px; color:var(--ink);">${escHTML(s.step)}</div>
+            <button type="button" onclick="deleteProcedureStep(${s.idx})" style="width:20px; height:20px; border-radius:50%; background:var(--coral-soft); color:var(--coral-dark); border:none; cursor:pointer; font-size:10.5px; line-height:1; flex-shrink:0;">✕</button>
+          </div>
+          <div class="mono" style="font-size:11px; color:var(--ink-dim); margin-top:2px;">${s.date || '—'}</div>
+          ${s.note ? `<div class="kh" style="font-size:12px; color:var(--ink-soft); margin-top:4px; background:var(--surface-2); padding:6px 8px; border-radius:6px;">${escHTML(s.note)}</div>` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function saveProcedureStepsToRecord(r){
+  r.doing = (r.procedureSteps || []).map(s => s.step).join(', ');
+  saveLocalRecords();
+  const payload = {...r, payments: JSON.stringify(r.payments || []), procedureStepsJSON: JSON.stringify(r.procedureSteps || [])};
+  try{ pushToSheet('updateRecord', payload); }catch(err){ console.warn('Sync queue error:', err); }
+}
+
+function deleteProcedureStep(idx){
+  const r = allRecords.find(x => x._id === activeProcStepsRecordId);
+  if(!r) return;
+  r.procedureSteps.splice(idx, 1);
+  saveProcedureStepsToRecord(r);
+  renderProcedureStepsCards();
+}
+
+document.getElementById('procStepSelect').addEventListener('change', (e) => {
+  document.getElementById('procStepCustomInput').style.display = e.target.value === 'custom' ? 'block' : 'none';
+});
+
+document.getElementById('addProcStepBtn').addEventListener('click', () => {
+  const r = allRecords.find(x => x._id === activeProcStepsRecordId);
+  if(!r) return;
+  const sel = document.getElementById('procStepSelect');
+  const stepName = sel.value === 'custom' ? document.getElementById('procStepCustomInput').value.trim() : sel.value;
+  if(!stepName){ alert('សូមបញ្ចូលឈ្មោះជំហាន'); return; }
+  const date = document.getElementById('procStepDate').value || getLocalTodayYMD();
+  const note = document.getElementById('procStepNote').value.trim();
+  if(!Array.isArray(r.procedureSteps)) r.procedureSteps = [];
+  r.procedureSteps.push({ step: stepName, date, note });
+  saveProcedureStepsToRecord(r);
+  renderProcedureStepsCards();
+  document.getElementById('procStepCustomInput').value = '';
+  document.getElementById('procStepNote').value = '';
+});
+
+document.getElementById('closeProcSteps').addEventListener('click', () => {
+  document.getElementById('procedureStepsOverlay').classList.add('hidden');
+  activeProcStepsRecordId = null;
+  if(activePatientContext) openPatientRecord(activePatientContext);
+});
+document.getElementById('procedureStepsOverlay').addEventListener('click', (e) => {
+  if(e.target.id === 'procedureStepsOverlay'){
+    document.getElementById('procedureStepsOverlay').classList.add('hidden');
+    activeProcStepsRecordId = null;
+    if(activePatientContext) openPatientRecord(activePatientContext);
+  }
+});
 
 function openRxDetail(patientName, records){
   document.getElementById('rxDetailTitle').textContent = `💊 វេជ្ជបញ្ជា — ${patientName}`;
@@ -5486,7 +5690,7 @@ function printCombinedInvoice(){
 }
 
 
-document.getElementById('invoiceBtn').addEventListener('click', () => showView('invoices'));
+document.getElementById('invoiceBtn').addEventListener('click', () => requestClinicPin(() => showView('invoices')));
 
 document.getElementById('closeInvoiceDetail').addEventListener('click', () => {
   document.getElementById('invoiceDetailOverlay').classList.add('hidden');
@@ -5786,7 +5990,7 @@ function printExpensesReport() {
 }
 
 // ភ្ជាប់ Event Listener សម្រាប់ Income & Expense page shortcut
-document.getElementById('expenseBtn').addEventListener('click', () => showView('income-expense'));
+document.getElementById('expenseBtn').addEventListener('click', () => requestClinicPin(() => showView('income-expense')));
 
 document.getElementById('addExpenseBtn').addEventListener('click', addExpenseItem);
 function getIncomeExpenseStats(){
@@ -6038,7 +6242,12 @@ function toggleSidebar(){
     mb.setAttribute('aria-expanded', isDrawerMode() ? (document.body.classList.contains('sb-open') ? 'true' : 'false') : (document.body.classList.contains('sb-collapsed') ? 'false' : 'true'));
   });
 
-  document.querySelectorAll('.sb-item[data-nav]').forEach(b=> b.addEventListener('click', ()=> showView(b.dataset.nav)));
+  const PIN_GATED_VIEWS = ['invoices', 'income-expense', 'reports'];
+  document.querySelectorAll('.sb-item[data-nav]').forEach(b=> b.addEventListener('click', ()=> {
+    const key = b.dataset.nav;
+    if(PIN_GATED_VIEWS.includes(key)) requestClinicPin(() => showView(key));
+    else showView(key);
+  }));
   document.querySelectorAll('#patientFilters .chip').forEach(ch=> ch.addEventListener('click', ()=> setPatientFilter(ch.dataset.filter)));
 
   document.getElementById('settingsBtn').addEventListener('click', closeSidebarDrawer);
@@ -6135,6 +6344,73 @@ function stampLabStatus(o){
   const t = getLocalTodayYMD();
   if(o.status === 'received' && !o.receivedDate) o.receivedDate = t;
   if(o.status === 'delivered'){ if(!o.receivedDate) o.receivedDate = t; if(!o.deliveredDate) o.deliveredDate = t; }
+}
+
+function upsertAutoLabExpense(order, forceNew){
+  const amount = parseFloat(order.cost) || 0;
+  loadExpenses();
+
+  if(!forceNew){
+    // Editing an existing order: update the most recent linked expense in place
+    // instead of creating a duplicate (or losing the edit entirely).
+    const linked = expensesList.filter(e => e.sourceOrderId === order.id);
+    linked.sort((a,b) => (b.date||'').localeCompare(a.date||''));
+    if(linked.length > 0){
+      const e = linked[0];
+      if(amount <= 0){
+        expensesList = expensesList.filter(x => x.id !== e.id);
+      } else {
+        e.date = order.sent || getLocalTodayYMD();
+        e.type = 'DL';
+        e.desc = `${order.teeth || '—'} - ${order.work || '—'} - ${order.patient || '—'}`;
+        e.amount = amount;
+      }
+      saveExpenses();
+      return;
+    }
+  }
+
+  if(amount <= 0) return;
+  expensesList.push({
+    id: genCode(),
+    date: order.sent || getLocalTodayYMD(),
+    type: 'DL',
+    amount: amount,
+    desc: `${order.teeth || '—'} - ${order.work || '—'} - ${order.patient || '—'}`,
+    sourceOrderId: order.id
+  });
+  saveExpenses();
+}
+
+function autoSyncLabFromStatus(record){
+  if(!record.labDate) return;
+  const existingLabOrder = labOrders.find(o => o.sourceRecordId === record.code);
+  if(existingLabOrder){
+    existingLabOrder.patient = record.name;
+    existingLabOrder.work = record.labDo || record.treatment;
+    existingLabOrder.teeth = record.teeth;
+    existingLabOrder.sent = record.labDate;
+    stampLabStatus(existingLabOrder);
+    saveLab();
+    pushToSheet('updateLabo', existingLabOrder);
+  } else {
+    const workName = record.labDo || record.treatment;
+    const priceMatch = appLabPrices.find(p => p.name === workName);
+    const autoCost = priceMatch && priceMatch.price ? (parseFloat(priceMatch.price) * (countTeeth(record.teeth) || 1)) : '';
+    const newLabOrder = {
+      id: genCode(), created: getLocalTodayYMD(), sourceRecordId: record.code,
+      patient: record.name, work: workName, lab: '',
+      teeth: record.teeth, shade: '',
+      sent: record.labDate, due: '', receivedDate: '', deliveredDate: '',
+      cost: autoCost, status: 'sent', note: 'Auto (from Case ' + record.code + ')'
+    };
+    stampLabStatus(newLabOrder);
+    labOrders.push(newLabOrder);
+    saveLab();
+    pushToSheet('addLabo', newLabOrder);
+    upsertAutoLabExpense(newLabOrder, true);
+  }
+  if(typeof renderLab === 'function') renderLab();
 }
 
 function renderLab(){
