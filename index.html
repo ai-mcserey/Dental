@@ -476,7 +476,7 @@
   .row-diag-idc { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   @media(max-width:640px){ .row-diag-idc { grid-template-columns: 1fr; } }
 
-  .procedure-datetime-row{ grid-column:1/-1; display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:12px; background:var(--surface); border:1px solid var(--border); padding:12px; border-radius:12px; }
+  .procedure-datetime-row{ grid-column:1/-1; display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px; background:var(--surface); border:1px solid var(--border); padding:12px; border-radius:12px; }
   @media(max-width:992px){ .procedure-datetime-row{grid-template-columns:1fr;} }
   @media(max-width:640px){ .procedure-datetime-row{grid-template-columns:1fr;} }
 
@@ -1434,15 +1434,6 @@
             <select id="f_procedure_select" class="kh"></select>
           </div>
           <div class="field" style="margin:0;">
-            <label>ស្ថានភាព · Status</label>
-            <select id="f_caseStatus" class="kh">
-              <option value="Appt">🔄 Appt</option>
-              <option value="Done">✅ Done</option>
-              <option value="Missing">⏳ Miss</option>
-              <option value="Labo">🧪 Lab</option>
-            </select>
-          </div>
-          <div class="field" style="margin:0;">
             <label>ម៉ោងនីតិវិធី · Time</label>
             <input type="datetime-local" id="f_doingDateTime" class="mono">
           </div>
@@ -1790,28 +1781,20 @@
       <div id="procStepsCards" style="margin-bottom:18px;"></div>
       <div style="border-top:1px dashed var(--border); padding-top:14px;">
         <label class="kh" style="display:block; font-size:12px; font-weight:700; color:var(--ink-soft); margin-bottom:8px;">＋ បន្ថែមជំហានថ្មី · Add Step</label>
-        <div style="display:flex; gap:8px; align-items:flex-start; flex-wrap:wrap; margin-bottom:8px;">
-          <div class="field" style="margin:0; flex:2; min-width:160px;">
+        <div style="display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap;">
+          <div class="field" style="margin:0; flex:2; min-width:150px;">
             <select id="procStepSelect" class="kh"></select>
             <input type="text" id="procStepCustomInput" class="kh" placeholder="សរសេរជំហានផ្សេង..." style="display:none; margin-top:6px;">
           </div>
-          <div class="field" style="margin:0; flex:1; min-width:110px;">
-            <select id="procStepStatus" class="kh">
-              <option value="Appt">🔄 Appt</option>
-              <option value="Done">✅ Done</option>
-              <option value="Miss">⏳ Miss</option>
-              <option value="Lab">🧪 Lab</option>
-            </select>
-          </div>
-        </div>
-        <div style="display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap; margin-bottom:8px;">
-          <div class="field" style="margin:0; width:140px;">
+          <div class="field" style="margin:0; width:130px;">
             <label style="font-size:10.5px;">ថ្ងៃខែឆ្នាំ</label>
             <input type="date" id="procStepDate" class="mono">
           </div>
+          <div class="field" style="margin:0; flex:2; min-width:140px;">
+            <input type="text" id="procStepNote" class="kh" placeholder="ចំណាំ (Note) — ស្រេចចិត្ត...">
+          </div>
           <button type="button" class="btn btn-primary btn-sm kh" id="addProcStepBtn" style="height:38px;">＋ បន្ថែម</button>
         </div>
-        <input type="text" id="procStepNote" class="kh" placeholder="ចំណាំ (Note) — ស្រេចចិត្ត..." style="width:100%; box-sizing:border-box;">
       </div>
     </div>
   </div>
@@ -3048,8 +3031,7 @@ function renderQueueRow(item){
   const ampm = hr >= 12 ? 'PM' : 'AM';
   hr = hr % 12; if(hr === 0) hr = 12;
   const timeStr = `${String(hr).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')} ${ampm}`;
-  const statusCls = r.status==='Done'?'done':(r.status==='Planning'?'planning':(r.status==='Labo'?'labo':(r.status==='Appt'||r.status==='Doing'?'doing':'missing')));
-  const statusText = r.status === 'Doing' ? 'Appt' : (r.status || 'Missing');
+  const statusText = r.status || '—';
   const planText = cleanStr(r.doing) || cleanStr(r.treatment) || cleanStr(r.diagnosis) || 'ពិនិត្យព្យាបាល';
 
   return `
@@ -3062,7 +3044,7 @@ function renderQueueRow(item){
         <div class="appt-name kh">${r.name}</div>
         <div class="appt-meta">${formatPhoneDisplay(r.phone)||'គ្មានលេខ'} · <span class="kh">${planText}</span></div>
       </div>
-      <div class="emr-status ${statusCls}">${statusText}</div>
+      <div class="kh" style="font-size:11px; font-weight:700; color:var(--primary-dark); background:var(--primary-soft); padding:4px 10px; border-radius:999px;">${escHTML(statusText)}</div>
     </div>`;
 }
 
@@ -3803,10 +3785,8 @@ function renderClinicalNotesHTML(records) {
               <td data-label="Treatment" class="kh" style="font-weight:700;color:var(--primary-dark);cursor:pointer;text-decoration:underline;text-decoration-style:dotted;" onclick="openProcedureStepsModal('${r._id}')">${r.treatment || r.diagnosis || '—'}</td>
               <td data-label="Visit" class="mono" style="text-align:center;font-weight:700;color:var(--ink-soft);">${visitNumById.get(r._id) || '—'}</td>
               <td data-label="Last Visit / Appt" style="font-size:12px;">${lastOrAppt}</td>
-              <td data-label="Status" style="text-align:center;">
-                <div class="emr-status ${r.status==='Done'?'done':(r.status==='Planning'?'planning':(r.status==='Labo'?'labo':(r.status==='Appt'||r.status==='Doing'?'doing':'missing')))}">
-                  ${r.status === 'Doing' ? 'Appt' : (r.status || 'Missing')}
-                </div>
+              <td data-label="Status" class="kh" style="text-align:center; font-size:12px; font-weight:700; color:var(--primary-dark);">
+                ${escHTML(r.status) || '—'}
               </td>
             </tr>
           `;}).join('')}
@@ -4373,9 +4353,6 @@ function openForm(editRecord, prefill){
     const recDT = editRecord.doingDateTime ? dateToYMDTime(editRecord.doingDateTime) : nowDateTime;
     document.getElementById('f_doingDateTime').value = recDT;
 
-    const caseStatusOptions = ['Appt','Done','Missing','Labo'];
-    document.getElementById('f_caseStatus').value = caseStatusOptions.includes(editRecord.status) ? editRecord.status : 'Appt';
-
     // Payment fields pre-fill
     document.getElementById('f_payDate').value = editRecord.payDate || todayDateOnly;
     document.getElementById('f_payTotal').value = editRecord.payTotal || '';
@@ -4429,17 +4406,7 @@ function openForm(editRecord, prefill){
     procSelect.value = defProc.name || '';
 
     document.getElementById('f_doingDateTime').value = nowDateTime;
-    document.getElementById('f_caseStatus').value = 'Appt';
     setStatusCheckbox('Appt');
-    document.getElementById('f_apptDateTime').value = nowDateTime;
-    document.getElementById('f_planDo').value = '';
-    document.getElementById('f_doneDate').value = '';
-    document.getElementById('f_doingStatusDate').value = '';
-    document.getElementById('f_missDate').value = '';
-    document.getElementById('f_labDate').value = '';
-    document.getElementById('f_labDo').value = '';
-    document.getElementById('f_planningDate').value = '';
-    document.getElementById('f_planningDo').value = '';
     currentPayments = [];
     document.getElementById('addPaymentRow').style.display = 'none';
     renderPaymentHistory();
@@ -4478,17 +4445,7 @@ function openForm(editRecord, prefill){
     procSelect.value = defProc2.name || '';
 
     document.getElementById('f_doingDateTime').value = nowDateTime;
-    document.getElementById('f_caseStatus').value = 'Appt';
     setStatusCheckbox('Appt');
-    document.getElementById('f_apptDateTime').value = nowDateTime;
-    document.getElementById('f_planDo').value = '';
-    document.getElementById('f_doneDate').value = '';
-    document.getElementById('f_doingStatusDate').value = '';
-    document.getElementById('f_missDate').value = '';
-    document.getElementById('f_labDate').value = '';
-    document.getElementById('f_labDo').value = '';
-    document.getElementById('f_planningDate').value = '';
-    document.getElementById('f_planningDo').value = '';
     currentPayments = [];
     document.getElementById('addPaymentRow').style.display = 'none';
     renderPaymentHistory();
@@ -4568,10 +4525,6 @@ function saveRecord(){
       status: 'Missing', timeLast: '', planDo: '', doneDate: '', doingStatusDate: '',
       missDate: '', labDate: '', labDo: '', planningDate: '', planningDo: ''
     };
-    // The Case form's own Status dropdown always wins for the record's overall status.
-    const caseStatusEl = document.getElementById('f_caseStatus');
-    if(caseStatusEl) preservedStatus.status = caseStatusEl.value;
-
     const medItems = getPrescriptionData();
     const medicationString = stringifyPrescription(medItems);
 
@@ -5641,8 +5594,6 @@ function renderProcedureStepsCards(){
 
   cardsEl.innerHTML = withIdx.map((s, i) => {
     const isLast = i === withIdx.length - 1;
-    const statusColor = STEP_STATUS_COLORS[s.status]?.text || 'var(--ink-soft)';
-    const statusIcon = STEP_STATUS_ICONS[s.status] || '';
     return `
       <div style="display:flex; gap:12px; position:relative;">
         <div style="display:flex; flex-direction:column; align-items:center; flex-shrink:0;">
@@ -5652,9 +5603,7 @@ function renderProcedureStepsCards(){
         <div style="flex:1; padding-bottom:${isLast ? '0' : '12px'};">
           <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
             <div class="kh" style="font-size:13.5px; color:var(--ink);">
-              <span class="mono" style="font-weight:700; color:${statusColor};">${statusIcon} ${s.status || '—'}</span>
-              <span style="color:var(--ink-dim);"> - </span>
-              <span style="font-weight:700;">${escHTML(s.step)}</span>
+              <span style="font-weight:700; color:${isLast ? 'var(--primary-dark)' : 'var(--ink)'};">${escHTML(s.step)}</span>
               <span style="color:var(--ink-dim);"> - </span>
               <span class="mono" style="color:var(--ink-soft);">${s.date || '—'}</span>
             </div>
@@ -5665,6 +5614,13 @@ function renderProcedureStepsCards(){
       </div>
     `;
   }).join('');
+}
+
+function updateRecordStatusFromLatestStep(r){
+  // The record's overall Status is simply the name of its most recently-dated step.
+  if(!Array.isArray(r.procedureSteps) || r.procedureSteps.length === 0) return;
+  const sorted = [...r.procedureSteps].sort((a,b) => (a.date||'').localeCompare(b.date||''));
+  r.status = sorted[sorted.length - 1].step;
 }
 
 function saveProcedureStepsToRecord(r){
@@ -5678,6 +5634,7 @@ function deleteProcedureStep(idx){
   const r = allRecords.find(x => x._id === activeProcStepsRecordId);
   if(!r) return;
   r.procedureSteps.splice(idx, 1);
+  updateRecordStatusFromLatestStep(r);
   saveProcedureStepsToRecord(r);
   renderProcedureStepsCards();
 }
@@ -5694,9 +5651,9 @@ document.getElementById('addProcStepBtn').addEventListener('click', () => {
   if(!stepName){ alert('សូមបញ្ចូលឈ្មោះជំហាន'); return; }
   const date = document.getElementById('procStepDate').value || getLocalTodayYMD();
   const note = document.getElementById('procStepNote').value.trim();
-  const status = document.getElementById('procStepStatus').value;
   if(!Array.isArray(r.procedureSteps)) r.procedureSteps = [];
-  r.procedureSteps.push({ step: stepName, date, note, status });
+  r.procedureSteps.push({ step: stepName, date, note });
+  updateRecordStatusFromLatestStep(r);
   saveProcedureStepsToRecord(r);
   renderProcedureStepsCards();
   document.getElementById('procStepCustomInput').value = '';
