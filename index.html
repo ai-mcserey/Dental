@@ -390,6 +390,24 @@
     box-shadow: 0 4px 10px -3px rgba(22,76,158,0.4); transform: translateY(-2px);
   }
   .tooth-cell.treated:hover:not(.invisible) { transform: scale(1.15) translateY(-2px); background: var(--primary-dark) !important; }
+  .tooth-cell.planned:not(.treated) {
+    background: var(--amber-soft); border: 2px dashed var(--amber-dark);
+    color: var(--amber-dark); font-weight: 800;
+  }
+  .tooth-cell.planned:not(.treated):hover:not(.invisible) { transform: scale(1.15); background: #FCEFC7; }
+  .chart-legend{ display:flex; gap:16px; flex-wrap:wrap; align-items:center; justify-content:center; margin-top:10px; font-size:11px; }
+  .chart-legend .lg-item{ display:flex; align-items:center; gap:6px; color:var(--ink-soft); }
+  .chart-legend .lg-swatch{ width:16px; height:16px; border-radius:5px; flex-shrink:0; }
+  .status-pill{
+    padding:8px 14px; border-radius:999px; border:1.5px solid var(--border);
+    background:var(--surface); color:var(--ink-soft); font-size:12.5px; font-weight:700;
+    cursor:pointer; transition:all .12s ease;
+  }
+  .status-pill:hover{ border-color:var(--pill-color, var(--primary)); }
+  .status-pill.active{
+    background:var(--pill-color, var(--primary)); border-color:var(--pill-color, var(--primary));
+    color:#fff; box-shadow:0 3px 8px -3px rgba(0,0,0,0.3);
+  }
   .arch-label { font-size: 10.5px; text-align: center; color: var(--ink-dim); letter-spacing: .05em; text-transform: uppercase; margin: 10px 0; font-weight: 800; }
 
   .emr-notes-section { 
@@ -1751,7 +1769,11 @@
   <div class="modal" style="max-width: 620px;">
     <div class="modal-head">
       <h2 class="kh" id="procStepsTitle">🦷 ជំហាននីតិវិធី · Procedure Steps</h2>
-      <button class="x" id="closeProcSteps">✕</button>
+      <div style="display:flex; align-items:center; gap:6px;">
+        <button type="button" class="btn btn-outline btn-sm kh" id="editProcStepsRecordBtn" title="កែប្រែករណីនេះ (Edit Case)">✎ កែ</button>
+        <button type="button" class="btn btn-danger btn-sm kh" id="deleteProcStepsRecordBtn" title="លុបកំណត់ត្រានេះ (ត្រូវការ PIN)">🗑 លុប</button>
+        <button class="x" id="closeProcSteps">✕</button>
+      </div>
     </div>
     <div class="modal-body">
       <div id="procStepsInfo" class="kh" style="font-size:12.5px; color:var(--ink-soft); margin-bottom:14px;"></div>
@@ -1780,92 +1802,73 @@
       </div>
 
       <div class="pstep-tab-panel" data-ptab="status" style="display:none;">
-        <div class="kh" style="font-size:11px; color:var(--ink-dim); margin-bottom:12px;">ស្លាកសញ្ញារួមរបស់ករណីនេះ នឹងយកតាមស្ថានភាពដែលមានកាលបរិច្ឆេទថ្មីបំផុត</div>
+        <div class="kh" style="font-size:11px; color:var(--ink-dim); margin-bottom:12px;">ជ្រើសរើសស្ថានភាពបច្ចុប្បន្នរបស់ករណីនេះ</div>
 
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-          <div class="status-row" data-row="done" style="border:1px solid var(--border); border-radius:10px; padding:10px 12px; background:var(--surface);">
-            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;font-size:13px;color:var(--primary-dark);text-transform:none;">
-              <input type="checkbox" id="f_statusDone" class="status-check" style="width:17px;height:17px;accent-color:var(--primary-dark);">
-              <span><b>✅ Done</b></span>
-            </label>
-            <div id="doneFields" class="field" style="margin:8px 0 0; display:none;">
-              <label>ថ្ងៃខែឆ្នាំ Done</label>
-              <input type="date" id="f_doneDate" class="mono">
+        <div id="statusPillRow" style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px;">
+          <button type="button" class="status-pill kh" data-status="Done" style="--pill-color:var(--primary-dark);">✅ Done</button>
+          <button type="button" class="status-pill kh" data-status="Doing" style="--pill-color:var(--amber-dark);">⚙️ Doing</button>
+          <button type="button" class="status-pill kh" data-status="Missing" style="--pill-color:var(--coral-dark);">⏳ Missing</button>
+          <button type="button" class="status-pill kh" data-status="Appt" style="--pill-color:var(--amber-dark);">🔄 Appointment</button>
+          <button type="button" class="status-pill kh" data-status="Labo" style="--pill-color:#1D4ED8;">🧪 ពុម្ភធ្មេញ</button>
+          <button type="button" class="status-pill kh" data-status="Planning" style="--pill-color:#6D28D9;">📝 Planning</button>
+        </div>
+
+        <div id="statusFieldsPanel" style="border:1px solid var(--border); border-radius:10px; padding:14px; background:var(--surface);">
+          <input type="checkbox" id="f_statusDone" style="display:none;">
+          <div id="doneFields" class="field" style="margin:0; display:none;">
+            <label>ថ្ងៃខែឆ្នាំ Done</label>
+            <input type="date" id="f_doneDate" class="mono">
+          </div>
+
+          <input type="checkbox" id="f_statusDoing" style="display:none;">
+          <div id="doingStatusFields" class="field" style="margin:0; display:none;">
+            <label>ថ្ងៃខែឆ្នាំ Doing</label>
+            <input type="date" id="f_doingStatusDate" class="mono">
+          </div>
+
+          <input type="checkbox" id="f_statusMissing" style="display:none;">
+          <div id="missFields" class="field" style="margin:0; display:none;">
+            <label>ថ្ងៃខែឆ្នាំ Miss</label>
+            <input type="date" id="f_missDate" class="mono">
+          </div>
+
+          <input type="checkbox" id="f_statusAppt" style="display:none;">
+          <div id="apptFields" style="display:none;">
+            <div class="field" style="margin:0 0 8px;">
+              <label>ថ្ងៃខែឆ្នាំ និងម៉ោងណាត់</label>
+              <input type="datetime-local" id="f_apptDateTime" class="mono">
+            </div>
+            <div class="field" style="margin:0;">
+              <label>Do</label>
+              <input type="text" id="f_planDo" class="kh" placeholder="ឧ. Obturation, Luting crown...">
             </div>
           </div>
 
-          <div class="status-row" data-row="doing" style="border:1px solid var(--border); border-radius:10px; padding:10px 12px; background:var(--surface);">
-            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;font-size:13px;color:var(--amber-dark);text-transform:none;">
-              <input type="checkbox" id="f_statusDoing" class="status-check" style="width:17px;height:17px;accent-color:var(--amber-dark);">
-              <span><b>⚙️ Doing</b></span>
-            </label>
-            <div id="doingStatusFields" class="field" style="margin:8px 0 0; display:none;">
-              <label>ថ្ងៃខែឆ្នាំ Doing</label>
-              <input type="date" id="f_doingStatusDate" class="mono">
+          <input type="checkbox" id="f_statusLabo" style="display:none;">
+          <div id="laboFields" style="display:none;">
+            <div class="field" style="margin:0 0 8px;">
+              <label>ថ្ងៃខែឆ្នាំ ផ្ញើ Lab</label>
+              <input type="date" id="f_labDate" class="mono">
+            </div>
+            <div class="field" style="margin:0;">
+              <label>Do</label>
+              <input type="text" id="f_labDo" class="kh" placeholder="ឧ. Crown, Bridge...">
             </div>
           </div>
 
-          <div class="status-row" data-row="missing" style="border:1px solid var(--border); border-radius:10px; padding:10px 12px; background:var(--surface);">
-            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;font-size:13px;color:var(--coral-dark);text-transform:none;">
-              <input type="checkbox" id="f_statusMissing" class="status-check" style="width:17px;height:17px;accent-color:var(--coral-dark);">
-              <span><b>⏳ Missing</b></span>
-            </label>
-            <div id="missFields" class="field" style="margin:8px 0 0; display:none;">
-              <label>ថ្ងៃខែឆ្នាំ Miss</label>
-              <input type="date" id="f_missDate" class="mono">
+          <input type="checkbox" id="f_statusPlanning" style="display:none;">
+          <div id="planningFields" style="display:none;">
+            <div class="field" style="margin:0 0 8px;">
+              <label>ថ្ងៃខែឆ្នាំ Plan</label>
+              <input type="date" id="f_planningDate" class="mono">
+            </div>
+            <div class="field" style="margin:0;">
+              <label>Do</label>
+              <input type="text" id="f_planningDo" class="kh" placeholder="ឧ. RCT, Extraction...">
             </div>
           </div>
 
-          <div class="status-row" data-row="appt" style="border:1px solid var(--border); border-radius:10px; padding:10px 12px; background:var(--surface);">
-            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;font-size:13px;color:var(--amber-dark);text-transform:none;">
-              <input type="checkbox" id="f_statusAppt" class="status-check" style="width:17px;height:17px;accent-color:var(--amber-dark);">
-              <span><b>🔄 Appointment</b></span>
-            </label>
-            <div id="apptFields" style="display:none;margin-top:8px;">
-              <div class="field" style="margin:0 0 8px;">
-                <label>ថ្ងៃខែឆ្នាំ និងម៉ោងណាត់</label>
-                <input type="datetime-local" id="f_apptDateTime" class="mono">
-              </div>
-              <div class="field" style="margin:0;">
-                <label>Do</label>
-                <input type="text" id="f_planDo" class="kh" placeholder="ឧ. Obturation, Luting crown...">
-              </div>
-            </div>
-          </div>
-
-          <div class="status-row" data-row="labo" style="border:1px solid var(--border); border-radius:10px; padding:10px 12px; background:var(--surface);">
-            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;font-size:13px;color:#1D4ED8;text-transform:none;">
-              <input type="checkbox" id="f_statusLabo" class="status-check" style="width:17px;height:17px;accent-color:#1D4ED8;">
-              <span><b>🧪 ពុម្ភធ្មេញ</b></span>
-            </label>
-            <div id="laboFields" style="display:none;margin-top:8px;">
-              <div class="field" style="margin:0 0 8px;">
-                <label>ថ្ងៃខែឆ្នាំ ផ្ញើ Lab</label>
-                <input type="date" id="f_labDate" class="mono">
-              </div>
-              <div class="field" style="margin:0;">
-                <label>Do</label>
-                <input type="text" id="f_labDo" class="kh" placeholder="ឧ. Crown, Bridge...">
-              </div>
-            </div>
-          </div>
-
-          <div class="status-row" data-row="planning" style="border:1px solid var(--border); border-radius:10px; padding:10px 12px; background:var(--surface);">
-            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;font-size:13px;color:#6D28D9;text-transform:none;">
-              <input type="checkbox" id="f_statusPlanning" class="status-check" style="width:17px;height:17px;accent-color:#6D28D9;">
-              <span><b>📝 Planning</b></span>
-            </label>
-            <div id="planningFields" style="display:none;margin-top:8px;">
-              <div class="field" style="margin:0 0 8px;">
-                <label>ថ្ងៃខែឆ្នាំ Plan</label>
-                <input type="date" id="f_planningDate" class="mono">
-              </div>
-              <div class="field" style="margin:0;">
-                <label>Do</label>
-                <input type="text" id="f_planningDo" class="kh" placeholder="ឧ. RCT, Extraction...">
-              </div>
-            </div>
-          </div>
+          <div id="statusNoSelection" class="kh" style="text-align:center; color:var(--ink-dim); padding:8px; font-size:12.5px;">សូមជ្រើសរើសស្ថានភាពខាងលើ</div>
         </div>
       </div>
     </div>
@@ -2337,55 +2340,51 @@ function getCheckedStatus(){
 }
 
 function populateStatusFieldsFromRecord(editRecord){
-  const nowDateTime = getLocalNowDateTime();
-  const legacyStatus = editRecord.status;
-  const hasNewStatusData = !!(editRecord.doneDate || editRecord.doingStatusDate || editRecord.missDate || editRecord.labDate || editRecord.planningDate);
+  // Determine the single "current" status for this record: whichever recorded date is most recent.
+  const candidates = [
+    { key: 'Done', date: editRecord.doneDate },
+    { key: 'Doing', date: editRecord.doingStatusDate },
+    { key: 'Missing', date: editRecord.missDate },
+    { key: 'Appt', date: editRecord.timeLast ? dateToYMDTime(editRecord.timeLast).slice(0,10) : '' },
+    { key: 'Labo', date: editRecord.labDate },
+    { key: 'Planning', date: editRecord.planningDate }
+  ].filter(c => c.date);
 
-  if(hasNewStatusData){
-    statusChecks.Done.checked = !!editRecord.doneDate;
-    document.getElementById('f_doneDate').value = editRecord.doneDate || '';
-
-    statusChecks.Doing.checked = !!editRecord.doingStatusDate;
-    document.getElementById('f_doingStatusDate').value = editRecord.doingStatusDate || '';
-
-    statusChecks.Missing.checked = !!editRecord.missDate;
-    document.getElementById('f_missDate').value = editRecord.missDate || '';
-
-    statusChecks.Appt.checked = !!editRecord.timeLast;
-    document.getElementById('f_apptDateTime').value = editRecord.timeLast ? dateToYMDTime(editRecord.timeLast) : '';
-    document.getElementById('f_planDo').value = editRecord.planDo || '';
-
-    statusChecks.Labo.checked = !!editRecord.labDate;
-    document.getElementById('f_labDate').value = editRecord.labDate || '';
-    document.getElementById('f_labDo').value = editRecord.labDo || '';
-
-    statusChecks.Planning.checked = !!editRecord.planningDate;
-    document.getElementById('f_planningDate').value = editRecord.planningDate || '';
-    document.getElementById('f_planningDo').value = editRecord.planningDo || '';
+  let currentKey;
+  if(candidates.length > 0){
+    candidates.sort((a,b) => b.date.localeCompare(a.date));
+    currentKey = candidates[0].key;
   } else {
-    // Legacy record (saved before per-status dates existed): route its single old status/date to the matching row.
-    statusChecks.Done.checked = legacyStatus === 'Done';
-    document.getElementById('f_doneDate').value = statusChecks.Done.checked ? (dateToYMDTime(editRecord.timestamp || '').slice(0,10) || getLocalTodayYMD()) : '';
-
-    statusChecks.Doing.checked = legacyStatus === 'Doing';
-    document.getElementById('f_doingStatusDate').value = statusChecks.Doing.checked ? (dateToYMDTime(editRecord.timestamp || '').slice(0,10) || getLocalTodayYMD()) : '';
-
-    statusChecks.Missing.checked = legacyStatus === 'Missing' || !legacyStatus;
-    document.getElementById('f_missDate').value = statusChecks.Missing.checked ? getLocalTodayYMD() : '';
-
-    statusChecks.Appt.checked = legacyStatus === 'Appt';
-    document.getElementById('f_apptDateTime').value = statusChecks.Appt.checked ? (editRecord.timeLast ? dateToYMDTime(editRecord.timeLast) : nowDateTime) : '';
-    document.getElementById('f_planDo').value = statusChecks.Appt.checked ? (editRecord.planDo || '') : '';
-
-    statusChecks.Labo.checked = legacyStatus === 'Labo';
-    document.getElementById('f_labDate').value = statusChecks.Labo.checked ? (editRecord.timeLast ? dateToYMDTime(editRecord.timeLast).slice(0,10) : getLocalTodayYMD()) : '';
-    document.getElementById('f_labDo').value = statusChecks.Labo.checked ? (editRecord.planDo || '') : '';
-
-    statusChecks.Planning.checked = legacyStatus === 'Planning';
-    document.getElementById('f_planningDate').value = statusChecks.Planning.checked ? (editRecord.timeLast ? dateToYMDTime(editRecord.timeLast).slice(0,10) : getLocalTodayYMD()) : '';
-    document.getElementById('f_planningDo').value = statusChecks.Planning.checked ? (editRecord.planDo || '') : '';
+    const legacyStatus = editRecord.status === 'Doing' ? 'Doing' : editRecord.status;
+    currentKey = ['Done','Doing','Missing','Appt','Labo','Planning'].includes(legacyStatus) ? legacyStatus : 'Missing';
   }
-  ['Done','Doing','Missing','Appt','Labo','Planning'].forEach(updateStatusRowVisibility);
+
+  // Clear all fields first, then populate only the ones relevant to the current status.
+  document.getElementById('f_doneDate').value = '';
+  document.getElementById('f_doingStatusDate').value = '';
+  document.getElementById('f_missDate').value = '';
+  document.getElementById('f_apptDateTime').value = '';
+  document.getElementById('f_planDo').value = '';
+  document.getElementById('f_labDate').value = '';
+  document.getElementById('f_labDo').value = '';
+  document.getElementById('f_planningDate').value = '';
+  document.getElementById('f_planningDo').value = '';
+
+  if(currentKey === 'Done') document.getElementById('f_doneDate').value = editRecord.doneDate || getLocalTodayYMD();
+  else if(currentKey === 'Doing') document.getElementById('f_doingStatusDate').value = editRecord.doingStatusDate || getLocalTodayYMD();
+  else if(currentKey === 'Missing') document.getElementById('f_missDate').value = editRecord.missDate || getLocalTodayYMD();
+  else if(currentKey === 'Appt'){
+    document.getElementById('f_apptDateTime').value = editRecord.timeLast ? dateToYMDTime(editRecord.timeLast) : getLocalNowDateTime();
+    document.getElementById('f_planDo').value = editRecord.planDo || '';
+  } else if(currentKey === 'Labo'){
+    document.getElementById('f_labDate').value = editRecord.labDate || getLocalTodayYMD();
+    document.getElementById('f_labDo').value = editRecord.labDo || '';
+  } else if(currentKey === 'Planning'){
+    document.getElementById('f_planningDate').value = editRecord.planningDate || getLocalTodayYMD();
+    document.getElementById('f_planningDo').value = editRecord.planningDo || '';
+  }
+
+  selectStatusPill(currentKey, true);
 }
 
 function saveStatusForActiveRecord(){
@@ -2413,16 +2412,23 @@ function saveStatusForActiveRecord(){
   autoSyncLabFromStatus(r);
 }
 
-Object.keys(statusChecks).forEach(key => {
-  if(!statusChecks[key]) return;
-  statusChecks[key].addEventListener('change', (e) => {
-    updateStatusRowVisibility(key);
-    if(e.target.checked && !document.getElementById(STATUS_ROW_DATE_ID[key]).value){
-      const dateEl = document.getElementById(STATUS_ROW_DATE_ID[key]);
-      dateEl.value = (dateEl.type === 'date') ? getLocalTodayYMD() : getLocalNowDateTime();
-    }
-    saveStatusForActiveRecord();
+function selectStatusPill(key, skipSave){
+  Object.keys(statusChecks).forEach(k => {
+    if(statusChecks[k]) statusChecks[k].checked = (k === key);
+    updateStatusRowVisibility(k);
   });
+  document.querySelectorAll('.status-pill').forEach(p => p.classList.toggle('active', p.dataset.status === key));
+  document.getElementById('statusNoSelection').style.display = 'none';
+
+  const dateEl = document.getElementById(STATUS_ROW_DATE_ID[key]);
+  if(dateEl && !dateEl.value){
+    dateEl.value = (dateEl.type === 'date') ? getLocalTodayYMD() : getLocalNowDateTime();
+  }
+  if(!skipSave) saveStatusForActiveRecord();
+}
+
+document.querySelectorAll('.status-pill').forEach(btn => {
+  btn.addEventListener('click', () => selectStatusPill(btn.dataset.status));
 });
 
 ['f_doneDate','f_doingStatusDate','f_missDate','f_apptDateTime','f_planDo','f_labDate','f_labDo','f_planningDate','f_planningDo'].forEach(id => {
@@ -2901,6 +2907,10 @@ async function fetchFromSheet(isSilent = false){
         }));
         saveInventory();
       }
+      if(Array.isArray(json.plans)){
+        treatmentPlans = json.plans;
+        saveTreatmentPlans();
+      }
       if(typeof renderLab === 'function') renderLab();
       if(typeof renderInventory === 'function') renderInventory();
 
@@ -2937,28 +2947,37 @@ async function fetchFromSheet(isSilent = false){
 
 function parseTeeth(str){ if(!str) return []; return String(str).split(',').map(s=>s.trim()).filter(Boolean); }
 
-function archCellsHTML(arr, treatedSet, isPrimary = false){
+function archCellsHTML(arr, treatedSet, isPrimary = false, plannedSet){
   const halfLen = arr.length / 2;
   return arr.map((t, idx)=>{
     const gap = idx === halfLen ? '<div class="quad-gap"></div>' : '';
     if(!t) return gap + `<div class="tooth-cell invisible"></div>`;
     const isTreated = treatedSet.has(t);
+    const isPlanned = plannedSet && plannedSet.has(t);
     const primaryCls = isPrimary ? ' primary-tooth' : '';
     const treatedCls = isTreated ? ' treated' : '';
-    const tooltip = isTreated ? `ធ្មេញលេខ ${t} (បានព្យាបាល - ចុចមើលប្រវត្តិ)` : `ធ្មេញលេខ ${t} (ចុចកត់ត្រាថ្មី)`;
-    return gap + `<div class="tooth-cell${primaryCls}${treatedCls}" data-tooth="${t}" title="${tooltip}">${t}</div>`;
+    const plannedCls = isPlanned ? ' planned' : '';
+    let tooltip = `ធ្មេញលេខ ${t} (ចុចកត់ត្រាថ្មី)`;
+    if(isTreated) tooltip = `ធ្មេញលេខ ${t} (បានព្យាបាល - ចុចមើលប្រវត្តិ)`;
+    else if(isPlanned) tooltip = `ធ្មេញលេខ ${t} (គម្រោងព្យាបាល · Plan to do)`;
+    return gap + `<div class="tooth-cell${primaryCls}${treatedCls}${plannedCls}" data-tooth="${t}" title="${tooltip}">${t}</div>`;
   }).join('');
 }
 
-function buildToothChartBlockHTML(treatedSet){
+function buildToothChartBlockHTML(treatedSet, plannedSet){
+  plannedSet = plannedSet || new Set();
   return `
     <div class="odontogram-panel" style="margin:0; width:100%;">
       <div class="arch-label">Upper Arch · ធ្មេញលើ</div>
-      <div class="arch-row upper-perm">${archCellsHTML(UPPER, treatedSet, false)}</div>
-      <div class="arch-row upper-prim">${archCellsHTML(PRIMARY_UPPER_PADDED, treatedSet, true)}</div>
-      <div class="arch-row lower-prim">${archCellsHTML(PRIMARY_LOWER_PADDED, treatedSet, true)}</div>
-      <div class="arch-row lower-perm">${archCellsHTML(LOWER, treatedSet, false)}</div>
+      <div class="arch-row upper-perm">${archCellsHTML(UPPER, treatedSet, false, plannedSet)}</div>
+      <div class="arch-row upper-prim">${archCellsHTML(PRIMARY_UPPER_PADDED, treatedSet, true, plannedSet)}</div>
+      <div class="arch-row lower-prim">${archCellsHTML(PRIMARY_LOWER_PADDED, treatedSet, true, plannedSet)}</div>
+      <div class="arch-row lower-perm">${archCellsHTML(LOWER, treatedSet, false, plannedSet)}</div>
       <div class="arch-label">Lower Arch · ធ្មេញក្រោម</div>
+      <div class="chart-legend kh">
+        <div class="lg-item"><span class="lg-swatch" style="background:var(--primary);"></span>បានព្យាបាល · Treated</div>
+        <div class="lg-item"><span class="lg-swatch" style="background:var(--amber-soft); border:2px dashed var(--amber-dark);"></span>គម្រោងព្យាបាល · Plan to do</div>
+      </div>
     </div>
   `;
 }
@@ -3577,6 +3596,16 @@ function getAllTreatedTeethSet(records){
   return set;
 }
 
+function getPlannedTeethSet(records){
+  const set = new Set();
+  records.forEach(r=>{
+    if(r.status === 'Planning' || r.status === 'Appt'){
+      parseTeeth(r.teeth).forEach(t=> set.add(t));
+    }
+  });
+  return set;
+}
+
 function openToothHistoryModal(toothNum, patientName){
   const records = getPatientRecords(patientName);
   
@@ -3670,6 +3699,8 @@ function deleteSingleRecordById(recordId){
     });
 
     closeFormModal();
+    document.getElementById('procedureStepsOverlay').classList.add('hidden');
+    activeProcStepsRecordId = null;
     if(activePatientContext) openPatientRecord(activePatientContext);
   });
 }
@@ -3706,32 +3737,104 @@ window.quickUpdateStatus = function(event, id, newStatus) {
   }
 };
 
-function renderClinicalNotesHTML(records) {
-  const rows = [...records].sort((a,b)=> (parseAnyDate(b.timestamp)||0) - (parseAnyDate(a.timestamp)||0));
+function renderTreatmentPlanHTML(patientName){
+  const plans = [...getPlansForPatient(patientName)].sort((a,b) => {
+    if(a.status !== b.status) return a.status === 'Completed' ? 1 : -1;
+    return (b.created||'').localeCompare(a.created||'');
+  });
+
+  const procOptions = appProcedures.map(p => `<option value="${p.name}">${p.name}</option>`).join('');
+
+  const rows = plans.length ? plans.map(p => `
+    <tr class="emr-tr" style="${p.status==='Completed' ? 'opacity:0.55;' : ''}">
+      <td class="mono" style="font-weight:800;color:var(--primary-dark);">${escHTML(p.tooth)}</td>
+      <td class="kh" style="font-weight:700;">${escHTML(p.procedure)}</td>
+      <td class="kh" style="font-size:12px;color:var(--ink-soft);">${escHTML(p.note) || '—'}</td>
+      <td class="mono" style="font-size:11px;color:var(--ink-dim);">${p.created}</td>
+      <td style="text-align:center;">
+        <span class="emr-status ${p.status==='Completed' ? 'done' : 'planning'}">${p.status==='Completed' ? 'Done' : 'Planned'}</span>
+      </td>
+      <td style="text-align:center; white-space:nowrap;">
+        ${p.status === 'Completed'
+          ? `<button type="button" class="icon-btn" title="ធ្វើឡើងវិញ / Reopen" onclick="reopenTreatmentPlan('${p.id}'); openPatientRecord(activePatientContext);">↺</button>`
+          : `<button type="button" class="icon-btn" title="បានធ្វើរួច / Mark Complete" onclick="completeTreatmentPlan('${p.id}'); openPatientRecord(activePatientContext);">✓</button>`
+        }
+        <button type="button" class="icon-btn danger" title="លុប / Delete" onclick="requestClinicPin(() => { deleteTreatmentPlan('${p.id}'); openPatientRecord(activePatientContext); })">✕</button>
+      </td>
+    </tr>
+  `).join('') : `<tr><td colspan="6" style="text-align:center;color:var(--ink-dim);padding:16px;" class="kh">មិនទាន់មានគម្រោងព្យាបាលទេ</td></tr>`;
+
   return `
+    <div style="display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap; margin-bottom:12px; padding:10px; background:var(--surface-2); border-radius:10px;">
+      <div class="field" style="margin:0; width:90px;">
+        <label style="font-size:10.5px;">លេខធ្មេញ</label>
+        <input type="text" id="planToothInput" class="mono" placeholder="16, 24...">
+      </div>
+      <div class="field" style="margin:0; flex:1; min-width:140px;">
+        <label style="font-size:10.5px;">នីតិវិធីគម្រោង</label>
+        <select id="planProcedureSelect" class="kh">${procOptions}</select>
+      </div>
+      <div class="field" style="margin:0; flex:1; min-width:140px;">
+        <label style="font-size:10.5px;">ចំណាំ (Note)</label>
+        <input type="text" id="planNoteInput" class="kh" placeholder="ស្រេចចិត្ត...">
+      </div>
+      <button type="button" class="btn btn-primary btn-sm kh" style="height:38px;" onclick="addTreatmentPlanFromForm('${encodeURIComponent(patientName)}')">＋ បន្ថែម</button>
+    </div>
     <div class="emr-table-wrap">
       <table class="emr-table">
         <thead>
           <tr>
-            <th style="width:90px;">កាលបរិច្ឆេទ<br>(Date)</th>
-            <th style="width:70px;">ធ្មេញ<br>(Tooth)</th>
-            <th>ការព្យាបាល<br>(Treatment)</th>
-            <th style="width:150px;">ចូលចុងក្រោយ / ការណាត់<br>(Last Visit / Appt)</th>
-            <th style="width:85px;text-align:center;">ស្ថានភាព<br>(Status)</th>
+            <th style="width:70px;">Tooth</th>
+            <th style="width:22%;">Procedure</th>
+            <th>Note</th>
+            <th style="width:90px;">Date</th>
+            <th style="width:80px;text-align:center;">Status</th>
+            <th style="width:70px;text-align:center;"></th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+function addTreatmentPlanFromForm(encodedPatientName){
+  const patientName = decodeURIComponent(encodedPatientName);
+  const tooth = document.getElementById('planToothInput').value.trim();
+  const procedure = document.getElementById('planProcedureSelect').value;
+  const note = document.getElementById('planNoteInput').value.trim();
+  if(!tooth){ alert('សូមបញ្ចូលលេខធ្មេញ'); return; }
+  if(!procedure){ alert('សូមជ្រើសរើសនីតិវិធី'); return; }
+  addTreatmentPlan(patientName, tooth, procedure, note);
+  openPatientRecord(patientName);
+}
+
+function renderClinicalNotesHTML(records) {
+  const rows = [...records].sort((a,b)=> (parseAnyDate(b.timestamp)||0) - (parseAnyDate(a.timestamp)||0));
+  return `
+    <div class="emr-table-wrap">
+      <table class="emr-table" style="table-layout:fixed; width:100%;">
+        <thead>
+          <tr>
+            <th style="width:16%;">Date</th>
+            <th style="width:12%;">Tooth</th>
+            <th style="width:32%;">Treatment</th>
+            <th style="width:24%;">Last Visit / Appt</th>
+            <th style="width:16%;text-align:center;">Status</th>
           </tr>
         </thead>
         <tbody>
           ${rows.map(r => {
             const lastOrAppt = r.timeLast
-              ? `<span class="mono" style="color:var(--amber-dark);font-weight:700;">🗓️ ${formatDateDisplay(r.timeLast).split(' ')[0]}</span>`
-              : (r.doingDateTime ? `<span class="mono" style="color:var(--ink-soft);">${formatDateDisplay(r.doingDateTime).split(' ')[0]}</span>` : '<span style="color:var(--ink-dim);">—</span>');
+              ? `<span class="mono" style="color:var(--amber-dark);font-weight:700;">🗓️ ${cleanStr(r.timeLast).split(' ')[0]}</span>`
+              : (r.doingDateTime ? `<span class="mono" style="color:var(--ink-soft);">${cleanStr(r.doingDateTime).split(' ')[0]}</span>` : '<span style="color:var(--ink-dim);">—</span>');
             return `
             <tr class="emr-tr">
-              <td data-label="កាលបរិច្ឆេទ (Date)" class="mono" style="font-size:11.5px;color:var(--ink-soft);font-weight:600;">${formatDateDisplay(r.timestamp).split(' ')[0]}</td>
-              <td data-label="ធ្មេញ (Tooth)" class="mono" style="font-weight:800;color:var(--primary-dark);font-size:13px;">${r.teeth || '—'}</td>
-              <td data-label="ការព្យាបាល (Treatment)" class="kh" style="font-weight:700;color:var(--primary-dark);cursor:pointer;text-decoration:underline;text-decoration-style:dotted;" onclick="openProcedureStepsModal('${r._id}')">${r.treatment || r.diagnosis || '—'}</td>
-              <td data-label="ចូលចុងក្រោយ / ការណាត់ (Last Visit / Appt)" style="font-size:12px;">${lastOrAppt}</td>
-              <td data-label="ស្ថានភាព (Status)" style="text-align:center;">
+              <td data-label="Date" class="mono" style="font-size:11.5px;color:var(--ink-soft);font-weight:600;">${cleanStr(r.timestamp).split(' ')[0]}</td>
+              <td data-label="Tooth" class="mono" style="font-weight:800;color:var(--primary-dark);font-size:13px;">${r.teeth || '—'}</td>
+              <td data-label="Treatment" class="kh" style="font-weight:700;color:var(--primary-dark);cursor:pointer;text-decoration:underline;text-decoration-style:dotted;" onclick="openProcedureStepsModal('${r._id}')">${r.treatment || r.diagnosis || '—'}</td>
+              <td data-label="Last Visit / Appt" style="font-size:12px;">${lastOrAppt}</td>
+              <td data-label="Status" style="text-align:center;">
                 <div class="emr-status ${r.status==='Done'?'done':(r.status==='Planning'?'planning':(r.status==='Labo'?'labo':(r.status==='Appt'||r.status==='Doing'?'doing':'missing')))}">
                   ${r.status === 'Doing' ? 'Appt' : (r.status || 'Missing')}
                 </div>
@@ -3877,6 +3980,7 @@ function openPatientRecord(name){
   const sortedRecords = [...records].sort((a,b)=> (parseAnyDate(b.timestamp)||0) - (parseAnyDate(a.timestamp)||0));
   const latest = sortedRecords[0];
   const treatedTeethSet = getAllTreatedTeethSet(records);
+  const plannedTeethSet = getPlannedTeethSetFromPlans(name);
 
   const realPhone = formatPhoneDisplay(sortedRecords.find(r => cleanStr(r.phone))?.phone || latest.phone || '');
   const realSex = sortedRecords.find(r => cleanStr(r.sex))?.sex || latest.sex || 'F';
@@ -3968,9 +4072,17 @@ function openPatientRecord(name){
           <span style="font-size:11.5px; font-weight:600; color:var(--ink-dim); text-transform:none;">ធ្មេញពាក់ព័ន្ធសរុប: <b style="color:var(--amber-dark); font-size:13px;">${treatedTeethSet.size}</b></span>
         </div>
         <div style="flex:1; display:flex; align-items:center; justify-content:center; padding:16px;">
-          ${buildToothChartBlockHTML(treatedTeethSet)}
+          ${buildToothChartBlockHTML(treatedTeethSet, plannedTeethSet)}
         </div>
       </div>
+    </div>
+
+    <div class="emr-notes-section">
+      <div class="emr-section-head kh">
+        <span>🦷 គម្រោងព្យាបាល · Treatment Plan</span>
+        <span style="font-size:11px; font-weight:600; color:var(--ink-dim); text-transform:none;">មិនទាន់ធ្វើ: <b style="color:var(--amber-dark); font-size:13px;">${getPlansForPatient(name).filter(p=>p.status!=='Completed').length}</b></span>
+      </div>
+      ${renderTreatmentPlanHTML(name)}
     </div>
 
     <div class="emr-notes-section">
@@ -4464,6 +4576,9 @@ function saveRecord(){
     
     const doingVal = procSelect.value;
 
+    const wasEditing = editingIndex !== null && editingIndex !== undefined && editingIndex >= 0;
+    const code = wasEditing && allRecords[editingIndex] ? (allRecords[editingIndex].code || genCode()) : genCode();
+
     // Status is managed exclusively via the Procedure Steps popup (opened from Clinical Notes) now —
     // the Case form no longer shows these fields, so preserve whatever the record already has rather
     // than reading stale/unrelated values out of DOM elements that now belong to that other popup.
@@ -4485,9 +4600,6 @@ function saveRecord(){
 
     const medItems = getPrescriptionData();
     const medicationString = stringifyPrescription(medItems);
-
-    const wasEditing = editingIndex !== null && editingIndex !== undefined && editingIndex >= 0;
-    const code = wasEditing && allRecords[editingIndex] ? (allRecords[editingIndex].code || genCode()) : genCode();
 
     const rawTs = visitDateTimeVal || editingOriginalTimestamp || getLocalNowDateTime();
     const cleanTs = formatDateDisplay(rawTs);
@@ -5601,6 +5713,20 @@ document.getElementById('addProcStepBtn').addEventListener('click', () => {
   document.getElementById('procStepNote').value = '';
 });
 
+document.getElementById('editProcStepsRecordBtn').addEventListener('click', () => {
+  if(!activeProcStepsRecordId) return;
+  const r = allRecords.find(x => x._id === activeProcStepsRecordId);
+  if(!r) return;
+  document.getElementById('procedureStepsOverlay').classList.add('hidden');
+  activeProcStepsRecordId = null;
+  openForm(r);
+});
+
+document.getElementById('deleteProcStepsRecordBtn').addEventListener('click', () => {
+  if(!activeProcStepsRecordId) return;
+  requestClinicPin(() => deleteSingleRecordById(activeProcStepsRecordId));
+});
+
 document.getElementById('closeProcSteps').addEventListener('click', () => {
   document.getElementById('procedureStepsOverlay').classList.add('hidden');
   activeProcStepsRecordId = null;
@@ -6366,6 +6492,62 @@ let labOrders = [], labFilter = 'all', labSearchTerm = '', editingLabId = null;
 
 function loadLab(){ try{ const a = JSON.parse(localStorage.getItem(LAB_KEY) || '[]'); labOrders = Array.isArray(a) ? a : []; }catch(e){ labOrders = []; } }
 function saveLab(){ try{ localStorage.setItem(LAB_KEY, JSON.stringify(labOrders)); }catch(e){} }
+
+/* ---------------- TREATMENT PLAN (per-tooth planning, standard EMR) ---------------- */
+const PLAN_KEY = 'kep_dental_treatment_plans_v1';
+let treatmentPlans = [];
+
+function loadTreatmentPlans(){ try{ const a = JSON.parse(localStorage.getItem(PLAN_KEY) || '[]'); treatmentPlans = Array.isArray(a) ? a : []; }catch(e){ treatmentPlans = []; } }
+function saveTreatmentPlans(){ try{ localStorage.setItem(PLAN_KEY, JSON.stringify(treatmentPlans)); }catch(e){} }
+
+function getPlansForPatient(patientName){
+  const key = cleanStr(patientName).toLowerCase();
+  return treatmentPlans.filter(p => cleanStr(p.patient).toLowerCase() === key);
+}
+
+function getPlannedTeethSetFromPlans(patientName){
+  const set = new Set();
+  getPlansForPatient(patientName).forEach(p => {
+    if(p.status !== 'Completed' && p.tooth) parseTeeth(p.tooth).forEach(t => set.add(t));
+  });
+  return set;
+}
+
+function addTreatmentPlan(patientName, tooth, procedure, note){
+  const item = {
+    id: genCode(), created: getLocalTodayYMD(),
+    patient: patientName, tooth: tooth, procedure: procedure, note: note,
+    status: 'Planned', dateCompleted: ''
+  };
+  treatmentPlans.push(item);
+  saveTreatmentPlans();
+  pushToSheet('addPlan', item);
+  return item;
+}
+
+function completeTreatmentPlan(id){
+  const p = treatmentPlans.find(x => x.id === id);
+  if(!p) return;
+  p.status = 'Completed';
+  p.dateCompleted = getLocalTodayYMD();
+  saveTreatmentPlans();
+  pushToSheet('updatePlan', p);
+}
+
+function reopenTreatmentPlan(id){
+  const p = treatmentPlans.find(x => x.id === id);
+  if(!p) return;
+  p.status = 'Planned';
+  p.dateCompleted = '';
+  saveTreatmentPlans();
+  pushToSheet('updatePlan', p);
+}
+
+function deleteTreatmentPlan(id){
+  treatmentPlans = treatmentPlans.filter(x => x.id !== id);
+  saveTreatmentPlans();
+  pushToSheet('deletePlan', { id });
+}
 function labOverdue(o){ return o.status === 'sent' && isYMD(o.due) && o.due < getLocalTodayYMD(); }
 function labRoundCount(o){
   return (Array.isArray(o.rounds) ? o.rounds.length : 0) + 1; // completed rounds + the current one
@@ -6898,7 +7080,7 @@ function updateOpsBadges(){
 }
 
 (function initOps(){
-  loadLab(); loadInventory();
+  loadLab(); loadInventory(); loadTreatmentPlans();
 
   el('lab_status').innerHTML = Object.keys(LAB_STATUS).map(k => `<option value="${k}">${LAB_STATUS[k].en} · ${LAB_STATUS[k].kh}</option>`).join('');
   el('inv_cat').innerHTML = INV_CATEGORIES.map(c => `<option value="${c[0]}">${c[1]}</option>`).join('');
