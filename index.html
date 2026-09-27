@@ -422,6 +422,23 @@
   }
   .form-tab-btn:hover{ color:var(--ink-soft); }
   .form-tab-btn.active{ color:var(--primary-dark); border-bottom-color:var(--primary); }
+  .pstep-tab-btn{
+    padding:9px 16px; border:none; background:transparent; cursor:pointer;
+    font-size:13px; font-weight:700; color:var(--ink-dim);
+    border-bottom:3px solid transparent; margin-bottom:-1.5px;
+    transition:color .12s ease, border-color .12s ease;
+  }
+  .pstep-tab-btn:hover{ color:var(--ink-soft); }
+  .pstep-tab-btn.active{ color:var(--primary-dark); border-bottom-color:var(--primary); }
+  .dash-pill{ flex:1; min-width:110px; padding:12px 14px; border-right:1px solid var(--border-soft); }
+  .dash-pill:last-child{ border-right:none; }
+  .dash-pill .dp-label{ font-size:10.5px; color:var(--ink-dim); font-weight:700; margin-bottom:4px; }
+  .dash-pill .dp-value{ font-size:19px; font-weight:800; color:var(--ink); font-family:'IBM Plex Mono',monospace; }
+  .dash-pill .dp-delta{ font-size:10.5px; font-weight:700; margin-left:6px; }
+  .dash-pill .dp-delta.up{ color:var(--primary-dark); }
+  .dash-pill .dp-delta.down{ color:var(--coral-dark); }
+  .dash-pill .dp-delta.flat{ color:var(--ink-dim); }
+  @media (max-width:640px){ .dash-pill{ min-width:33%; border-bottom:1px solid var(--border-soft); } }
   .form-grid .full{grid-column:1/-1;}
   .field label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-dim);margin-bottom:5px;}
   .field input,.field select,.field textarea{width:100%;background:var(--surface);border:1.5px solid var(--border);color:var(--ink);border-radius:9px;padding:9px 11px;font-size:13.5px;font-family:inherit;}
@@ -903,26 +920,18 @@
       <!-- Dashboard -->
       <section class="view active" id="view-dashboard">
         <div class="section-title">
-          <h2 class="kh">សង្ខេបថ្ងៃនេះ & ថ្ងៃម្សិល · Today & Yesterday at a glance</h2>
+          <h2 class="kh">ផ្ទាំងសរុប · Dashboard</h2>
           <span class="kh" id="dashDate" style="font-size:12px;color:var(--ink-dim)"></span>
         </div>
-        <div class="kh" style="font-size:12px; font-weight:700; color:var(--ink-dim); margin-bottom:6px;">👥 អ្នកជំងឺ · Patients</div>
-        <div class="stats2 dash-stats" id="demoStatsRowPatients" style="margin-bottom:16px;"></div>
 
-        <div class="kh" style="font-size:12px; font-weight:700; color:var(--ink-dim); margin-bottom:6px;">💰 ចំណូលចំណាយ · Income &amp; Expense</div>
-        <div class="stats2 dash-stats" id="demoStatsRowMoney" style="margin-bottom:16px;"></div>
+        <div id="dashSummaryStrip" style="display:flex; flex-wrap:wrap; gap:0; border:1px solid var(--border); border-radius:12px; background:var(--surface); margin-bottom:20px; overflow:hidden;"></div>
 
-        <div class="kh" style="font-size:12px; font-weight:700; color:var(--ink-dim); margin-bottom:6px;">🗓️ ណាត់ជួប & ពុម្ភធ្មេញ · Appointments &amp; Dental Lab</div>
-        <div class="stats2 dash-stats" id="demoStatsRowOps" style="margin-bottom:16px;"></div>
-
-        <div class="appt-grid">
-          <div class="appt-panel" style="grid-column: 1 / -1;">
-            <div class="appt-panel-head">
-              <h3 class="kh">ការព្យាបាល · Procedures</h3>
-              <span class="count-pill" id="procTodayCount">0</span>
-            </div>
-            <div id="procTodayBody"></div>
+        <div class="appt-panel" style="width:100%;">
+          <div class="appt-panel-head">
+            <h3 class="kh">🗓️ ជួរអ្នកជំងឺថ្ងៃនេះ · Today's Patient Queue</h3>
+            <span class="count-pill" id="queueTodayCount">0</span>
           </div>
+          <div id="queueTodayBody"></div>
         </div>
       </section>
 
@@ -1746,11 +1755,35 @@
     </div>
     <div class="modal-body">
       <div id="procStepsInfo" class="kh" style="font-size:12.5px; color:var(--ink-soft); margin-bottom:14px;"></div>
-        <div class="appointment-box-wrapper">
-          <label class="kh" style="display:block;margin:0 0 10px;font-size:13px;color:var(--ink-soft);text-transform:none;font-weight:700;">🗓️ ស្ថានភាព · Status</label>
-          <div class="kh" style="font-size:11px; color:var(--ink-dim); margin-bottom:10px;">ស្លាកសញ្ញារួមរបស់ករណីនេះ នឹងយកតាមស្ថានភាពដែលមានកាលបរិច្ឆេទថ្មីបំផុត</div>
 
-          <div class="status-row" data-row="done" style="border:1px solid var(--border); border-radius:10px; padding:10px 12px; margin-bottom:8px; background:var(--surface);">
+      <div style="display:flex;gap:6px;margin-bottom:16px;border-bottom:1.5px solid var(--border);padding-bottom:0;">
+        <button type="button" class="pstep-tab-btn kh active" data-ptab="steps" onclick="switchProcStepsTab('steps')">📜 ជំហាន · Steps</button>
+        <button type="button" class="pstep-tab-btn kh" data-ptab="status" onclick="switchProcStepsTab('status')">🗓️ ស្ថានភាព · Status</button>
+      </div>
+
+      <div class="pstep-tab-panel" data-ptab="steps">
+        <div id="procStepsCards" style="margin-bottom:18px;"></div>
+        <div style="border-top:1px dashed var(--border); padding-top:14px;">
+          <label class="kh" style="display:block; font-size:12px; font-weight:700; color:var(--ink-soft); margin-bottom:8px;">＋ បន្ថែមជំហានថ្មី · Add Step</label>
+          <div style="display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap; margin-bottom:8px;">
+            <div class="field" style="margin:0; flex:1; min-width:160px;">
+              <select id="procStepSelect" class="kh"></select>
+              <input type="text" id="procStepCustomInput" class="kh" placeholder="សរសេរជំហានផ្សេង..." style="display:none; margin-top:6px;">
+            </div>
+            <div class="field" style="margin:0; width:140px;">
+              <input type="date" id="procStepDate" class="mono">
+            </div>
+            <button type="button" class="btn btn-primary btn-sm kh" id="addProcStepBtn" style="height:38px;">＋ បន្ថែម</button>
+          </div>
+          <input type="text" id="procStepNote" class="kh" placeholder="ចំណាំ (Note) — ស្រេចចិត្ត..." style="width:100%; box-sizing:border-box;">
+        </div>
+      </div>
+
+      <div class="pstep-tab-panel" data-ptab="status" style="display:none;">
+        <div class="kh" style="font-size:11px; color:var(--ink-dim); margin-bottom:12px;">ស្លាកសញ្ញារួមរបស់ករណីនេះ នឹងយកតាមស្ថានភាពដែលមានកាលបរិច្ឆេទថ្មីបំផុត</div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div class="status-row" data-row="done" style="border:1px solid var(--border); border-radius:10px; padding:10px 12px; background:var(--surface);">
             <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;font-size:13px;color:var(--primary-dark);text-transform:none;">
               <input type="checkbox" id="f_statusDone" class="status-check" style="width:17px;height:17px;accent-color:var(--primary-dark);">
               <span><b>✅ Done</b></span>
@@ -1761,7 +1794,7 @@
             </div>
           </div>
 
-          <div class="status-row" data-row="doing" style="border:1px solid var(--border); border-radius:10px; padding:10px 12px; margin-bottom:8px; background:var(--surface);">
+          <div class="status-row" data-row="doing" style="border:1px solid var(--border); border-radius:10px; padding:10px 12px; background:var(--surface);">
             <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;font-size:13px;color:var(--amber-dark);text-transform:none;">
               <input type="checkbox" id="f_statusDoing" class="status-check" style="width:17px;height:17px;accent-color:var(--amber-dark);">
               <span><b>⚙️ Doing</b></span>
@@ -1772,7 +1805,7 @@
             </div>
           </div>
 
-          <div class="status-row" data-row="missing" style="border:1px solid var(--border); border-radius:10px; padding:10px 12px; margin-bottom:8px; background:var(--surface);">
+          <div class="status-row" data-row="missing" style="border:1px solid var(--border); border-radius:10px; padding:10px 12px; background:var(--surface);">
             <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;font-size:13px;color:var(--coral-dark);text-transform:none;">
               <input type="checkbox" id="f_statusMissing" class="status-check" style="width:17px;height:17px;accent-color:var(--coral-dark);">
               <span><b>⏳ Missing</b></span>
@@ -1783,30 +1816,30 @@
             </div>
           </div>
 
-          <div class="status-row" data-row="appt" style="border:1px solid var(--border); border-radius:10px; padding:10px 12px; margin-bottom:8px; background:var(--surface);">
+          <div class="status-row" data-row="appt" style="border:1px solid var(--border); border-radius:10px; padding:10px 12px; background:var(--surface);">
             <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;font-size:13px;color:var(--amber-dark);text-transform:none;">
               <input type="checkbox" id="f_statusAppt" class="status-check" style="width:17px;height:17px;accent-color:var(--amber-dark);">
               <span><b>🔄 Appointment</b></span>
             </label>
-            <div id="apptFields" class="appointment-fields-grid" style="display:none;margin-top:8px;">
-              <div class="field" style="margin:0;">
+            <div id="apptFields" style="display:none;margin-top:8px;">
+              <div class="field" style="margin:0 0 8px;">
                 <label>ថ្ងៃខែឆ្នាំ និងម៉ោងណាត់</label>
                 <input type="datetime-local" id="f_apptDateTime" class="mono">
               </div>
               <div class="field" style="margin:0;">
                 <label>Do</label>
-                <input type="text" id="f_planDo" class="kh" placeholder="ឧ. Obturation, Luting crown, Remove suture...">
+                <input type="text" id="f_planDo" class="kh" placeholder="ឧ. Obturation, Luting crown...">
               </div>
             </div>
           </div>
 
-          <div class="status-row" data-row="labo" style="border:1px solid var(--border); border-radius:10px; padding:10px 12px; margin-bottom:8px; background:var(--surface);">
+          <div class="status-row" data-row="labo" style="border:1px solid var(--border); border-radius:10px; padding:10px 12px; background:var(--surface);">
             <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin:0;font-size:13px;color:#1D4ED8;text-transform:none;">
               <input type="checkbox" id="f_statusLabo" class="status-check" style="width:17px;height:17px;accent-color:#1D4ED8;">
               <span><b>🧪 ពុម្ភធ្មេញ</b></span>
             </label>
-            <div id="laboFields" class="appointment-fields-grid" style="display:none;margin-top:8px;">
-              <div class="field" style="margin:0;">
+            <div id="laboFields" style="display:none;margin-top:8px;">
+              <div class="field" style="margin:0 0 8px;">
                 <label>ថ្ងៃខែឆ្នាំ ផ្ញើ Lab</label>
                 <input type="date" id="f_labDate" class="mono">
               </div>
@@ -1822,8 +1855,8 @@
               <input type="checkbox" id="f_statusPlanning" class="status-check" style="width:17px;height:17px;accent-color:#6D28D9;">
               <span><b>📝 Planning</b></span>
             </label>
-            <div id="planningFields" class="appointment-fields-grid" style="display:none;margin-top:8px;">
-              <div class="field" style="margin:0;">
+            <div id="planningFields" style="display:none;margin-top:8px;">
+              <div class="field" style="margin:0 0 8px;">
                 <label>ថ្ងៃខែឆ្នាំ Plan</label>
                 <input type="date" id="f_planningDate" class="mono">
               </div>
@@ -1834,24 +1867,6 @@
             </div>
           </div>
         </div>
-
-<div style="border-top:1px dashed var(--border); margin-bottom:14px;"></div>
-
-<label class="kh" style="display:block; font-size:12px; font-weight:700; color:var(--ink-soft); margin-bottom:8px;">📜 ជំហាននីតិវិធី · Procedure Steps</label>
-      <div id="procStepsCards" style="margin-bottom:18px;"></div>
-      <div style="border-top:1px dashed var(--border); padding-top:14px;">
-        <label class="kh" style="display:block; font-size:12px; font-weight:700; color:var(--ink-soft); margin-bottom:8px;">＋ បន្ថែមជំហានថ្មី · Add Step</label>
-        <div style="display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap; margin-bottom:8px;">
-          <div class="field" style="margin:0; flex:1; min-width:160px;">
-            <select id="procStepSelect" class="kh"></select>
-            <input type="text" id="procStepCustomInput" class="kh" placeholder="សរសេរជំហានផ្សេង..." style="display:none; margin-top:6px;">
-          </div>
-          <div class="field" style="margin:0; width:140px;">
-            <input type="date" id="procStepDate" class="mono">
-          </div>
-          <button type="button" class="btn btn-primary btn-sm kh" id="addProcStepBtn" style="height:38px;">＋ បន្ថែម</button>
-        </div>
-        <input type="text" id="procStepNote" class="kh" placeholder="ចំណាំ (Note) — ស្រេចចិត្ត..." style="width:100%; box-sizing:border-box;">
       </div>
     </div>
   </div>
@@ -2297,7 +2312,7 @@ function updateStatusRowVisibility(key){
   const fieldsEl = document.getElementById(STATUS_ROW_FIELDS_ID[key]);
   if(!fieldsEl) return;
   const checked = statusChecks[key] && statusChecks[key].checked;
-  fieldsEl.style.display = checked ? (key === 'Done' || key === 'Doing' || key === 'Missing' ? 'block' : 'grid') : 'none';
+  fieldsEl.style.display = checked ? 'block' : 'none';
 }
 
 function computeOverallStatus(){
@@ -3035,15 +3050,60 @@ function renderProcRow(item){
     </div>`;
 }
 
+function getTodayQueue(){
+  const now = new Date();
+  const dayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+  const dayEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 23, 59, 59, 999);
+  const seen = new Set();
+  const queue = [];
+  allRecords.forEach(r => {
+    const apptDt = r.timeLast ? parseAnyDate(r.timeLast) : null;
+    const doDt = r.doingDateTime ? parseAnyDate(r.doingDateTime) : null;
+    const isApptToday = apptDt && apptDt >= dayStart && apptDt <= dayEnd;
+    const isDoToday = doDt && doDt >= dayStart && doDt <= dayEnd;
+    if(!isApptToday && !isDoToday) return;
+    const key = r._id || (r.name + r.timestamp);
+    if(seen.has(key)) return;
+    seen.add(key);
+    queue.push({ r, d: isApptToday ? apptDt : doDt, isAppt: isApptToday });
+  });
+  queue.sort((a,b) => a.d - b.d);
+  return queue;
+}
+
+function renderQueueRow(item){
+  const {r, d, isAppt} = item;
+  let hr = d.getHours();
+  const ampm = hr >= 12 ? 'PM' : 'AM';
+  hr = hr % 12; if(hr === 0) hr = 12;
+  const timeStr = `${String(hr).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')} ${ampm}`;
+  const statusCls = r.status==='Done'?'done':(r.status==='Planning'?'planning':(r.status==='Labo'?'labo':(r.status==='Appt'||r.status==='Doing'?'doing':'missing')));
+  const statusText = r.status === 'Doing' ? 'Appt' : (r.status || 'Missing');
+  const planText = cleanStr(r.doing) || cleanStr(r.treatment) || cleanStr(r.diagnosis) || 'ពិនិត្យព្យាបាល';
+
+  return `
+    <div class="appt-row" data-name="${encodeURIComponent(r.name)}">
+      <div class="appt-time">
+        <div class="mono" style="color:var(--primary-dark); font-weight:700;">${timeStr}</div>
+        <div class="appt-day kh" style="font-size:10px; color:var(--ink-dim);">${isAppt ? 'ណាត់' : 'ព្យាបាល'}</div>
+      </div>
+      <div class="appt-main">
+        <div class="appt-name kh">${r.name}</div>
+        <div class="appt-meta">${formatPhoneDisplay(r.phone)||'គ្មានលេខ'} · <span class="kh">${planText}</span></div>
+      </div>
+      <div class="emr-status ${statusCls}">${statusText}</div>
+    </div>`;
+}
+
 function renderAppointments(){
-  const {todayProcList} = getAppointments();
+  const queue = getTodayQueue();
 
-  document.getElementById('procTodayCount').textContent = todayProcList.length;
-  const procBody = document.getElementById('procTodayBody');
+  document.getElementById('queueTodayCount').textContent = queue.length;
+  const queueBody = document.getElementById('queueTodayBody');
 
-  procBody.innerHTML = todayProcList.length
-    ? todayProcList.map(renderProcRow).join('')
-    : `<div class="empty-state kh" style="padding:20px;font-size:12px;">មិនមានការព្យាបាលក្នុងចន្លោះ ៣ ថ្ងៃនេះទេ<br><span style="opacity:.7">No procedures (yesterday - tomorrow)</span></div>`;
+  queueBody.innerHTML = queue.length
+    ? queue.map(renderQueueRow).join('')
+    : `<div class="empty-state kh" style="padding:20px;font-size:12px;">មិនមានអ្នកជំងឺណាត់ជួប ឬព្យាបាលថ្ងៃនេះទេ<br><span style="opacity:.7">No patients scheduled or treated today</span></div>`;
 
   document.querySelectorAll('.appt-row').forEach(el=>{
     el.addEventListener('click', ()=> openPatientRecord(decodeURIComponent(el.dataset.name)));
@@ -3169,44 +3229,14 @@ function computeDayStats(targetDate){
   return { apptCount, newPatientsCount, patientsTodayCount: patientsToday.size, male, female, children, income, expense, laboCount };
 }
 
-const DASH_METRIC_GROUPS = {
-  patients: [
-    { kh: 'ជំងឺថ្មី', en: 'New Patients', key: 'newPatientsCount', fmt: v => v },
-    { kh: 'ចំនួនជំងឺ', en: 'Patients', key: 'patientsTodayCount', fmt: v => v },
-    { kh: 'ប្រុស', en: 'Male', key: 'male', fmt: v => v },
-    { kh: 'ស្រី', en: 'Female', key: 'female', fmt: v => v },
-    { kh: 'ក្មេង (១៥ចុះ)', en: 'Children ≤15', key: 'children', fmt: v => v }
-  ],
-  money: [
-    { kh: 'ចំណូល', en: 'Income', key: 'income', fmt: v => '$' + v.toFixed(2) },
-    { kh: 'ចំណាយ', en: 'Expense', key: 'expense', fmt: v => '$' + v.toFixed(2) }
-  ],
-  ops: [
-    { kh: 'ណាត់ជួប', en: 'Appointments', key: 'apptCount', fmt: v => v },
-    { kh: 'ពុម្ភធ្មេញ', en: 'Dental Lab', key: 'laboCount', fmt: v => v }
-  ]
-};
-
-function buildCompareStatCards(todayStats, yestStats, groupKey){
-  const metrics = DASH_METRIC_GROUPS[groupKey];
-  return metrics.map(m => `
-    <div class="stat-card" style="padding:12px;">
-      <div class="stat-label kh" style="margin-bottom:8px;">${m.kh}</div>
-      <div style="display:flex; justify-content:space-between; align-items:flex-end; gap:8px;">
-        <div style="text-align:left;">
-          <div class="kh" style="font-size:10px; color:var(--amber-dark); margin-bottom:2px; font-weight:700;">ម្សិល · Yest.</div>
-          <div class="mono" style="font-size:17px; font-weight:800; color:var(--amber-dark);">${m.fmt(yestStats[m.key])}</div>
-        </div>
-        <div style="width:1px; align-self:stretch; background:var(--border-soft);"></div>
-        <div style="text-align:right;">
-          <div class="kh" style="font-size:10px; color:var(--primary-dark); margin-bottom:2px; font-weight:700;">ថ្ងៃនេះ · Today</div>
-          <div class="mono" style="font-size:17px; font-weight:800; color:var(--primary-dark);">${m.fmt(todayStats[m.key])}</div>
-        </div>
-      </div>
-      <div class="stat-khmer" style="margin-top:6px;">${m.en}</div>
-    </div>
-  `).join('');
-}
+const DASH_SUMMARY_METRICS = [
+  { kh: 'ចំនួនជំងឺ', en: 'Patients', key: 'patientsTodayCount', fmt: v => v },
+  { kh: 'ជំងឺថ្មី', en: 'New', key: 'newPatientsCount', fmt: v => v },
+  { kh: 'ណាត់ជួប', en: 'Appts', key: 'apptCount', fmt: v => v },
+  { kh: 'ពុម្ភធ្មេញ', en: 'Dental Lab', key: 'laboCount', fmt: v => v },
+  { kh: 'ចំណូល', en: 'Income', key: 'income', fmt: v => '$' + v.toFixed(0) },
+  { kh: 'ចំណាយ', en: 'Expense', key: 'expense', fmt: v => '$' + v.toFixed(0) }
+];
 
 function renderDashboardDayStats(){
   const today = new Date();
@@ -3214,12 +3244,22 @@ function renderDashboardDayStats(){
   const todayStats = computeDayStats(today);
   const yestStats = computeDayStats(yesterday);
 
-  const patientsEl = document.getElementById('demoStatsRowPatients');
-  const moneyEl = document.getElementById('demoStatsRowMoney');
-  const opsEl = document.getElementById('demoStatsRowOps');
-  if(patientsEl) patientsEl.innerHTML = buildCompareStatCards(todayStats, yestStats, 'patients');
-  if(moneyEl) moneyEl.innerHTML = buildCompareStatCards(todayStats, yestStats, 'money');
-  if(opsEl) opsEl.innerHTML = buildCompareStatCards(todayStats, yestStats, 'ops');
+  const stripEl = document.getElementById('dashSummaryStrip');
+  if(stripEl){
+    stripEl.innerHTML = DASH_SUMMARY_METRICS.map(m => {
+      const tv = todayStats[m.key], yv = yestStats[m.key];
+      const diff = tv - yv;
+      const deltaCls = diff > 0 ? 'up' : (diff < 0 ? 'down' : 'flat');
+      const deltaSign = diff > 0 ? '▲' : (diff < 0 ? '▼' : '—');
+      const deltaAbs = m.key === 'income' || m.key === 'expense' ? Math.abs(diff).toFixed(0) : Math.abs(diff);
+      return `
+        <div class="dash-pill">
+          <div class="dp-label kh">${m.kh}</div>
+          <div><span class="dp-value">${m.fmt(tv)}</span><span class="dp-delta ${deltaCls}">${deltaSign}${diff !== 0 ? deltaAbs : ''}</span></div>
+        </div>
+      `;
+    }).join('');
+  }
 }
 
 function renderTreatmentStats(){
@@ -5456,10 +5496,20 @@ function renderInvoicesTable(searchQ) {
 
 let activeProcStepsRecordId = null;
 
+function switchProcStepsTab(tab){
+  document.querySelectorAll('.pstep-tab-panel').forEach(p => {
+    p.style.display = (p.dataset.ptab === tab) ? 'block' : 'none';
+  });
+  document.querySelectorAll('.pstep-tab-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.ptab === tab);
+  });
+}
+
 function openProcedureStepsModal(recordId){
   const r = allRecords.find(x => x._id === recordId);
   if(!r) return;
   activeProcStepsRecordId = recordId;
+  switchProcStepsTab('steps');
 
   if(!Array.isArray(r.procedureSteps) || r.procedureSteps.length === 0){
     // Migrate legacy comma-separated `doing` string into structured steps.
