@@ -476,7 +476,7 @@
   .row-diag-idc { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   @media(max-width:640px){ .row-diag-idc { grid-template-columns: 1fr; } }
 
-  .procedure-datetime-row{ grid-column:1/-1; display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px; background:var(--surface); border:1px solid var(--border); padding:12px; border-radius:12px; }
+  .procedure-datetime-row{ grid-column:1/-1; display:grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap:12px; background:var(--surface); border:1px solid var(--border); padding:12px; border-radius:12px; }
   @media(max-width:992px){ .procedure-datetime-row{grid-template-columns:1fr;} }
   @media(max-width:640px){ .procedure-datetime-row{grid-template-columns:1fr;} }
 
@@ -552,7 +552,7 @@
   @media print{
     body{background:none;}
     .app-shell, .sidebar-scrim, .topbar, .wrap, .fab,
-    #detailOverlay, #formOverlay, #settingsOverlay, #clinicalConfigOverlay, #patientOverlay, #toothHistoryModalOverlay, #printSizeModalOverlay, #invoiceDetailOverlay, #laboPatientDetailOverlay, #rxDetailOverlay, #procedureStepsOverlay, #xrayGalleryOverlay, #pinModalOverlay, #laboFormOverlay, #invFormOverlay, #invAdjustOverlay, #invHistoryOverlay{ display:none !important; }
+    #detailOverlay, #formOverlay, #settingsOverlay, #clinicalConfigOverlay, #patientOverlay, #toothHistoryModalOverlay, #printSizeModalOverlay, #invoiceDetailOverlay, #laboPatientDetailOverlay, #rxDetailOverlay, #procedureStepsOverlay, #treatmentPlanOverlay, #xrayGalleryOverlay, #pinModalOverlay, #laboFormOverlay, #invFormOverlay, #invAdjustOverlay, #invHistoryOverlay{ display:none !important; }
     #printOverlay{ position:static !important; inset:auto; background:none !important; backdrop-filter:none !important; padding:0 !important; display:block !important; }
     #printOverlay .modal{ box-shadow:none !important; border:none !important; max-width:100% !important; border-radius:0 !important; background:none !important; margin:0 !important; }
     #printOverlay .modal-head, #printOverlay .modal-actions{ display:none !important; }
@@ -1434,6 +1434,15 @@
             <select id="f_procedure_select" class="kh"></select>
           </div>
           <div class="field" style="margin:0;">
+            <label>ស្ថានភាព · Status</label>
+            <select id="f_caseStatus" class="kh">
+              <option value="Appt">🔄 Appt</option>
+              <option value="Done">✅ Done</option>
+              <option value="Missing">⏳ Miss</option>
+              <option value="Labo">🧪 Lab</option>
+            </select>
+          </div>
+          <div class="field" style="margin:0;">
             <label>ម៉ោងនីតិវិធី · Time</label>
             <input type="datetime-local" id="f_doingDateTime" class="mono">
           </div>
@@ -1778,99 +1787,44 @@
     <div class="modal-body">
       <div id="procStepsInfo" class="kh" style="font-size:12.5px; color:var(--ink-soft); margin-bottom:14px;"></div>
 
-      <div style="display:flex;gap:6px;margin-bottom:16px;border-bottom:1.5px solid var(--border);padding-bottom:0;">
-        <button type="button" class="pstep-tab-btn kh active" data-ptab="steps" onclick="switchProcStepsTab('steps')">📜 ជំហាន · Steps</button>
-        <button type="button" class="pstep-tab-btn kh" data-ptab="status" onclick="switchProcStepsTab('status')">🗓️ ស្ថានភាព · Status</button>
-      </div>
-
-      <div class="pstep-tab-panel" data-ptab="steps">
-        <div id="procStepsCards" style="margin-bottom:18px;"></div>
-        <div style="border-top:1px dashed var(--border); padding-top:14px;">
-          <label class="kh" style="display:block; font-size:12px; font-weight:700; color:var(--ink-soft); margin-bottom:8px;">＋ បន្ថែមជំហានថ្មី · Add Step</label>
-          <div style="display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap; margin-bottom:8px;">
-            <div class="field" style="margin:0; flex:1; min-width:160px;">
-              <select id="procStepSelect" class="kh"></select>
-              <input type="text" id="procStepCustomInput" class="kh" placeholder="សរសេរជំហានផ្សេង..." style="display:none; margin-top:6px;">
-            </div>
-            <div class="field" style="margin:0; width:140px;">
-              <input type="date" id="procStepDate" class="mono">
-            </div>
-            <button type="button" class="btn btn-primary btn-sm kh" id="addProcStepBtn" style="height:38px;">＋ បន្ថែម</button>
-          </div>
-          <input type="text" id="procStepNote" class="kh" placeholder="ចំណាំ (Note) — ស្រេចចិត្ត..." style="width:100%; box-sizing:border-box;">
+      <div id="procStepsCards" style="margin-bottom:18px;"></div>
+      <div style="border-top:1px dashed var(--border); padding-top:14px;">
+        <label class="kh" style="display:block; font-size:12px; font-weight:700; color:var(--ink-soft); margin-bottom:8px;">＋ បន្ថែមជំហានថ្មី · Add Step</label>
+        <div class="field" style="margin:0 0 8px;">
+          <select id="procStepSelect" class="kh"></select>
+          <input type="text" id="procStepCustomInput" class="kh" placeholder="សរសេរជំហានផ្សេង..." style="display:none; margin-top:6px;">
         </div>
-      </div>
-
-      <div class="pstep-tab-panel" data-ptab="status" style="display:none;">
-        <div class="kh" style="font-size:11px; color:var(--ink-dim); margin-bottom:12px;">ជ្រើសរើសស្ថានភាពបច្ចុប្បន្នរបស់ករណីនេះ</div>
-
-        <div id="statusPillRow" style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:16px;">
-          <button type="button" class="status-pill kh" data-status="Done" style="--pill-color:var(--primary-dark);">✅ Done</button>
-          <button type="button" class="status-pill kh" data-status="Doing" style="--pill-color:var(--amber-dark);">⚙️ Doing</button>
-          <button type="button" class="status-pill kh" data-status="Missing" style="--pill-color:var(--coral-dark);">⏳ Missing</button>
-          <button type="button" class="status-pill kh" data-status="Appt" style="--pill-color:var(--amber-dark);">🔄 Appointment</button>
-          <button type="button" class="status-pill kh" data-status="Labo" style="--pill-color:#1D4ED8;">🧪 ពុម្ភធ្មេញ</button>
-          <button type="button" class="status-pill kh" data-status="Planning" style="--pill-color:#6D28D9;">📝 Planning</button>
+        <div style="display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap; margin-bottom:8px;">
+          <div class="field" style="margin:0; flex:1; min-width:120px;">
+            <label style="font-size:10.5px;">Status</label>
+            <select id="procStepStatus" class="kh">
+              <option value="Appt">🔄 Appt</option>
+              <option value="Done">✅ Done</option>
+              <option value="Miss">⏳ Miss</option>
+              <option value="Lab">🧪 Lab</option>
+            </select>
+          </div>
+          <div class="field" style="margin:0; width:140px;">
+            <label style="font-size:10.5px;">ថ្ងៃខែឆ្នាំ</label>
+            <input type="date" id="procStepDate" class="mono">
+          </div>
+          <button type="button" class="btn btn-primary btn-sm kh" id="addProcStepBtn" style="height:38px;">＋ បន្ថែម</button>
         </div>
-
-        <div id="statusFieldsPanel" style="border:1px solid var(--border); border-radius:10px; padding:14px; background:var(--surface);">
-          <input type="checkbox" id="f_statusDone" style="display:none;">
-          <div id="doneFields" class="field" style="margin:0; display:none;">
-            <label>ថ្ងៃខែឆ្នាំ Done</label>
-            <input type="date" id="f_doneDate" class="mono">
-          </div>
-
-          <input type="checkbox" id="f_statusDoing" style="display:none;">
-          <div id="doingStatusFields" class="field" style="margin:0; display:none;">
-            <label>ថ្ងៃខែឆ្នាំ Doing</label>
-            <input type="date" id="f_doingStatusDate" class="mono">
-          </div>
-
-          <input type="checkbox" id="f_statusMissing" style="display:none;">
-          <div id="missFields" class="field" style="margin:0; display:none;">
-            <label>ថ្ងៃខែឆ្នាំ Miss</label>
-            <input type="date" id="f_missDate" class="mono">
-          </div>
-
-          <input type="checkbox" id="f_statusAppt" style="display:none;">
-          <div id="apptFields" style="display:none;">
-            <div class="field" style="margin:0 0 8px;">
-              <label>ថ្ងៃខែឆ្នាំ និងម៉ោងណាត់</label>
-              <input type="datetime-local" id="f_apptDateTime" class="mono">
-            </div>
-            <div class="field" style="margin:0;">
-              <label>Do</label>
-              <input type="text" id="f_planDo" class="kh" placeholder="ឧ. Obturation, Luting crown...">
-            </div>
-          </div>
-
-          <input type="checkbox" id="f_statusLabo" style="display:none;">
-          <div id="laboFields" style="display:none;">
-            <div class="field" style="margin:0 0 8px;">
-              <label>ថ្ងៃខែឆ្នាំ ផ្ញើ Lab</label>
-              <input type="date" id="f_labDate" class="mono">
-            </div>
-            <div class="field" style="margin:0;">
-              <label>Do</label>
-              <input type="text" id="f_labDo" class="kh" placeholder="ឧ. Crown, Bridge...">
-            </div>
-          </div>
-
-          <input type="checkbox" id="f_statusPlanning" style="display:none;">
-          <div id="planningFields" style="display:none;">
-            <div class="field" style="margin:0 0 8px;">
-              <label>ថ្ងៃខែឆ្នាំ Plan</label>
-              <input type="date" id="f_planningDate" class="mono">
-            </div>
-            <div class="field" style="margin:0;">
-              <label>Do</label>
-              <input type="text" id="f_planningDo" class="kh" placeholder="ឧ. RCT, Extraction...">
-            </div>
-          </div>
-
-          <div id="statusNoSelection" class="kh" style="text-align:center; color:var(--ink-dim); padding:8px; font-size:12.5px;">សូមជ្រើសរើសស្ថានភាពខាងលើ</div>
-        </div>
+        <input type="text" id="procStepNote" class="kh" placeholder="ចំណាំ (Note) — ស្រេចចិត្ត..." style="width:100%; box-sizing:border-box;">
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Treatment Plan popup (opened from the green button in Full Dental Record) -->
+<div class="overlay hidden" id="treatmentPlanOverlay">
+  <div class="modal" style="max-width: 680px;">
+    <div class="modal-head">
+      <h2 class="kh" id="treatmentPlanTitle">🦷 គម្រោងព្យាបាល · Treatment Plan</h2>
+      <button class="x" id="closeTreatmentPlan">✕</button>
+    </div>
+    <div class="modal-body">
+      <div id="treatmentPlanBody"></div>
     </div>
   </div>
 </div>
@@ -2417,7 +2371,8 @@ function selectStatusPill(key, skipSave){
     if(statusChecks[k]) statusChecks[k].checked = (k === key);
     updateStatusRowVisibility(k);
   });
-  document.querySelectorAll('.status-pill').forEach(p => p.classList.toggle('active', p.dataset.status === key));
+  const dropdown = document.getElementById('statusDropdown');
+  if(dropdown) dropdown.value = key;
   document.getElementById('statusNoSelection').style.display = 'none';
 
   const dateEl = document.getElementById(STATUS_ROW_DATE_ID[key]);
@@ -2426,10 +2381,6 @@ function selectStatusPill(key, skipSave){
   }
   if(!skipSave) saveStatusForActiveRecord();
 }
-
-document.querySelectorAll('.status-pill').forEach(btn => {
-  btn.addEventListener('click', () => selectStatusPill(btn.dataset.status));
-});
 
 ['f_doneDate','f_doingStatusDate','f_missDate','f_apptDateTime','f_planDo','f_labDate','f_labDo','f_planningDate','f_planningDo'].forEach(id => {
   const el = document.getElementById(id);
@@ -3756,10 +3707,10 @@ function renderTreatmentPlanHTML(patientName){
       </td>
       <td style="text-align:center; white-space:nowrap;">
         ${p.status === 'Completed'
-          ? `<button type="button" class="icon-btn" title="ធ្វើឡើងវិញ / Reopen" onclick="reopenTreatmentPlan('${p.id}'); openPatientRecord(activePatientContext);">↺</button>`
-          : `<button type="button" class="icon-btn" title="បានធ្វើរួច / Mark Complete" onclick="completeTreatmentPlan('${p.id}'); openPatientRecord(activePatientContext);">✓</button>`
+          ? `<button type="button" class="icon-btn" title="ធ្វើឡើងវិញ / Reopen" onclick="reopenTreatmentPlan('${p.id}'); openTreatmentPlanPopup(activeTreatmentPlanPatient);">↺</button>`
+          : `<button type="button" class="icon-btn" title="បានធ្វើរួច / Mark Complete" onclick="completeTreatmentPlan('${p.id}'); openTreatmentPlanPopup(activeTreatmentPlanPatient);">✓</button>`
         }
-        <button type="button" class="icon-btn danger" title="លុប / Delete" onclick="requestClinicPin(() => { deleteTreatmentPlan('${p.id}'); openPatientRecord(activePatientContext); })">✕</button>
+        <button type="button" class="icon-btn danger" title="លុប / Delete" onclick="requestClinicPin(() => { deleteTreatmentPlan('${p.id}'); openTreatmentPlanPopup(activeTreatmentPlanPatient); })">✕</button>
       </td>
     </tr>
   `).join('') : `<tr><td colspan="6" style="text-align:center;color:var(--ink-dim);padding:16px;" class="kh">មិនទាន់មានគម្រោងព្យាបាលទេ</td></tr>`;
@@ -3806,20 +3757,36 @@ function addTreatmentPlanFromForm(encodedPatientName){
   if(!tooth){ alert('សូមបញ្ចូលលេខធ្មេញ'); return; }
   if(!procedure){ alert('សូមជ្រើសរើសនីតិវិធី'); return; }
   addTreatmentPlan(patientName, tooth, procedure, note);
-  openPatientRecord(patientName);
+  openTreatmentPlanPopup(patientName);
+}
+
+let activeTreatmentPlanPatient = null;
+
+function openTreatmentPlanPopup(patientName){
+  activeTreatmentPlanPatient = patientName;
+  const pending = getPlansForPatient(patientName).filter(p => p.status !== 'Completed').length;
+  document.getElementById('treatmentPlanTitle').textContent = `🦷 គម្រោងព្យាបាល · ${patientName} (មិនទាន់ធ្វើ ${pending})`;
+  document.getElementById('treatmentPlanBody').innerHTML = renderTreatmentPlanHTML(patientName);
+  document.getElementById('treatmentPlanOverlay').classList.remove('hidden');
 }
 
 function renderClinicalNotesHTML(records) {
+  // Assign a running visit number per record, oldest = Visit 1.
+  const chronoAsc = [...records].sort((a,b)=> (parseAnyDate(a.timestamp)||0) - (parseAnyDate(b.timestamp)||0));
+  const visitNumById = new Map();
+  chronoAsc.forEach((r, idx) => visitNumById.set(r._id, idx + 1));
+
   const rows = [...records].sort((a,b)=> (parseAnyDate(b.timestamp)||0) - (parseAnyDate(a.timestamp)||0));
   return `
     <div class="emr-table-wrap">
       <table class="emr-table" style="table-layout:fixed; width:100%;">
         <thead>
           <tr>
-            <th style="width:16%;">Date</th>
-            <th style="width:12%;">Tooth</th>
-            <th style="width:32%;">Treatment</th>
-            <th style="width:24%;">Last Visit / Appt</th>
+            <th style="width:14%;">Date</th>
+            <th style="width:10%;">Tooth</th>
+            <th style="width:28%;">Treatment</th>
+            <th style="width:10%;text-align:center;">Visit</th>
+            <th style="width:22%;">Last Visit / Appt</th>
             <th style="width:16%;text-align:center;">Status</th>
           </tr>
         </thead>
@@ -3833,6 +3800,7 @@ function renderClinicalNotesHTML(records) {
               <td data-label="Date" class="mono" style="font-size:11.5px;color:var(--ink-soft);font-weight:600;">${cleanStr(r.timestamp).split(' ')[0]}</td>
               <td data-label="Tooth" class="mono" style="font-weight:800;color:var(--primary-dark);font-size:13px;">${r.teeth || '—'}</td>
               <td data-label="Treatment" class="kh" style="font-weight:700;color:var(--primary-dark);cursor:pointer;text-decoration:underline;text-decoration-style:dotted;" onclick="openProcedureStepsModal('${r._id}')">${r.treatment || r.diagnosis || '—'}</td>
+              <td data-label="Visit" class="mono" style="text-align:center;font-weight:700;color:var(--ink-soft);">${visitNumById.get(r._id) || '—'}</td>
               <td data-label="Last Visit / Appt" style="font-size:12px;">${lastOrAppt}</td>
               <td data-label="Status" style="text-align:center;">
                 <div class="emr-status ${r.status==='Done'?'done':(r.status==='Planning'?'planning':(r.status==='Labo'?'labo':(r.status==='Appt'||r.status==='Doing'?'doing':'missing')))}">
@@ -4058,6 +4026,7 @@ function openPatientRecord(name){
 
         <div class="emr-actions-bar">
           <button type="button" class="btn btn-primary btn-full kh" id="addVisitBtn">＋ កត់ត្រាព្យាបាលថ្មី (New Visit)</button>
+          <button type="button" class="btn btn-full kh" id="treatmentPlanBtn" style="background:#16A34A; border-color:#16A34A; color:#fff;">🦷 គម្រោងព្យាបាល · Treatment Plan</button>
           <button type="button" class="btn btn-outline kh" onclick="openXrayGallery('${safeName}')">📷 មើល X-Ray</button>
           <button type="button" class="btn btn-outline kh" id="printPatientBtn">🖨 បោះពុម្ព (Full)</button>
           <button type="button" class="btn btn-outline kh" id="printReceiptBtn">🧾 វិក្កយបត្រ (Invoices)</button>
@@ -4079,14 +4048,6 @@ function openPatientRecord(name){
 
     <div class="emr-notes-section">
       <div class="emr-section-head kh">
-        <span>🦷 គម្រោងព្យាបាល · Treatment Plan</span>
-        <span style="font-size:11px; font-weight:600; color:var(--ink-dim); text-transform:none;">មិនទាន់ធ្វើ: <b style="color:var(--amber-dark); font-size:13px;">${getPlansForPatient(name).filter(p=>p.status!=='Completed').length}</b></span>
-      </div>
-      ${renderTreatmentPlanHTML(name)}
-    </div>
-
-    <div class="emr-notes-section">
-      <div class="emr-section-head kh">
         <span>📜 ប្រវត្តិព្យាបាល (Clinical Notes)</span>
         <span style="font-size:11px; font-weight:600; color:var(--ink-dim); text-transform:none;">ចំនួនមកព្យាបាលសរុប: <b style="color:var(--primary-dark); font-size:13px;">${records.length} លើក</b></span>
       </div>
@@ -4104,6 +4065,10 @@ function openPatientRecord(name){
 
   document.getElementById('addVisitBtn').addEventListener('click', ()=>{
     openForm(null, {name: latest.name, phone: realPhone, sex: realSex, age: realAge});
+  });
+
+  document.getElementById('treatmentPlanBtn').addEventListener('click', ()=>{
+    openTreatmentPlanPopup(latest.name);
   });
 
   document.getElementById('printPatientBtn').addEventListener('click', ()=>{
@@ -4407,6 +4372,9 @@ function openForm(editRecord, prefill){
     const recDT = editRecord.doingDateTime ? dateToYMDTime(editRecord.doingDateTime) : nowDateTime;
     document.getElementById('f_doingDateTime').value = recDT;
 
+    const caseStatusOptions = ['Appt','Done','Missing','Labo'];
+    document.getElementById('f_caseStatus').value = caseStatusOptions.includes(editRecord.status) ? editRecord.status : 'Appt';
+
     // Payment fields pre-fill
     document.getElementById('f_payDate').value = editRecord.payDate || todayDateOnly;
     document.getElementById('f_payTotal').value = editRecord.payTotal || '';
@@ -4460,6 +4428,7 @@ function openForm(editRecord, prefill){
     procSelect.value = defProc.name || '';
 
     document.getElementById('f_doingDateTime').value = nowDateTime;
+    document.getElementById('f_caseStatus').value = 'Appt';
     setStatusCheckbox('Appt');
     document.getElementById('f_apptDateTime').value = nowDateTime;
     document.getElementById('f_planDo').value = '';
@@ -4508,6 +4477,7 @@ function openForm(editRecord, prefill){
     procSelect.value = defProc2.name || '';
 
     document.getElementById('f_doingDateTime').value = nowDateTime;
+    document.getElementById('f_caseStatus').value = 'Appt';
     setStatusCheckbox('Appt');
     document.getElementById('f_apptDateTime').value = nowDateTime;
     document.getElementById('f_planDo').value = '';
@@ -4597,6 +4567,9 @@ function saveRecord(){
       status: 'Missing', timeLast: '', planDo: '', doneDate: '', doingStatusDate: '',
       missDate: '', labDate: '', labDo: '', planningDate: '', planningDo: ''
     };
+    // The Case form's own Status dropdown always wins for the record's overall status.
+    const caseStatusEl = document.getElementById('f_caseStatus');
+    if(caseStatusEl) preservedStatus.status = caseStatusEl.value;
 
     const medItems = getPrescriptionData();
     const medicationString = stringifyPrescription(medItems);
@@ -5633,8 +5606,6 @@ function openProcedureStepsModal(recordId){
   document.getElementById('procStepsTitle').textContent = `🦷 ${r.treatment || r.diagnosis || 'Procedure'} — ${r.name}`;
   document.getElementById('procStepsInfo').textContent = `ធ្មេញ៖ ${r.teeth || '—'} · ${formatDateDisplay(r.timestamp).split(' ')[0]}`;
 
-  populateStatusFieldsFromRecord(r);
-
   const sel = document.getElementById('procStepSelect');
   sel.innerHTML = appProcedures.map(p => `<option value="${p.name}">${p.name}</option>`).join('') + '<option value="custom">ផ្សេងទៀត / Custom…</option>';
   document.getElementById('procStepCustomInput').style.display = 'none';
@@ -5644,6 +5615,13 @@ function openProcedureStepsModal(recordId){
   renderProcedureStepsCards();
   document.getElementById('procedureStepsOverlay').classList.remove('hidden');
 }
+
+const STEP_STATUS_COLORS = {
+  Appt: { bg: 'var(--amber-soft)', text: 'var(--amber-dark)' },
+  Done: { bg: 'var(--primary-soft)', text: 'var(--primary-dark)' },
+  Miss: { bg: 'var(--coral-soft)', text: 'var(--coral-dark)' },
+  Lab:  { bg: '#DBEAFE', text: '#1D4ED8' }
+};
 
 function renderProcedureStepsCards(){
   const r = allRecords.find(x => x._id === activeProcStepsRecordId);
@@ -5667,7 +5645,9 @@ function renderProcedureStepsCards(){
         </div>
         <div style="flex:1; padding-bottom:${isLast ? '0' : '18px'};">
           <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
-            <div class="kh" style="font-weight:700; font-size:13.5px; color:var(--ink);">${escHTML(s.step)}</div>
+            <div class="kh" style="font-weight:700; font-size:13.5px; color:var(--ink);">
+              ${escHTML(s.step)}${s.status ? ` <span class="badge-mini kh" style="background:${STEP_STATUS_COLORS[s.status]?.bg || 'var(--surface-2)'};color:${STEP_STATUS_COLORS[s.status]?.text || 'var(--ink-soft)'};">${s.status}</span>` : ''}
+            </div>
             <button type="button" onclick="deleteProcedureStep(${s.idx})" style="width:20px; height:20px; border-radius:50%; background:var(--coral-soft); color:var(--coral-dark); border:none; cursor:pointer; font-size:10.5px; line-height:1; flex-shrink:0;">✕</button>
           </div>
           <div class="mono" style="font-size:11px; color:var(--ink-dim); margin-top:2px;">${s.date || '—'}</div>
@@ -5705,8 +5685,9 @@ document.getElementById('addProcStepBtn').addEventListener('click', () => {
   if(!stepName){ alert('សូមបញ្ចូលឈ្មោះជំហាន'); return; }
   const date = document.getElementById('procStepDate').value || getLocalTodayYMD();
   const note = document.getElementById('procStepNote').value.trim();
+  const status = document.getElementById('procStepStatus').value;
   if(!Array.isArray(r.procedureSteps)) r.procedureSteps = [];
-  r.procedureSteps.push({ step: stepName, date, note });
+  r.procedureSteps.push({ step: stepName, date, note, status });
   saveProcedureStepsToRecord(r);
   renderProcedureStepsCards();
   document.getElementById('procStepCustomInput').value = '';
@@ -5725,6 +5706,19 @@ document.getElementById('editProcStepsRecordBtn').addEventListener('click', () =
 document.getElementById('deleteProcStepsRecordBtn').addEventListener('click', () => {
   if(!activeProcStepsRecordId) return;
   requestClinicPin(() => deleteSingleRecordById(activeProcStepsRecordId));
+});
+
+document.getElementById('closeTreatmentPlan').addEventListener('click', () => {
+  document.getElementById('treatmentPlanOverlay').classList.add('hidden');
+  activeTreatmentPlanPatient = null;
+  if(activePatientContext) openPatientRecord(activePatientContext);
+});
+document.getElementById('treatmentPlanOverlay').addEventListener('click', (e) => {
+  if(e.target.id === 'treatmentPlanOverlay'){
+    document.getElementById('treatmentPlanOverlay').classList.add('hidden');
+    activeTreatmentPlanPatient = null;
+    if(activePatientContext) openPatientRecord(activePatientContext);
+  }
 });
 
 document.getElementById('closeProcSteps').addEventListener('click', () => {
