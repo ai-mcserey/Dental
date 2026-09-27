@@ -1790,13 +1790,12 @@
       <div id="procStepsCards" style="margin-bottom:18px;"></div>
       <div style="border-top:1px dashed var(--border); padding-top:14px;">
         <label class="kh" style="display:block; font-size:12px; font-weight:700; color:var(--ink-soft); margin-bottom:8px;">＋ បន្ថែមជំហានថ្មី · Add Step</label>
-        <div class="field" style="margin:0 0 8px;">
-          <select id="procStepSelect" class="kh"></select>
-          <input type="text" id="procStepCustomInput" class="kh" placeholder="សរសេរជំហានផ្សេង..." style="display:none; margin-top:6px;">
-        </div>
-        <div style="display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap; margin-bottom:8px;">
-          <div class="field" style="margin:0; flex:1; min-width:120px;">
-            <label style="font-size:10.5px;">Status</label>
+        <div style="display:flex; gap:8px; align-items:flex-start; flex-wrap:wrap; margin-bottom:8px;">
+          <div class="field" style="margin:0; flex:2; min-width:160px;">
+            <select id="procStepSelect" class="kh"></select>
+            <input type="text" id="procStepCustomInput" class="kh" placeholder="សរសេរជំហានផ្សេង..." style="display:none; margin-top:6px;">
+          </div>
+          <div class="field" style="margin:0; flex:1; min-width:110px;">
             <select id="procStepStatus" class="kh">
               <option value="Appt">🔄 Appt</option>
               <option value="Done">✅ Done</option>
@@ -1804,6 +1803,8 @@
               <option value="Lab">🧪 Lab</option>
             </select>
           </div>
+        </div>
+        <div style="display:flex; gap:8px; align-items:flex-end; flex-wrap:wrap; margin-bottom:8px;">
           <div class="field" style="margin:0; width:140px;">
             <label style="font-size:10.5px;">ថ្ងៃខែឆ្នាំ</label>
             <input type="date" id="procStepDate" class="mono">
@@ -5622,6 +5623,9 @@ const STEP_STATUS_COLORS = {
   Miss: { bg: 'var(--coral-soft)', text: 'var(--coral-dark)' },
   Lab:  { bg: '#DBEAFE', text: '#1D4ED8' }
 };
+const STEP_STATUS_ICONS = {
+  Appt: '🔄', Done: '✅', Miss: '⏳', Lab: '🧪'
+};
 
 function renderProcedureStepsCards(){
   const r = allRecords.find(x => x._id === activeProcStepsRecordId);
@@ -5637,21 +5641,26 @@ function renderProcedureStepsCards(){
 
   cardsEl.innerHTML = withIdx.map((s, i) => {
     const isLast = i === withIdx.length - 1;
+    const statusColor = STEP_STATUS_COLORS[s.status]?.text || 'var(--ink-soft)';
+    const statusIcon = STEP_STATUS_ICONS[s.status] || '';
     return `
       <div style="display:flex; gap:12px; position:relative;">
         <div style="display:flex; flex-direction:column; align-items:center; flex-shrink:0;">
           <div style="width:28px; height:28px; border-radius:50%; background:${isLast ? 'var(--primary)' : 'var(--primary-soft)'}; color:${isLast ? '#fff' : 'var(--primary-dark)'}; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px;">${i+1}</div>
-          ${!isLast ? '<div style="width:2px; flex:1; min-height:22px; background:var(--border); margin:2px 0;"></div>' : ''}
+          ${!isLast ? '<div style="width:2px; flex:1; min-height:14px; background:var(--border); margin:2px 0;"></div>' : ''}
         </div>
-        <div style="flex:1; padding-bottom:${isLast ? '0' : '18px'};">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
-            <div class="kh" style="font-weight:700; font-size:13.5px; color:var(--ink);">
-              ${escHTML(s.step)}${s.status ? ` <span class="badge-mini kh" style="background:${STEP_STATUS_COLORS[s.status]?.bg || 'var(--surface-2)'};color:${STEP_STATUS_COLORS[s.status]?.text || 'var(--ink-soft)'};">${s.status}</span>` : ''}
+        <div style="flex:1; padding-bottom:${isLast ? '0' : '12px'};">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+            <div class="kh" style="font-size:13.5px; color:var(--ink);">
+              <span class="mono" style="font-weight:700; color:${statusColor};">${statusIcon} ${s.status || '—'}</span>
+              <span style="color:var(--ink-dim);"> - </span>
+              <span style="font-weight:700;">${escHTML(s.step)}</span>
+              <span style="color:var(--ink-dim);"> - </span>
+              <span class="mono" style="color:var(--ink-soft);">${s.date || '—'}</span>
             </div>
             <button type="button" onclick="deleteProcedureStep(${s.idx})" style="width:20px; height:20px; border-radius:50%; background:var(--coral-soft); color:var(--coral-dark); border:none; cursor:pointer; font-size:10.5px; line-height:1; flex-shrink:0;">✕</button>
           </div>
-          <div class="mono" style="font-size:11px; color:var(--ink-dim); margin-top:2px;">${s.date || '—'}</div>
-          ${s.note ? `<div class="kh" style="font-size:12px; color:var(--ink-soft); margin-top:4px; background:var(--surface-2); padding:6px 8px; border-radius:6px;">${escHTML(s.note)}</div>` : ''}
+          ${s.note ? `<div class="kh" style="font-size:12px; color:var(--ink-soft); margin-top:4px; background:var(--surface-2); padding:5px 8px; border-radius:6px;">${escHTML(s.note)}</div>` : ''}
         </div>
       </div>
     `;
