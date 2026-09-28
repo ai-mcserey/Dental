@@ -2114,6 +2114,12 @@ function format12Hour(hour24, minute){
   return `${String(hr).padStart(2, '0')}:${mn} ${ampm}`;
 }
 
+function toDDMMYYYY(str){
+  const d = parseAnyDate(str);
+  if(!d) return '—';
+  return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+}
+
 function parseAnyDate(str){
   if(!str) return null;
   const s = cleanStr(str);
@@ -2400,7 +2406,7 @@ function renderPaymentHistory(){
     return;
   }
   const withIdx = currentPayments.map((p, idx) => ({...p, idx}));
-  withIdx.sort((a,b) => (b.date||'').localeCompare(a.date||''));
+  withIdx.sort((a,b) => (parseAnyDate(b.date)||0) - (parseAnyDate(a.date)||0));
   listEl.innerHTML = withIdx.map(p => `
     <div style="display:flex; justify-content:space-between; align-items:center; padding:6px 0; border-bottom:1px dashed var(--border-soft);">
       <span class="mono" style="color:var(--ink-soft);">${fmtYMD(p.date)}</span>
@@ -3776,11 +3782,11 @@ function renderClinicalNotesHTML(records) {
         <tbody>
           ${rows.map(r => {
             const lastOrAppt = r.timeLast
-              ? `<span class="mono" style="color:var(--amber-dark);font-weight:700;">🗓️ ${cleanStr(r.timeLast).split(' ')[0]}</span>`
-              : (r.doingDateTime ? `<span class="mono" style="color:var(--ink-soft);">${cleanStr(r.doingDateTime).split(' ')[0]}</span>` : '<span style="color:var(--ink-dim);">—</span>');
+              ? `<span class="mono" style="color:var(--amber-dark);font-weight:700;">🗓️ ${toDDMMYYYY(r.timeLast)}</span>`
+              : (r.doingDateTime ? `<span class="mono" style="color:var(--ink-soft);">${toDDMMYYYY(r.doingDateTime)}</span>` : '<span style="color:var(--ink-dim);">—</span>');
             return `
             <tr class="emr-tr">
-              <td data-label="Date" class="mono" style="font-size:11.5px;color:var(--ink-soft);font-weight:600;">${cleanStr(r.timestamp).split(' ')[0]}</td>
+              <td data-label="Date" class="mono" style="font-size:11.5px;color:var(--ink-soft);font-weight:600;">${toDDMMYYYY(r.timestamp)}</td>
               <td data-label="Tooth" class="mono" style="font-weight:800;color:var(--primary-dark);font-size:13px;">${r.teeth || '—'}</td>
               <td data-label="Treatment" class="kh" style="font-weight:700;color:var(--primary-dark);cursor:pointer;text-decoration:underline;text-decoration-style:dotted;" onclick="openProcedureStepsModal('${r._id}')">${r.treatment || r.diagnosis || '—'}</td>
               <td data-label="Visit" class="mono" style="text-align:center;font-weight:700;color:var(--ink-soft);">${visitNumById.get(r._id) || '—'}</td>
@@ -5558,7 +5564,7 @@ function openProcedureStepsModal(recordId){
   }
 
   document.getElementById('procStepsTitle').textContent = `🦷 ${r.treatment || r.diagnosis || 'Procedure'} — ${r.name}`;
-  document.getElementById('procStepsInfo').textContent = `ធ្មេញ៖ ${r.teeth || '—'} · ${formatDateDisplay(r.timestamp).split(' ')[0]}`;
+  document.getElementById('procStepsInfo').textContent = `ធ្មេញ៖ ${r.teeth || '—'} · ${toDDMMYYYY(r.timestamp)}`;
 
   const sel = document.getElementById('procStepSelect');
   sel.innerHTML = appProcedures.map(p => `<option value="${p.name}">${p.name}</option>`).join('') + '<option value="custom">ផ្សេងទៀត / Custom…</option>';
@@ -5590,7 +5596,7 @@ function renderProcedureStepsCards(){
   }
   // Show progression in chronological order (oldest first); keep original array index for delete.
   const withIdx = r.procedureSteps.map((s, idx) => ({...s, idx}));
-  withIdx.sort((a,b) => (a.date||'').localeCompare(b.date||''));
+  withIdx.sort((a,b) => (parseAnyDate(a.date)||0) - (parseAnyDate(b.date)||0));
 
   cardsEl.innerHTML = withIdx.map((s, i) => {
     const isLast = i === withIdx.length - 1;
@@ -5605,7 +5611,7 @@ function renderProcedureStepsCards(){
             <div class="kh" style="font-size:13.5px; color:var(--ink);">
               <span style="font-weight:700; color:${isLast ? 'var(--primary-dark)' : 'var(--ink)'};">${escHTML(s.step)}</span>
               <span style="color:var(--ink-dim);"> - </span>
-              <span class="mono" style="color:var(--ink-soft);">${s.date || '—'}</span>
+              <span class="mono" style="color:var(--ink-soft);">${toDDMMYYYY(s.date)}</span>
             </div>
             <button type="button" onclick="deleteProcedureStep(${s.idx})" style="width:20px; height:20px; border-radius:50%; background:var(--coral-soft); color:var(--coral-dark); border:none; cursor:pointer; font-size:10.5px; line-height:1; flex-shrink:0;">✕</button>
           </div>
@@ -5619,7 +5625,7 @@ function renderProcedureStepsCards(){
 function updateRecordStatusFromLatestStep(r){
   // The record's overall Status is simply the name of its most recently-dated step.
   if(!Array.isArray(r.procedureSteps) || r.procedureSteps.length === 0) return;
-  const sorted = [...r.procedureSteps].sort((a,b) => (a.date||'').localeCompare(b.date||''));
+  const sorted = [...r.procedureSteps].sort((a,b) => (parseAnyDate(a.date)||0) - (parseAnyDate(b.date)||0));
   r.status = sorted[sorted.length - 1].step;
 }
 
