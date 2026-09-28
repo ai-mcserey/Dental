@@ -1424,16 +1424,19 @@
           </div>
         </div>
 
-        <div class="procedure-datetime-row">
+        <div class="procedure-datetime-row" style="grid-template-columns: 1fr 1fr;">
           <div class="field" style="margin:0;">
             <label>Treatment</label>
             <select id="f_treatment" class="kh"></select>
+            <input type="text" id="f_treatment_custom" placeholder="សរសេរផ្សេង / type custom" style="margin-top:6px;display:none;">
           </div>
           <div class="field" style="margin:0;">
             <label>នីតិវិធី · Procedures</label>
             <select id="f_procedure_select" class="kh"></select>
+            <textarea id="f_doing" class="kh" placeholder="សរសេរនីតិវិធីលម្អិត / custom procedure..." style="margin-top:6px;display:none;"></textarea>
           </div>
-          <div class="field" style="margin:0;">
+          <!-- លាក់ ម៉ោងនិងថ្ងៃខែនីតិវិធី -->
+          <div class="field" style="display:none; margin:0;">
             <label>ម៉ោងនីតិវិធី · Time</label>
             <input type="datetime-local" id="f_doingDateTime" class="mono">
           </div>
@@ -1786,9 +1789,9 @@
             <select id="procStepSelect" class="kh"></select>
             <input type="text" id="procStepCustomInput" class="kh" placeholder="សរសេរជំហានផ្សេង..." style="display:none; margin-top:6px;">
           </div>
-          <div class="field" style="margin:0; width:130px;">
-            <label style="font-size:10.5px;">ថ្ងៃខែឆ្នាំ</label>
-            <input type="date" id="procStepDate" class="mono">
+          <div class="field" style="margin:0; width:180px;">
+            <label style="font-size:10.5px;">ថ្ងៃខែឆ្នាំ និង ម៉ោង</label>
+            <input type="datetime-local" id="procStepDate" class="mono">
           </div>
           <div class="field" style="margin:0; flex:2; min-width:140px;">
             <input type="text" id="procStepNote" class="kh" placeholder="ចំណាំ (Note) — ស្រេចចិត្ត...">
@@ -2118,6 +2121,16 @@ function toDDMMYYYY(str){
   const d = parseAnyDate(str);
   if(!d) return '—';
   return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+}
+
+// Same as above, but appends HH:MM (24-hour) when the stored value actually contains a time.
+function toDDMMYYYYTime(str){
+  const d = parseAnyDate(str);
+  if(!d) return '—';
+  const base = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+  const hasTime = /[T\s]\d{1,2}:\d{2}/.test(cleanStr(str));
+  if(!hasTime) return base;
+  return `${base} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
 }
 
 function parseAnyDate(str){
@@ -2724,7 +2737,85 @@ async function flushPendingQueue(){
   setTimeout(()=>{ badge.textContent = '🔄 Sync'; }, 2000);
 }
 
+/* ---------- Step dates <-> the Sheet's "doing" column ----------
+   The procedure column carries each step together with its own date, e.g.
+     Access Cavity (2026/09/27 02:00 PM), Obturation (2026/09/30 11:30 AM)
+   so the dates always travel with the procedures and can rebuild the steps. */
+function stepDateToSheetText(str){
+  const d = parseAnyDate(str);
+  if(!d) return '';
+  const y = d.getFullYear(), mo = String(d.getMonth()+1).padStart(2,'0'), da = String(d.getDate()).padStart(2,'0');
+  const hasTime = /[T\s]\d{1,2}:\d{2}/.test(cleanStr(str));
+  if(!hasTime) return `${y}/${mo}/${da}`;
+  let h = d.getHours(); const ap = h >= 12 ? 'PM' : 'AM'; h = h % 12; if(h === 0) h = 12;
+  return `${y}/${mo}/${da} ${String(h).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')} ${ap}`;
+}
+
+// "2026/09/27 02:00 PM" -> "2026-09-27T14:00" (the app's own step format); date-only stays date-only.
+function sheetTextToStepDate(str){
+  const d = parseAnyDate(str);
+  if(!d) return '';
+  const base = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const hasTime = /[T\s]\d{1,2}:\d{2}/.test(cleanStr(str));
+  return hasTime ? `${base}T${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}` : base;
+}
+
+function getRecordSteps(rec){
+  if(rec && Array.isArray(rec.procedureSteps)) return rec.procedureSteps;
+  if(rec && typeof rec.procedureStepsJSON === 'string' && rec.procedureStepsJSON){
+    try{ const a = JSON.parse(rec.procedureStepsJSON); if(Array.isArray(a)) return a; }catch(e){}
+  }
+  return null;
+}
+
+function buildDoingForSheet(rec){
+  const steps = getRecordSteps(rec);
+  if(!steps || steps.length === 0) return rec.doing;
+  const sorted = [...steps].sort((a,b) => (parseAnyDate(a.date)||0) - (parseAnyDate(b.date)||0));
+  return sorted.map(s => {
+    const d = stepDateToSheetText(s.date);
+    return d ? `${s.step} (${d})` : s.step;
+  }).join(', ');
+}
+
+// Reads "Name (date), Name (date)" back into steps. Returns null unless at least one step really has a date,
+// so ordinary text (and names that merely contain brackets, like "Crown (PFM)") is left alone.
+function parseDoingWithDates(str){
+  const s = cleanStr(str);
+  if(!s || s.indexOf('(') === -1) return null;
+  const parts = s.split(/,\s*(?![^()]*\))/);
+  const out = []; let anyDate = false;
+  parts.forEach(p => {
+    const t = p.trim();
+    if(!t) return;
+    const m = t.match(/^(.*?)\s*\((\d{4}[-\/.]\d{1,2}[-\/.]\d{1,2}[^()]*)\)$/);
+    if(m && m[1].trim()){ out.push({ step: m[1].trim(), date: sheetTextToStepDate(m[2]), note: '' }); anyDate = true; }
+    else out.push({ step: t, date: '', note: '' });
+  });
+  return anyDate ? out : null;
+}
+
+// Every record sent to the Sheet passes through here, so the steps (JSON column) and the dated procedure text
+// are always included -- previously some saves (e.g. the Edit Case form) sent neither and blanked the steps.
+function normalizeRecordForSheet(rec){
+  const out = {...rec};
+  const steps = getRecordSteps(rec);
+  if(steps){
+    out.procedureStepsJSON = JSON.stringify(steps);
+    out.doing = buildDoingForSheet(rec);
+  }
+  delete out.procedureSteps;
+  
+  // បន្ថែមកូដនេះដើម្បីលុបទិន្នន័យ doingDateTime ចោល កុំឱ្យវាបញ្ជូនទៅកាន់ Sheet
+  delete out.doingDateTime; 
+
+  if(Array.isArray(out.payments)) out.payments = JSON.stringify(out.payments);
+  return out;
+}
 function pushToSheet(action, data){
+  if((action === 'addRecord' || action === 'updateRecord') && data && typeof data === 'object'){
+    data = normalizeRecordForSheet(data);
+  }
   const payload = { action, data, timestamp: Date.now() };
   const queue = getPendingQueue();
   queue.push(payload);
@@ -2788,6 +2879,13 @@ async function fetchFromSheet(isSilent = false){
           procedureSteps = rawSteps ? JSON.parse(rawSteps) : [];
           if(!Array.isArray(procedureSteps)) procedureSteps = [];
         } catch(e) { procedureSteps = []; }
+
+        // The "doing" column may carry each step with its own date: "Name (2026/09/27 02:00 PM), ..."
+        const stepsFromDoing = parseDoingWithDates(doing);
+        if(stepsFromDoing){
+          if(procedureSteps.length === 0) procedureSteps = stepsFromDoing;   // rebuild the steps, with their dates
+          doing = stepsFromDoing.map(s => s.step).join(', ');               // inside the app it stays plain names
+        }
 
         let timestamp = cleanStr(r['timestamp'] || r[0] || '');
         let code = cleanStr(r['code'] || r[1] || '') || ('row_' + i);
@@ -4564,6 +4662,7 @@ function saveRecord(){
       planningDate: preservedStatus.planningDate,
       planningDo: preservedStatus.planningDo,
       payments: currentPayments,
+      procedureSteps: (wasEditing && editingOriginalRecord && Array.isArray(editingOriginalRecord.procedureSteps)) ? editingOriginalRecord.procedureSteps : [],
       payDate: document.getElementById('f_payDate').value.trim(),
       payTotal: document.getElementById('f_payTotal').value.trim(),
       payDiscount: document.getElementById('f_payDiscount').value.trim(),
@@ -5541,6 +5640,13 @@ function renderInvoicesTable(searchQ) {
 
 let activeProcStepsRecordId = null;
 
+// The Add-Step date box may be a date-only or a date+time input; give it a value that is valid for its type
+// (a date-only value is silently rejected by a date+time input, which used to leave it blank).
+function stepDateDefaultValue(){
+  const el = document.getElementById('procStepDate');
+  return (el && el.type === 'datetime-local') ? getLocalNowDateTime() : getLocalTodayYMD();
+}
+
 function switchProcStepsTab(tab){
   document.querySelectorAll('.pstep-tab-panel').forEach(p => {
     p.style.display = (p.dataset.ptab === tab) ? 'block' : 'none';
@@ -5570,7 +5676,7 @@ function openProcedureStepsModal(recordId){
   sel.innerHTML = appProcedures.map(p => `<option value="${p.name}">${p.name}</option>`).join('') + '<option value="custom">ផ្សេងទៀត / Custom…</option>';
   document.getElementById('procStepCustomInput').style.display = 'none';
   document.getElementById('procStepCustomInput').value = '';
-  document.getElementById('procStepDate').value = getLocalTodayYMD();
+  document.getElementById('procStepDate').value = stepDateDefaultValue();
 
   renderProcedureStepsCards();
   document.getElementById('procedureStepsOverlay').classList.remove('hidden');
@@ -5586,32 +5692,63 @@ const STEP_STATUS_ICONS = {
   Appt: '🔄', Done: '✅', Miss: '⏳', Lab: '🧪'
 };
 
+// Steps that represent a status get their own highlight colour (matched by exact name, case-insensitive).
+const STEP_HIGHLIGHTS = [
+  { id:'appt', keys:['appointment','appt'], solid:'#D97706', bg:'#FEF3C7', fg:'#92400E' },  // amber
+  { id:'done', keys:['done'],                solid:'#16A34A', bg:'#DCFCE7', fg:'#166534' },  // green
+  { id:'miss', keys:['miss','missing'],      solid:'#DC2626', bg:'#FEE2E2', fg:'#991B1B' },  // red
+  { id:'lab',  keys:['lab','labo'],          solid:'#7C3AED', bg:'#EDE9FE', fg:'#5B21B6' }   // purple
+];
+function stepHighlightFor(name){
+  const n = cleanStr(name).toLowerCase();
+  return STEP_HIGHLIGHTS.find(h => h.keys.includes(n)) || null;
+}
+
 function renderProcedureStepsCards(){
   const r = allRecords.find(x => x._id === activeProcStepsRecordId);
   if(!r) return;
   const cardsEl = document.getElementById('procStepsCards');
-  if(!r.procedureSteps || r.procedureSteps.length === 0){
-    cardsEl.innerHTML = `<div class="kh" style="text-align:center;color:var(--ink-dim);padding:20px;">មិនទាន់មានជំហាននៅឡើយទេ</div>`;
+  const treatmentLabel = r.treatment || r.diagnosis || '';
+  const hasSteps = !!(r.procedureSteps && r.procedureSteps.length > 0);
+  // First node of the timeline: a "TX" circle + the treatment name, joined by the same connector line down to step 1.
+  const treatmentHeading = treatmentLabel ? `
+      <div class="proc-tx-root" style="display:flex; gap:12px; position:relative;">
+        <div style="display:flex; flex-direction:column; align-items:center; flex-shrink:0;">
+          <div style="width:28px; height:28px; border-radius:50%; background:var(--primary-dark); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:10.5px; letter-spacing:.02em;">TX</div>
+          ${hasSteps ? '<div class="proc-tx-line" style="width:2px; flex:1; min-height:14px; background:var(--border); margin:2px 0;"></div>' : ''}
+        </div>
+        <div style="flex:1; padding-bottom:${hasSteps ? '12px' : '0'};">
+          <div class="kh" style="min-height:28px; display:flex; align-items:center; font-weight:800; font-size:14.5px; color:var(--ink); font-style:italic;">${escHTML(treatmentLabel)}</div>
+        </div>
+      </div>` : '';
+  if(!hasSteps){
+    cardsEl.innerHTML = treatmentHeading + `<div class="kh" style="text-align:center;color:var(--ink-dim);padding:20px;">មិនទាន់មានជំហាននៅឡើយទេ</div>`;
     return;
   }
   // Show progression in chronological order (oldest first); keep original array index for delete.
   const withIdx = r.procedureSteps.map((s, idx) => ({...s, idx}));
   withIdx.sort((a,b) => (parseAnyDate(a.date)||0) - (parseAnyDate(b.date)||0));
 
-  cardsEl.innerHTML = withIdx.map((s, i) => {
+  cardsEl.innerHTML = treatmentHeading + withIdx.map((s, i) => {
     const isLast = i === withIdx.length - 1;
+    const hl = stepHighlightFor(s.step);
+    const circleBg = hl ? hl.solid : (isLast ? 'var(--primary)' : 'var(--primary-soft)');
+    const circleFg = hl ? '#fff' : (isLast ? '#fff' : 'var(--primary-dark)');
+    const nameHtml = hl
+      ? `<span data-hl="${hl.id}" style="font-weight:800; color:${hl.fg}; background:${hl.bg}; padding:2px 10px; border-radius:999px;">${escHTML(s.step)}</span>`
+      : `<span style="font-weight:700; color:${isLast ? 'var(--primary-dark)' : 'var(--ink)'};">${escHTML(s.step)}</span>`;
     return `
       <div style="display:flex; gap:12px; position:relative;">
         <div style="display:flex; flex-direction:column; align-items:center; flex-shrink:0;">
-          <div style="width:28px; height:28px; border-radius:50%; background:${isLast ? 'var(--primary)' : 'var(--primary-soft)'}; color:${isLast ? '#fff' : 'var(--primary-dark)'}; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px;">${i+1}</div>
+          <div data-circle="${hl ? hl.id : ''}" style="width:28px; height:28px; border-radius:50%; background:${circleBg}; color:${circleFg}; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px;">${i+1}</div>
           ${!isLast ? '<div style="width:2px; flex:1; min-height:14px; background:var(--border); margin:2px 0;"></div>' : ''}
         </div>
         <div style="flex:1; padding-bottom:${isLast ? '0' : '12px'};">
           <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
             <div class="kh" style="font-size:13.5px; color:var(--ink);">
-              <span style="font-weight:700; color:${isLast ? 'var(--primary-dark)' : 'var(--ink)'};">${escHTML(s.step)}</span>
+              ${nameHtml}
               <span style="color:var(--ink-dim);"> - </span>
-              <span class="mono" style="color:var(--ink-soft);">${toDDMMYYYY(s.date)}</span>
+              <span class="mono" style="color:var(--ink-soft);">${toDDMMYYYYTime(s.date)}</span>
             </div>
             <button type="button" onclick="deleteProcedureStep(${s.idx})" style="width:20px; height:20px; border-radius:50%; background:var(--coral-soft); color:var(--coral-dark); border:none; cursor:pointer; font-size:10.5px; line-height:1; flex-shrink:0;">✕</button>
           </div>
@@ -5655,7 +5792,7 @@ document.getElementById('addProcStepBtn').addEventListener('click', () => {
   const sel = document.getElementById('procStepSelect');
   const stepName = sel.value === 'custom' ? document.getElementById('procStepCustomInput').value.trim() : sel.value;
   if(!stepName){ alert('សូមបញ្ចូលឈ្មោះជំហាន'); return; }
-  const date = document.getElementById('procStepDate').value || getLocalTodayYMD();
+  const date = document.getElementById('procStepDate').value || stepDateDefaultValue();
   const note = document.getElementById('procStepNote').value.trim();
   if(!Array.isArray(r.procedureSteps)) r.procedureSteps = [];
   r.procedureSteps.push({ step: stepName, date, note });
@@ -5664,6 +5801,8 @@ document.getElementById('addProcStepBtn').addEventListener('click', () => {
   renderProcedureStepsCards();
   document.getElementById('procStepCustomInput').value = '';
   document.getElementById('procStepNote').value = '';
+  // Start the next step from the current time, rather than reusing the previous step's date/time.
+  document.getElementById('procStepDate').value = stepDateDefaultValue();
 });
 
 document.getElementById('editProcStepsRecordBtn').addEventListener('click', () => {
@@ -7230,6 +7369,54 @@ setInterval(() => {
 
 // Require PIN immediately on every page load/refresh.
 showAppLock();
+// មុខងារបង្ហាញផ្ទាំង Procedure Steps និងបញ្ចូលឈ្មោះ Treatment
+function renderProcStepsCards() {
+  if (!activeProcStepsRecordId) return;
+  const r = allRecords.find(x => x._id === activeProcStepsRecordId || x.code === activeProcStepsRecordId);
+  if (!r) return;
+
+  const container = document.getElementById('procStepsCards');
+  
+  // ១. ទាញយកឈ្មោះ Treatment មកបង្ហាញនៅខាងលើគេបង្អស់
+  let treatmentName = r.treatment || r.diagnosis || 'មិនមាន Treatment';
+  let html = `<div class="kh" style="font-weight: 800; font-size: 15px; color: var(--primary-dark); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px dashed var(--border-soft);">
+    *${treatmentName}*
+  </div>`;
+
+  const steps = r.procedureSteps || [];
+  if (steps.length === 0) {
+    html += `<div class="kh" style="font-size:12px; color:var(--ink-dim);">មិនទាន់មានជំហាននៅឡើយទេ</div>`;
+  } else {
+    // ២. បង្ហាញជំហាននីតិវិធីនីមួយៗ (1, 2, 3...)
+    html += steps.map((s, idx) => {
+      // ផ្លាស់ប្តូរត្រង់នេះ៖ បង្ហាញទាំងម៉ោង និងថ្ងៃខែពេញលេញ
+      let dateAndTime = s.date ? formatDateDisplay(s.date) : '—';
+      
+      return `
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 14px; background:var(--surface-2); border:1px solid var(--border); border-radius:10px; margin-bottom:10px;">
+        <div>
+          <div class="kh" style="font-size:13.5px; font-weight:700; color:var(--ink);">${idx + 1}. ${s.step}</div>
+          ${s.note ? `<div class="kh" style="font-size:11.5px; color:var(--ink-dim); margin-top:4px;">${s.note}</div>` : ''}
+        </div>
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div class="mono" style="font-size:11px; color:var(--ink-dim);">${dateAndTime}</div>
+          <button type="button" class="icon-btn danger" style="width:26px; height:26px; font-size:12px;" onclick="deleteProcStep(${idx})">✕</button>
+        </div>
+      </div>
+    `}).join('');
+  }
+  
+  // ៣. បន្ថែមពាក្យ "Done" នៅចុងបញ្ចប់
+  if (steps.length > 0) {
+      html += `<div class="kh" style="font-weight: 700; font-size: 13.5px; color: var(--primary-dark); margin-top: 10px;">
+        ${steps.length + 1}. Done
+      </div>`;
+  }
+  
+  if (container) {
+    container.innerHTML = html;
+  }
+}
 </script>
 </body>
 </html>
