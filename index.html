@@ -419,6 +419,8 @@
   .emr-status.missing { background: #F8D7DA; color: #721C24; border: 1px solid #721C2440; }
   .emr-status.planning { background: #EDE9FE; color: #6D28D9; border: 1px solid #6D28D940; }
   .emr-status.labo { background: #DBEAFE; color: #1D4ED8; border: 1px solid #1D4ED840; }
+  .cn-status { display:inline-block; max-width:100%; padding:4px 10px; border-radius:999px; font-size:11.5px; line-height:1.45; white-space:normal; word-break:break-word; }
+  .cn-status .mono { font-size:11px; font-weight:600; opacity:.9; white-space:nowrap; }
 
   /* Form */
   .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
@@ -3752,6 +3754,36 @@ function openTreatmentPlanPopup(patientName){
   document.getElementById('treatmentPlanOverlay').classList.remove('hidden');
 }
 
+// "2026-09-30T13:00" -> "2026/09/30 13:00:00" (24-hour, as shown in Clinical Notes status)
+function toYMDHMS24(str){
+  const d = parseAnyDate(str);
+  if(!d) return '';
+  const p = n => String(n).padStart(2,'0');
+  return `${d.getFullYear()}/${p(d.getMonth()+1)}/${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+}
+
+// Status of a case + the date that status happened (taken from its matching step, else the latest step).
+function clinicalStatusInfo(r){
+  const status = cleanStr(r.status) || 'Missing';
+  const steps = Array.isArray(r.procedureSteps) ? r.procedureSteps : [];
+  let date = '';
+  const sKey = status.toLowerCase();
+  let best = null;
+  steps.forEach(st => {
+    const d = parseAnyDate(st && st.date);
+    if(d && cleanStr(st.step).toLowerCase() === sKey && (!best || d > best)) best = d;
+  });
+  if(!best){
+    steps.forEach(st => { const d = parseAnyDate(st && st.date); if(d && (!best || d > best)) best = d; });
+  }
+  if(best) date = dateToIsoLocal(best);
+  else if(stepHighlightFor(status) && stepHighlightFor(status).id === 'appt' && r.timeLast) date = r.timeLast;
+  else date = r.doingDateTime || r.timestamp || '';
+  // colour: Appointment / Done / Missing / Lab have their own; any other step = in progress (blue)
+  const hl = stepHighlightFor(status) || { id:'doing', bg:'#E1EFFF', fg:'#0B5ED7', solid:'#0B5ED7' };
+  return { status, dateText: toYMDHMS24(date), hl };
+}
+
 function renderClinicalNotesHTML(records) {
   const rows = [...records].sort((a,b)=> (parseAnyDate(b.timestamp)||0) - (parseAnyDate(a.timestamp)||0));
   return `
@@ -3759,28 +3791,24 @@ function renderClinicalNotesHTML(records) {
       <table class="emr-table" style="table-layout:fixed; width:100%;">
         <thead>
           <tr>
-            <th style="width:16%;">Date</th>
+            <th style="width:15%;">Date</th>
             <th style="width:12%;">Tooth</th>
-            <th style="width:32%;">Treatment</th>
-            <th style="width:24%;">Last Visit / Appt</th>
-            <th style="width:16%;text-align:center;">Status</th>
+            <th style="width:35%;">Treatment</th>
+            <th style="width:38%;text-align:center;">Status</th>
           </tr>
         </thead>
         <tbody>
           ${rows.map(r => {
-            const lastStepVal = latestStepDateText(r.procedureSteps) || r.doingDateTime;   // the case's LAST step date
-            const lastOrAppt = lastStepVal
-              ? `<span class="mono" style="color:var(--ink-soft);">${toDDMMYYYY(lastStepVal)}</span>`
-              : (r.timeLast ? `<span class="mono" style="color:var(--amber-dark);font-weight:700;">🗓️ ${toDDMMYYYY(r.timeLast)}</span>` : '<span style="color:var(--ink-dim);">—</span>');
+            const si = clinicalStatusInfo(r);
+            const statusHtml = `<span class="cn-status" style="background:${si.hl.bg}; color:${si.hl.fg}; border:1px solid ${si.hl.solid}55;">
+                <b>${escHTML(si.status)}</b>${si.dateText ? ` <span class="mono">(${si.dateText})</span>` : ''}
+              </span>`;
             return `
             <tr class="emr-tr">
-              <td data-label="Date" class="mono" style="font-size:11.5px;color:var(--ink-soft);font-weight:600;">${toDDMMYYYY(r.timestamp)}</td>
-              <td data-label="Tooth" class="mono" style="font-weight:800;color:var(--primary-dark);font-size:13px;">${r.teeth || '—'}</td>
-              <td data-label="Treatment" class="kh" style="font-weight:700;color:var(--primary-dark);cursor:pointer;text-decoration:underline;text-decoration-style:dotted;" onclick="openProcedureStepsModal('${r._id}')">${r.treatment || r.diagnosis || '—'}</td>
-              <td data-label="Last Visit / Appt" style="font-size:12px;">${lastOrAppt}</td>
-              <td data-label="Status" class="kh" style="text-align:center; font-size:12px; font-weight:700; color:var(--primary-dark);">
-                ${escHTML(r.status) || '—'}
-              </td>
+              <td data-label="Date" class="mono" style="font-size:11.5px;color:var(--ink-soft);font-weight:600;vertical-align:middle;">${toDDMMYYYY(r.timestamp)}</td>
+              <td data-label="Tooth" class="mono" style="font-weight:800;color:var(--primary-dark);font-size:13px;vertical-align:middle;word-break:break-word;">${r.teeth || '—'}</td>
+              <td data-label="Treatment" class="kh" style="font-weight:700;color:var(--primary-dark);cursor:pointer;text-decoration:underline;text-decoration-style:dotted;vertical-align:middle;word-break:break-word;" onclick="openProcedureStepsModal('${r._id}')">${r.treatment || r.diagnosis || '—'}</td>
+              <td data-label="Status" class="kh" style="text-align:center;vertical-align:middle;">${statusHtml}</td>
             </tr>
           `;}).join('')}
         </tbody>
