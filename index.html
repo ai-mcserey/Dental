@@ -398,6 +398,16 @@
   .chart-legend{ display:flex; gap:16px; flex-wrap:wrap; align-items:center; justify-content:center; margin-top:10px; font-size:11px; }
   .chart-legend .lg-item{ display:flex; align-items:center; gap:6px; color:var(--ink-soft); }
   .chart-legend .lg-swatch{ width:16px; height:16px; border-radius:5px; flex-shrink:0; }
+  .status-pill{
+    padding:8px 14px; border-radius:999px; border:1.5px solid var(--border);
+    background:var(--surface); color:var(--ink-soft); font-size:12.5px; font-weight:700;
+    cursor:pointer; transition:all .12s ease;
+  }
+  .status-pill:hover{ border-color:var(--pill-color, var(--primary)); }
+  .status-pill.active{
+    background:var(--pill-color, var(--primary)); border-color:var(--pill-color, var(--primary));
+    color:#fff; box-shadow:0 3px 8px -3px rgba(0,0,0,0.3);
+  }
   .arch-label { font-size: 10.5px; text-align: center; color: var(--ink-dim); letter-spacing: .05em; text-transform: uppercase; margin: 10px 0; font-weight: 800; }
 
   .emr-notes-section { 
@@ -693,7 +703,6 @@
   .chip-dot.planning{ background:#6D28D9; }
   .chip-dot.labo{ background:#1D4ED8; }
   .chip-dot.done{ background:var(--primary); }
-  .chip-dot.yesterday{ background:#0F766E; }
   .chip[aria-pressed="true"] .chip-dot{ box-shadow:0 0 0 2px rgba(255,255,255,.85); }
   .chip-n{ font-family:'IBM Plex Mono',monospace; font-size:11px; opacity:.8; }
 
@@ -702,8 +711,6 @@
   #recordList[data-filter="planning"] .record-card:not([data-state="planning"]),
   #recordList[data-filter="labo"] .record-card:not([data-state="labo"]),
   #recordList[data-filter="done"] .record-card:not([data-state="done"]){ display:none; }
-  #recordList[data-filter="yesterday"] .record-card:not([data-yesterday="1"]){ display:none; }
-  #recordList[data-filter="yesterday"] .section-title{ display:none; }
 
   /* content width follows the space next to the sidebar, not the screen */
   @container (max-width: 820px){
@@ -959,7 +966,6 @@
           <button type="button" class="chip" data-filter="planning" aria-pressed="false"><span class="chip-dot planning"></span>Planning<span class="chip-n">0</span></button>
           <button type="button" class="chip" data-filter="labo" aria-pressed="false"><span class="chip-dot labo"></span>ពុម្ភធ្មេញ<span class="chip-n">0</span></button>
           <button type="button" class="chip" data-filter="done" aria-pressed="false"><span class="chip-dot done"></span>Done<span class="chip-n">0</span></button>
-          <button type="button" class="chip" data-filter="yesterday" aria-pressed="false"><span class="chip-dot yesterday"></span>Yesterday<span class="chip-n">0</span></button>
         </div>
         <div class="record-list" id="recordList" data-filter="all"></div>
         <div class="empty-state kh hidden" id="filterEmpty">មិនមានអ្នកជំងឺក្នុងស្ថានភាពនេះទេ<br><span style="opacity:.7">No patients with this status</span></div>
@@ -1489,7 +1495,7 @@
             </div>
           </div>
 
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 0;">
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
             <div>
               <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">បានបង់សរុប (Paid) — Auto</div>
               <input type="text" id="f_payPaid" class="mono" readonly style="color:var(--primary-dark); font-weight:bold; background:var(--surface-2);">
@@ -1500,6 +1506,28 @@
             </div>
           </div>
 
+          <!-- លាក់ ដំណាក់កាលបង់ (Stage) និង វិធីបង់ប្រាក់ (Method) -->
+          <div style="display:none; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+            <div>
+              <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">ដំណាក់កាលបង់ (Stage)</div>
+              <input type="text" id="f_payStage" class="kh" placeholder="ឧ. លើកទី១, បង់ពេញ...">
+            </div>
+            <div>
+              <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">វិធីបង់ប្រាក់ (Method)</div>
+              <select id="f_payMethod" class="kh">
+                <option value="សាច់ប្រាក់ (Cash)">សាច់ប្រាក់ (Cash)</option>
+                <option value="ABA Bank">ABA Bank</option>
+                <option value="Acleda Bank">Acleda Bank</option>
+                <option value="ផ្សេងៗ (Other)">ផ្សេងៗ (Other)</option>
+              </select>
+            </div>
+          </div>
+          
+          <!-- លាក់ ចំណាំ (Note) -->
+          <div class="field" style="display:none; margin:0;">
+            <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">ចំណាំ (Note)</div>
+            <input type="text" id="f_payNote" class="kh" placeholder="ចំណាំផ្សេងៗបន្ថែម...">
+          </div>
         </div>
 
         <!-- ប្រវត្តិការបង់ប្រាក់ Payment History (installments) -->
@@ -1770,11 +1798,9 @@
           </div>
           <div class="field" style="margin:0; flex:2; min-width:140px;">
             <input type="text" id="procStepNote" class="kh" placeholder="ចំណាំ (Note) — ស្រេចចិត្ត...">
-            <datalist id="procStepLabList"></datalist>
           </div>
           <button type="button" class="btn btn-primary btn-sm kh" id="addProcStepBtn" style="height:38px;">＋ បន្ថែម</button>
         </div>
-        <div id="procStepLabHint" class="kh" style="display:none; margin-top:8px; font-size:12px; color:#5B21B6; background:#EDE9FE; padding:6px 10px; border-radius:8px;"></div>
       </div>
     </div>
   </div>
@@ -2097,17 +2123,18 @@ function format12Hour(hour24, minute){
 function toDDMMYYYY(str){
   const d = parseAnyDate(str);
   if(!d) return '—';
-  return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+  // ប្តូរទៅជា mm/dd/yyyy
+  return `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}/${d.getFullYear()}`;
 }
 
-// Same as above, but appends HH:MM (24-hour) when the stored value actually contains a time.
 function toDDMMYYYYTime(str){
   const d = parseAnyDate(str);
   if(!d) return '—';
-  const base = `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}`;
+  // ប្តូរទៅជា mm/dd/yyyy hh:mm:ss
+  const base = `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}/${d.getFullYear()}`;
   const hasTime = /[T\s]\d{1,2}:\d{2}/.test(cleanStr(str));
   if(!hasTime) return base;
-  return `${base} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+  return `${base} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:00`;
 }
 
 function parseAnyDate(str){
@@ -2157,34 +2184,33 @@ function formatDateDisplay(str){
     const mn = String(m[5]).padStart(2, '0');
     const ampm = m[6].toUpperCase();
     if(hr === 0) hr = 12;
-    return `${yr}/${mo}/${da} ${String(hr).padStart(2, '0')}:${mn} ${ampm}`;
+    return `${mo}/${da}/${yr} ${String(hr).padStart(2, '0')}:${mn}:00 ${ampm}`;
   }
 
-  m = s.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})(?:[T\s](\d{1,2}))?/);
+  m = s.match(/^(\d{4})[-\/.](\d{1,2})[-\/.](\d{1,2})(?:[T\s](\d{1,2}):(\d{1,2}))?/);
   if(m){
     const yr = m[1];
     const mo = String(m[2]).padStart(2, '0');
     const da = String(m[3]).padStart(2, '0');
     if(m[4] !== undefined){
-      return `${yr}/${mo}/${da} ${format12Hour(m[4], m[5])}`;
+      return `${mo}/${da}/${yr} ${String(m[4]).padStart(2,'0')}:${String(m[5]||'0').padStart(2,'0')}:00`;
     }
-    return `${yr}/${mo}/${da}`;
+    return `${mo}/${da}/${yr}`;
   }
 
-  m = s.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})(?:[T\s](\d{1,2}))?/);
+  m = s.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{4})(?:[T\s](\d{1,2}):(\d{1,2}))?/);
   if(m){
     const yr = m[3];
     const mo = String(m[2]).padStart(2, '0');
     const da = String(m[1]).padStart(2, '0');
     if(m[4] !== undefined){
-      return `${yr}/${mo}/${da} ${format12Hour(m[4], m[5])}`;
+      return `${mo}/${da}/${yr} ${String(m[4]).padStart(2,'0')}:${String(m[5]||'0').padStart(2,'0')}:00`;
     }
-    return `${yr}/${mo}/${da}`;
+    return `${mo}/${da}/${yr}`;
   }
 
   return s;
 }
-
 function dateToYMDTime(str){
   if(!str) return '';
   const s = cleanStr(str);
@@ -2218,6 +2244,154 @@ function patientKey(r){
 }
 
 const procSelect = document.getElementById('f_procedure_select');
+
+// Each status row is now independent (not mutually exclusive), with its own date (+ Do where relevant).
+// The record's single overall `status` is derived from whichever ticked row has the latest date.
+const statusChecks = {
+  Done: document.getElementById('f_statusDone'),
+  Doing: document.getElementById('f_statusDoing'),
+  Missing: document.getElementById('f_statusMissing'),
+  Appt: document.getElementById('f_statusAppt'),
+  Labo: document.getElementById('f_statusLabo'),
+  Planning: document.getElementById('f_statusPlanning')
+};
+const STATUS_ROW_FIELDS_ID = {
+  Done: 'doneFields', Doing: 'doingStatusFields', Missing: 'missFields', Appt: 'apptFields', Labo: 'laboFields', Planning: 'planningFields'
+};
+const STATUS_ROW_DATE_ID = {
+  Done: 'f_doneDate', Doing: 'f_doingStatusDate', Missing: 'f_missDate', Appt: 'f_apptDateTime', Labo: 'f_labDate', Planning: 'f_planningDate'
+};
+
+function setStatusCheckbox(status){
+  // Legacy-compatible helper: ticks exactly one row (used when opening a NEW/quick-add form).
+  Object.keys(statusChecks).forEach(key => {
+    if(!statusChecks[key]) return;
+    statusChecks[key].checked = (key === status);
+    updateStatusRowVisibility(key);
+  });
+}
+
+function updateStatusRowVisibility(key){
+  const fieldsEl = document.getElementById(STATUS_ROW_FIELDS_ID[key]);
+  if(!fieldsEl) return;
+  const checked = statusChecks[key] && statusChecks[key].checked;
+  fieldsEl.style.display = checked ? 'block' : 'none';
+}
+
+function computeOverallStatus(){
+  const candidates = [];
+  Object.keys(statusChecks).forEach(key => {
+    if(!statusChecks[key] || !statusChecks[key].checked) return;
+    const dateVal = document.getElementById(STATUS_ROW_DATE_ID[key]).value;
+    if(dateVal){
+      const t = parseAnyDate(dateVal);
+      if(t) candidates.push({ key, time: t.getTime() });
+    } else {
+      candidates.push({ key, time: -Infinity }); // ticked but no date — lowest priority
+    }
+  });
+  if(candidates.length === 0) return 'Missing';
+  candidates.sort((a,b) => b.time - a.time);
+  return candidates[0].key;
+}
+
+function getCheckedStatus(){
+  return computeOverallStatus();
+}
+
+function populateStatusFieldsFromRecord(editRecord){
+  // Determine the single "current" status for this record: whichever recorded date is most recent.
+  const candidates = [
+    { key: 'Done', date: editRecord.doneDate },
+    { key: 'Doing', date: editRecord.doingStatusDate },
+    { key: 'Missing', date: editRecord.missDate },
+    { key: 'Appt', date: editRecord.timeLast ? dateToYMDTime(editRecord.timeLast).slice(0,10) : '' },
+    { key: 'Labo', date: editRecord.labDate },
+    { key: 'Planning', date: editRecord.planningDate }
+  ].filter(c => c.date);
+
+  let currentKey;
+  if(candidates.length > 0){
+    candidates.sort((a,b) => b.date.localeCompare(a.date));
+    currentKey = candidates[0].key;
+  } else {
+    const legacyStatus = editRecord.status === 'Doing' ? 'Doing' : editRecord.status;
+    currentKey = ['Done','Doing','Missing','Appt','Labo','Planning'].includes(legacyStatus) ? legacyStatus : 'Missing';
+  }
+
+  // Clear all fields first, then populate only the ones relevant to the current status.
+  document.getElementById('f_doneDate').value = '';
+  document.getElementById('f_doingStatusDate').value = '';
+  document.getElementById('f_missDate').value = '';
+  document.getElementById('f_apptDateTime').value = '';
+  document.getElementById('f_planDo').value = '';
+  document.getElementById('f_labDate').value = '';
+  document.getElementById('f_labDo').value = '';
+  document.getElementById('f_planningDate').value = '';
+  document.getElementById('f_planningDo').value = '';
+
+  if(currentKey === 'Done') document.getElementById('f_doneDate').value = editRecord.doneDate || getLocalTodayYMD();
+  else if(currentKey === 'Doing') document.getElementById('f_doingStatusDate').value = editRecord.doingStatusDate || getLocalTodayYMD();
+  else if(currentKey === 'Missing') document.getElementById('f_missDate').value = editRecord.missDate || getLocalTodayYMD();
+  else if(currentKey === 'Appt'){
+    document.getElementById('f_apptDateTime').value = editRecord.timeLast ? dateToYMDTime(editRecord.timeLast) : getLocalNowDateTime();
+    document.getElementById('f_planDo').value = editRecord.planDo || '';
+  } else if(currentKey === 'Labo'){
+    document.getElementById('f_labDate').value = editRecord.labDate || getLocalTodayYMD();
+    document.getElementById('f_labDo').value = editRecord.labDo || '';
+  } else if(currentKey === 'Planning'){
+    document.getElementById('f_planningDate').value = editRecord.planningDate || getLocalTodayYMD();
+    document.getElementById('f_planningDo').value = editRecord.planningDo || '';
+  }
+
+  selectStatusPill(currentKey, true);
+}
+
+function saveStatusForActiveRecord(){
+  // Status now lives only in the Procedure Steps popup — only save when that popup is actually open.
+  if(!activeProcStepsRecordId) return;
+  const r = allRecords.find(x => x._id === activeProcStepsRecordId);
+  if(!r) return;
+
+  r.status = computeOverallStatus();
+  r.doneDate = (statusChecks.Done && statusChecks.Done.checked) ? document.getElementById('f_doneDate').value : '';
+  r.doingStatusDate = (statusChecks.Doing && statusChecks.Doing.checked) ? document.getElementById('f_doingStatusDate').value : '';
+  r.missDate = (statusChecks.Missing && statusChecks.Missing.checked) ? document.getElementById('f_missDate').value : '';
+  const apptRaw = (statusChecks.Appt && statusChecks.Appt.checked) ? document.getElementById('f_apptDateTime').value : '';
+  r.timeLast = apptRaw ? formatDateDisplay(apptRaw) : '';
+  r.planDo = (statusChecks.Appt && statusChecks.Appt.checked) ? document.getElementById('f_planDo').value.trim() : '';
+  r.labDate = (statusChecks.Labo && statusChecks.Labo.checked) ? document.getElementById('f_labDate').value : '';
+  r.labDo = (statusChecks.Labo && statusChecks.Labo.checked) ? document.getElementById('f_labDo').value.trim() : '';
+  r.planningDate = (statusChecks.Planning && statusChecks.Planning.checked) ? document.getElementById('f_planningDate').value : '';
+  r.planningDo = (statusChecks.Planning && statusChecks.Planning.checked) ? document.getElementById('f_planningDo').value.trim() : '';
+
+  saveLocalRecords();
+  const payload = {...r, payments: JSON.stringify(r.payments || []), procedureStepsJSON: JSON.stringify(r.procedureSteps || [])};
+  try{ pushToSheet('updateRecord', payload); }catch(err){ console.warn('Sync queue error:', err); }
+
+  autoSyncLabFromStatus(r);
+}
+
+function selectStatusPill(key, skipSave){
+  Object.keys(statusChecks).forEach(k => {
+    if(statusChecks[k]) statusChecks[k].checked = (k === key);
+    updateStatusRowVisibility(k);
+  });
+  const dropdown = document.getElementById('statusDropdown');
+  if(dropdown) dropdown.value = key;
+  document.getElementById('statusNoSelection').style.display = 'none';
+
+  const dateEl = document.getElementById(STATUS_ROW_DATE_ID[key]);
+  if(dateEl && !dateEl.value){
+    dateEl.value = (dateEl.type === 'date') ? getLocalTodayYMD() : getLocalNowDateTime();
+  }
+  if(!skipSave) saveStatusForActiveRecord();
+}
+
+['f_doneDate','f_doingStatusDate','f_missDate','f_apptDateTime','f_planDo','f_labDate','f_labDo','f_planningDate','f_planningDo'].forEach(id => {
+  const el = document.getElementById(id);
+  if(el) el.addEventListener('change', saveStatusForActiveRecord);
+});
 
 function calcBal() {
   let tot = parseFloat(document.getElementById('f_payTotal').value.replace(/[^\d.]/g,'')) || 0;
@@ -2575,9 +2749,9 @@ function stepDateToSheetText(str){
   if(!d) return '';
   const y = d.getFullYear(), mo = String(d.getMonth()+1).padStart(2,'0'), da = String(d.getDate()).padStart(2,'0');
   const hasTime = /[T\s]\d{1,2}:\d{2}/.test(cleanStr(str));
-  if(!hasTime) return `${y}/${mo}/${da}`;
+  if(!hasTime) return `${mo}/${da}/${y}`;
   let h = d.getHours(); const ap = h >= 12 ? 'PM' : 'AM'; h = h % 12; if(h === 0) h = 12;
-  return `${y}/${mo}/${da} ${String(h).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')} ${ap}`;
+  return `${mo}/${da}/${y} ${String(h).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}:00 ${ap}`;
 }
 
 // "2026/09/27 02:00 PM" -> "2026-09-27T14:00" (the app's own step format); date-only stays date-only.
@@ -2624,64 +2798,6 @@ function parseDoingWithDates(str){
   return anyDate ? out : null;
 }
 
-// The date of a record's procedure is no longer a separate Sheet column: it is the date of its most recent step.
-function latestStepDateText(steps){
-  if(!Array.isArray(steps) || steps.length === 0) return '';
-  let best = null, bestT = -Infinity;
-  steps.forEach(s => { const d = parseAnyDate(s && s.date); if(d && d.getTime() > bestT){ bestT = d.getTime(); best = s.date; } });
-  return best ? stepDateToSheetText(best) : '';
-}
-
-/* ---------- Last visit / appointment come from the STEPS ---------- */
-function patientHasSteps(list){
-  return (list || []).some(r => Array.isArray(r.procedureSteps) && r.procedureSteps.length > 0);
-}
-// Every date a patient's records were worked on: each step's date (older records with no steps contribute
-// their procedure/visit date).
-function patientStepDates(list){
-  const out = [];
-  (list || []).forEach(r => {
-    if(Array.isArray(r.procedureSteps) && r.procedureSteps.length){
-      r.procedureSteps.forEach(s => { const d = parseAnyDate(s && s.date); if(d) out.push(d); });
-    } else {
-      const d = parseAnyDate(r.doingDateTime || r.timestamp);
-      if(d) out.push(d);
-    }
-  });
-  return out;
-}
-// Last visit = the latest step date that has already happened.
-function patientLastVisitDate(list, now){
-  now = now || new Date(); let best = null;
-  patientStepDates(list).forEach(d => { if(d <= now && (!best || d > best)) best = d; });
-  return best;
-}
-// Appointment = the next step date still to come.
-function patientNextApptDate(list, now){
-  now = now || new Date(); let best = null;
-  patientStepDates(list).forEach(d => { if(d > now && (!best || d < best)) best = d; });
-  return best;
-}
-// The very last step date (past or future).
-function patientLatestStepDate(list){
-  let best = null;
-  patientStepDates(list).forEach(d => { if(!best || d > best) best = d; });
-  return best;
-}
-function fmtDMY(d){
-  return d ? `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}/${d.getFullYear()}` : '—';
-}
-function dateToIsoLocal(d){
-  const p = n => String(n).padStart(2,'0');
-  return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;
-}
-
-// "Opening, Shaping" (older records, or the case form's Procedure) -> one step per name, all on the given date.
-function stepsFromDoingString(doing, dateStr){
-  const d = sheetTextToStepDate(dateStr) || cleanStr(dateStr);
-  return cleanStr(doing).split(',').map(s => s.trim()).filter(Boolean).map(name => ({ step: name, date: d, note: '' }));
-}
-
 // Every record sent to the Sheet passes through here, so the steps (JSON column) and the dated procedure text
 // are always included -- previously some saves (e.g. the Edit Case form) sent neither and blanked the steps.
 function normalizeRecordForSheet(rec){
@@ -2690,14 +2806,15 @@ function normalizeRecordForSheet(rec){
   if(steps){
     out.procedureStepsJSON = JSON.stringify(steps);
     out.doing = buildDoingForSheet(rec);
-    const latest = latestStepDateText(steps);
-    if(latest) out.doingDateTime = latest;
   }
   delete out.procedureSteps;
+  
+  // បន្ថែមកូដនេះដើម្បីលុបទិន្នន័យ doingDateTime ចោល កុំឱ្យវាបញ្ជូនទៅកាន់ Sheet
+  delete out.doingDateTime; 
+
   if(Array.isArray(out.payments)) out.payments = JSON.stringify(out.payments);
   return out;
 }
-
 function pushToSheet(action, data){
   if((action === 'addRecord' || action === 'updateRecord') && data && typeof data === 'object'){
     data = normalizeRecordForSheet(data);
@@ -2772,9 +2889,6 @@ async function fetchFromSheet(isSilent = false){
           if(procedureSteps.length === 0) procedureSteps = stepsFromDoing;   // rebuild the steps, with their dates
           doing = stepsFromDoing.map(s => s.step).join(', ');               // inside the app it stays plain names
         }
-        // The procedure date comes from the steps (the old separate DateProcedure column is no longer used).
-        const derivedProcDate = latestStepDateText(procedureSteps);
-        if(derivedProcDate) doingDateTime = derivedProcDate;
 
         let timestamp = cleanStr(r['timestamp'] || r[0] || '');
         let code = cleanStr(r['code'] || r[1] || '') || ('row_' + i);
@@ -2952,7 +3066,7 @@ function renderApptRow(item){
   hr = hr % 12;
   if(hr === 0) hr = 12;
   const timeStr = `${String(hr).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')} ${ampm}`;
-  const dayStr = `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
+  const dayStr = `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}/${d.getFullYear()}`;
   const planText = cleanStr(r.planDo) || cleanStr(r.treatment) || cleanStr(r.diagnosis) || 'ពិនិត្យព្យាបាល';
 
   return `
@@ -3006,15 +3120,13 @@ function getTodayQueue(){
   allRecords.forEach(r => {
     const apptDt = r.timeLast ? parseAnyDate(r.timeLast) : null;
     const doDt = r.doingDateTime ? parseAnyDate(r.doingDateTime) : null;
-    let stepToday = null;   // any step of this record dated today (its earliest one)
-    (r.procedureSteps || []).forEach(s => { const d = parseAnyDate(s && s.date); if(d && d >= dayStart && d <= dayEnd && (!stepToday || d < stepToday)) stepToday = d; });
     const isApptToday = apptDt && apptDt >= dayStart && apptDt <= dayEnd;
-    const isDoToday = (doDt && doDt >= dayStart && doDt <= dayEnd) || !!stepToday;
+    const isDoToday = doDt && doDt >= dayStart && doDt <= dayEnd;
     if(!isApptToday && !isDoToday) return;
     const key = r._id || (r.name + r.timestamp);
     if(seen.has(key)) return;
     seen.add(key);
-    queue.push({ r, d: isApptToday ? apptDt : (stepToday || doDt), isAppt: isApptToday });
+    queue.push({ r, d: isApptToday ? apptDt : doDt, isAppt: isApptToday });
   });
   queue.sort((a,b) => a.d - b.d);
   return queue;
@@ -3287,27 +3399,15 @@ function buildPatientGroups(filterFn){
       }
     });
 
-    const stepLatest = patientHasSteps(list) ? patientLatestStepDate(list) : null;
-    let lastVisitVal = stepLatest ? dateToIsoLocal(stepLatest)
-      : (activeAppt ? activeAppt.record.timeLast : (latest.timeLast || latest.doingDateTime || latest.timestamp));
+    let lastVisitVal = activeAppt ? activeAppt.record.timeLast : (latest.timeLast || latest.doingDateTime || latest.timestamp);
     let hasActiveAppt = !!activeAppt;
 
     return {latest, list, sorted, lastVisitVal, hasActiveAppt, activeAppt};
   });
 
-  patients.sort((a,b)=> (parseAnyDate(b.latest.doingDateTime || b.latest.timestamp)||0) - (parseAnyDate(a.latest.doingDateTime || a.latest.timestamp)||0));
+  // កូដថ្មីដែលតម្រៀបតាមកាលបរិច្ឆេទព្យាបាលជាក់ស្តែង
+  patients.sort((a,b)=> (parseAnyDate(b.lastVisitVal)||0) - (parseAnyDate(a.lastVisitVal)||0));
   return patients;
-}
-
-// A patient "belongs" to a day when any of their records has activity dated on that day: a step, or (for older
-// records that have no steps) the procedure/visit date, or an appointment date. Used by "Today" and "Yesterday".
-function patientHasActivityBetween(p, from, to){
-  const within = v => { const d = parseAnyDate(v); return !!(d && d >= from && d < to); };
-  return (p.list || []).some(r => {
-    if(r.timeLast && within(r.timeLast)) return true;
-    if(Array.isArray(r.procedureSteps) && r.procedureSteps.length) return r.procedureSteps.some(s => within(s && s.date));
-    return within(r.doingDateTime || r.timestamp);
-  });
 }
 
 function buildPatientRowHTML(p, startOfToday){
@@ -3317,7 +3417,7 @@ function buildPatientRowHTML(p, startOfToday){
     if (p.lastVisitVal) {
       let d = parseAnyDate(p.lastVisitVal);
       if (d) {
-        dStr = `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
+        dStr = `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}/${d.getFullYear()}`;
         let hr = d.getHours();
         const ampm = hr >= 12 ? 'PM' : 'AM';
         hr = hr % 12;
@@ -3373,7 +3473,7 @@ function buildPatientRowHTML(p, startOfToday){
     }
 
     return `
-    <div class="appt-row record-card${cardClass}" data-name="${nameKey}" data-state="${stateKey}" data-yesterday="${(() => { const y = new Date(startOfToday); y.setDate(y.getDate() - 1); return patientHasActivityBetween(p, y, startOfToday) ? '1' : '0'; })()}">
+    <div class="appt-row record-card${cardClass}" data-name="${nameKey}" data-state="${stateKey}">
       <div class="appt-time">
         <div class="mono">${tStr}</div>
         <div class="appt-day mono">${dStr}</div>
@@ -3406,11 +3506,9 @@ function renderListBase(){
   }
 
   const isToday = (p) => {
-    if(p.lastVisitVal){
-      const d = parseAnyDate(p.lastVisitVal);
-      if(d && d >= startOfToday && d < startOfTomorrow) return true;
-    }
-    return patientHasActivityBetween(p, startOfToday, startOfTomorrow);
+    if(!p.lastVisitVal) return false;
+    const d = parseAnyDate(p.lastVisitVal);
+    return d && d >= startOfToday && d < startOfTomorrow;
   };
   const todayPatients = patients.filter(isToday);
   const otherPatients = patients.filter(p => !isToday(p));
@@ -3540,6 +3638,16 @@ function getAllTreatedTeethSet(records){
   return set;
 }
 
+function getPlannedTeethSet(records){
+  const set = new Set();
+  records.forEach(r=>{
+    if(r.status === 'Planning' || r.status === 'Appt'){
+      parseTeeth(r.teeth).forEach(t=> set.add(t));
+    }
+  });
+  return set;
+}
+
 function openToothHistoryModal(toothNum, patientName){
   const records = getPatientRecords(patientName);
   
@@ -3582,17 +3690,9 @@ function openToothHistoryModal(toothNum, patientName){
   document.getElementById('toothHistoryModalOverlay').classList.remove('hidden');
 }
 
-// Deleting a whole patient always needs the clinic PIN first (then the usual "are you sure?" confirmation).
 function deletePatient(patientName){
   if(!patientName) return;
-  requestClinicPin(() => deletePatientConfirmed(patientName));
-}
-
-function deletePatientConfirmed(patientName){
-  if(!patientName) return;
-  const linkedLab = autoLabLinkedTo(allRecords.filter(r => cleanStr(r.name).toLowerCase() === cleanStr(patientName).toLowerCase()));
-  showConfirm(`តើលោកអ្នកពិតជាចង់លុបកំណត់ត្រាទាំងអស់របស់អ្នកជំងឺ "${patientName}" មែនទេ?\nសកម្មភាពនេះមិនអាចត្រឡប់ក្រោយបានឡើយ!${autoLabWarning(linkedLab)}`, ()=>{
-    linkedLab.orders.forEach(o => removeLabOrderCascade(o.id));
+  showConfirm(`តើលោកអ្នកពិតជាចង់លុបកំណត់ត្រាទាំងអស់របស់អ្នកជំងឺ "${patientName}" មែនទេ?\nសកម្មភាពនេះមិនអាចត្រឡប់ក្រោយបានឡើយ!`, ()=>{
     const normalized = cleanStr(patientName).toLowerCase();
     deletedIdentifiers.add(normalized);
     
@@ -3618,9 +3718,7 @@ function deleteSingleRecordById(recordId){
   const diagStr = recToDelete.treatment || recToDelete.diagnosis || '';
   const teethStr = recToDelete.teeth ? ` (ធ្មេញ ${recToDelete.teeth})` : '';
 
-  const linkedLab = autoLabLinkedTo([recToDelete]);
-  showConfirm(`តើលោកអ្នកពិតជាចង់លុបកំណត់ត្រា "${diagStr}${teethStr} - ${dateStr}" នេះមែនទេ?${autoLabWarning(linkedLab)}`, ()=>{
-    linkedLab.orders.forEach(o => removeLabOrderCascade(o.id));
+  showConfirm(`តើលោកអ្នកពិតជាចង់លុបកំណត់ត្រា "${diagStr}${teethStr} - ${dateStr}" នេះមែនទេ?`, ()=>{
     const pName = cleanStr(recToDelete.name).toLowerCase();
     const itemKey = `${pName}_${cleanStr(recToDelete.timestamp)}_${cleanStr(recToDelete.treatment || recToDelete.diagnosis)}`;
     
@@ -3764,30 +3862,36 @@ function openTreatmentPlanPopup(patientName){
 }
 
 function renderClinicalNotesHTML(records) {
+  // Assign a running visit number per record, oldest = Visit 1.
+  const chronoAsc = [...records].sort((a,b)=> (parseAnyDate(a.timestamp)||0) - (parseAnyDate(b.timestamp)||0));
+  const visitNumById = new Map();
+  chronoAsc.forEach((r, idx) => visitNumById.set(r._id, idx + 1));
+
   const rows = [...records].sort((a,b)=> (parseAnyDate(b.timestamp)||0) - (parseAnyDate(a.timestamp)||0));
   return `
     <div class="emr-table-wrap">
       <table class="emr-table" style="table-layout:fixed; width:100%;">
         <thead>
           <tr>
-            <th style="width:16%;">Date</th>
-            <th style="width:12%;">Tooth</th>
-            <th style="width:32%;">Treatment</th>
-            <th style="width:24%;">Last Visit / Appt</th>
+            <th style="width:14%;">Date</th>
+            <th style="width:10%;">Tooth</th>
+            <th style="width:28%;">Treatment</th>
+            <th style="width:10%;text-align:center;">Visit</th>
+            <th style="width:22%;">Last Visit / Appt</th>
             <th style="width:16%;text-align:center;">Status</th>
           </tr>
         </thead>
         <tbody>
           ${rows.map(r => {
-            const lastStepVal = latestStepDateText(r.procedureSteps) || r.doingDateTime;   // the case's LAST step date
-            const lastOrAppt = lastStepVal
-              ? `<span class="mono" style="color:var(--ink-soft);">${toDDMMYYYY(lastStepVal)}</span>`
-              : (r.timeLast ? `<span class="mono" style="color:var(--amber-dark);font-weight:700;">🗓️ ${toDDMMYYYY(r.timeLast)}</span>` : '<span style="color:var(--ink-dim);">—</span>');
+            const lastOrAppt = r.timeLast
+              ? `<span class="mono" style="color:var(--amber-dark);font-weight:700;">🗓️ ${toDDMMYYYY(r.timeLast)}</span>`
+              : (r.doingDateTime ? `<span class="mono" style="color:var(--ink-soft);">${toDDMMYYYY(r.doingDateTime)}</span>` : '<span style="color:var(--ink-dim);">—</span>');
             return `
             <tr class="emr-tr">
               <td data-label="Date" class="mono" style="font-size:11.5px;color:var(--ink-soft);font-weight:600;">${toDDMMYYYY(r.timestamp)}</td>
               <td data-label="Tooth" class="mono" style="font-weight:800;color:var(--primary-dark);font-size:13px;">${r.teeth || '—'}</td>
               <td data-label="Treatment" class="kh" style="font-weight:700;color:var(--primary-dark);cursor:pointer;text-decoration:underline;text-decoration-style:dotted;" onclick="openProcedureStepsModal('${r._id}')">${r.treatment || r.diagnosis || '—'}</td>
+              <td data-label="Visit" class="mono" style="text-align:center;font-weight:700;color:var(--ink-soft);">${visitNumById.get(r._id) || '—'}</td>
               <td data-label="Last Visit / Appt" style="font-size:12px;">${lastOrAppt}</td>
               <td data-label="Status" class="kh" style="text-align:center; font-size:12px; font-weight:700; color:var(--primary-dark);">
                 ${escHTML(r.status) || '—'}
@@ -3941,14 +4045,8 @@ function openPatientRecord(name){
 
   const sexKhmer = realSex.toUpperCase() === 'M' ? 'ប្រុស (M)' : (realSex.toUpperCase() === 'F' ? 'ស្រី (F)' : '—');
   const ageDisplay = realAge !== '' ? `${realAge} ឆ្នាំ` : '—';
-  // "Last visit" = the latest step date that already happened; "Appointment" = the next step date still to come.
-  // (Patients whose records have no steps at all keep the old behaviour.)
-  const headerNow = new Date();
-  const stepBased = patientHasSteps(records);
-  const headerLast = stepBased ? patientLastVisitDate(records, headerNow) : null;
-  const headerNext = stepBased ? patientNextApptDate(records, headerNow) : null;
-  const lastVisitFormatted = headerLast ? fmtDMY(headerLast) : formatDateDisplay(latest.timestamp);
-  const nextApptFormatted = stepBased ? (headerNext ? fmtDMY(headerNext) : '—') : (latest.timeLast ? formatDateDisplay(latest.timeLast) : '—');
+  const lastVisitFormatted = formatDateDisplay(latest.timestamp);
+  const nextApptFormatted = latest.timeLast ? formatDateDisplay(latest.timeLast) : '—';
 
   const safeName = latest.name.replace(/'/g, "\\'");
   
@@ -4368,7 +4466,10 @@ function openForm(editRecord, prefill){
     document.getElementById('f_payTotal').value = editRecord.payTotal || '';
     document.getElementById('f_payDiscount').value = editRecord.payDiscount || '';
     document.getElementById('f_payPaid').value = editRecord.payPaid || '';
+    document.getElementById('f_payStage').value = editRecord.payStage || '';
     document.getElementById('f_payBalance').value = editRecord.payBalance || '';
+    document.getElementById('f_payMethod').value = editRecord.payMethod || 'សាច់ប្រាក់ (Cash)';
+    document.getElementById('f_payNote').value = editRecord.payNote || '';
 
     if(Array.isArray(editRecord.payments) && editRecord.payments.length > 0){
       currentPayments = editRecord.payments.map(p => ({...p}));
@@ -4413,6 +4514,7 @@ function openForm(editRecord, prefill){
     procSelect.value = defProc.name || '';
 
     document.getElementById('f_doingDateTime').value = nowDateTime;
+    setStatusCheckbox('Appt');
     currentPayments = [];
     document.getElementById('addPaymentRow').style.display = 'none';
     renderPaymentHistory();
@@ -4420,7 +4522,10 @@ function openForm(editRecord, prefill){
     document.getElementById('f_payDate').value = todayDateOnly;
     document.getElementById('f_payDiscount').value = '';
     document.getElementById('f_payPaid').value = '';
+    document.getElementById('f_payStage').value = '';
     document.getElementById('f_payBalance').value = '';
+    document.getElementById('f_payMethod').value = 'សាច់ប្រាក់ (Cash)';
+    document.getElementById('f_payNote').value = '';
     document.getElementById('f_payTotal').value = '';
     updateProcedurePriceTotal();
 
@@ -4448,6 +4553,7 @@ function openForm(editRecord, prefill){
     procSelect.value = defProc2.name || '';
 
     document.getElementById('f_doingDateTime').value = nowDateTime;
+    setStatusCheckbox('Appt');
     currentPayments = [];
     document.getElementById('addPaymentRow').style.display = 'none';
     renderPaymentHistory();
@@ -4455,7 +4561,10 @@ function openForm(editRecord, prefill){
     document.getElementById('f_payDate').value = todayDateOnly;
     document.getElementById('f_payDiscount').value = '';
     document.getElementById('f_payPaid').value = '';
+    document.getElementById('f_payStage').value = '';
     document.getElementById('f_payBalance').value = '';
+    document.getElementById('f_payMethod').value = 'សាច់ប្រាក់ (Cash)';
+    document.getElementById('f_payNote').value = '';
     document.getElementById('f_payTotal').value = '';
     updateProcedurePriceTotal();
 
@@ -4524,14 +4633,6 @@ function saveRecord(){
       status: 'Missing', timeLast: '', planDo: '', doneDate: '', doingStatusDate: '',
       missDate: '', labDate: '', labDo: '', planningDate: '', planningDo: ''
     };
-    // The case's own Procedure becomes its first dated step, so the Sheet's Procedure column carries a date from
-    // the very first save. (Existing steps are always kept as they are.)
-    let stepsForRec = (wasEditing && editingOriginalRecord && Array.isArray(editingOriginalRecord.procedureSteps)) ? editingOriginalRecord.procedureSteps : [];
-    if(stepsForRec.length === 0 && doingVal){
-      stepsForRec = stepsFromDoingString(doingVal, doingDateTimeVal || visitDateTimeVal || getLocalNowDateTime());
-      if(stepsForRec.length) preservedStatus.status = stepsForRec[stepsForRec.length - 1].step;   // Status = latest procedure
-    }
-
     const medItems = getPrescriptionData();
     const medicationString = stringifyPrescription(medItems);
 
@@ -4554,7 +4655,7 @@ function saveRecord(){
       timeLast: preservedStatus.timeLast, 
       planDo: preservedStatus.planDo, 
       doing: doingVal, 
-      doingDateTime: latestStepDateText(stepsForRec) || (doingDateTimeVal ? formatDateDisplay(doingDateTimeVal) : ''), 
+      doingDateTime: doingDateTimeVal ? formatDateDisplay(doingDateTimeVal) : '', 
       medication: medicationString, 
       status: preservedStatus.status,
       doneDate: preservedStatus.doneDate,
@@ -4565,17 +4666,15 @@ function saveRecord(){
       planningDate: preservedStatus.planningDate,
       planningDo: preservedStatus.planningDo,
       payments: currentPayments,
-      procedureSteps: stepsForRec,
+      procedureSteps: (wasEditing && editingOriginalRecord && Array.isArray(editingOriginalRecord.procedureSteps)) ? editingOriginalRecord.procedureSteps : [],
       payDate: document.getElementById('f_payDate').value.trim(),
       payTotal: document.getElementById('f_payTotal').value.trim(),
       payDiscount: document.getElementById('f_payDiscount').value.trim(),
       payPaid: document.getElementById('f_payPaid').value.trim(),
-      // Stage / Method / Note are no longer on the form: keep what an existing record already has,
-      // and new records default to Cash (the Income & Expense list shows the method as the source).
-      payStage: (wasEditing && editingOriginalRecord) ? (editingOriginalRecord.payStage || '') : '',
+      payStage: document.getElementById('f_payStage').value.trim(),
       payBalance: document.getElementById('f_payBalance').value.trim(),
-      payMethod: (wasEditing && editingOriginalRecord) ? (editingOriginalRecord.payMethod || '') : 'សាច់ប្រាក់ (Cash)',
-      payNote: (wasEditing && editingOriginalRecord) ? (editingOriginalRecord.payNote || '') : ''
+      payMethod: document.getElementById('f_payMethod').value.trim(),
+      payNote: document.getElementById('f_payNote').value.trim()
     };
 
     const payload = {...rec, payments: JSON.stringify(currentPayments)};
@@ -5570,7 +5669,7 @@ function openProcedureStepsModal(recordId){
   if(!Array.isArray(r.procedureSteps) || r.procedureSteps.length === 0){
     // Migrate legacy comma-separated `doing` string into structured steps.
     const legacy = cleanStr(r.doing);
-    const legacyDate = r.doingDateTime ? sheetTextToStepDate(r.doingDateTime) : sheetTextToStepDate(r.timestamp);
+    const legacyDate = r.doingDateTime ? formatDateDisplay(r.doingDateTime).split(' ')[0] : '';
     r.procedureSteps = legacy ? legacy.split(',').map(s => s.trim()).filter(Boolean).map(s => ({ step: s, date: legacyDate })) : [];
   }
 
@@ -5582,11 +5681,20 @@ function openProcedureStepsModal(recordId){
   document.getElementById('procStepCustomInput').style.display = 'none';
   document.getElementById('procStepCustomInput').value = '';
   document.getElementById('procStepDate').value = stepDateDefaultValue();
-  refreshStepNoteMode();
 
   renderProcedureStepsCards();
   document.getElementById('procedureStepsOverlay').classList.remove('hidden');
 }
+
+const STEP_STATUS_COLORS = {
+  Appt: { bg: 'var(--amber-soft)', text: 'var(--amber-dark)' },
+  Done: { bg: 'var(--primary-soft)', text: 'var(--primary-dark)' },
+  Miss: { bg: 'var(--coral-soft)', text: 'var(--coral-dark)' },
+  Lab:  { bg: '#DBEAFE', text: '#1D4ED8' }
+};
+const STEP_STATUS_ICONS = {
+  Appt: '🔄', Done: '✅', Miss: '⏳', Lab: '🧪'
+};
 
 // Steps that represent a status get their own highlight colour (matched by exact name, case-insensitive).
 const STEP_HIGHLIGHTS = [
@@ -5645,7 +5753,6 @@ function renderProcedureStepsCards(){
               ${nameHtml}
               <span style="color:var(--ink-dim);"> - </span>
               <span class="mono" style="color:var(--ink-soft);">${toDDMMYYYYTime(s.date)}</span>
-              ${(s.labOrderId && labOrders.some(o => o.id === s.labOrderId)) ? '<span class="kh" data-lab-tag="1" style="font-size:10.5px; color:#5B21B6; background:#EDE9FE; padding:1px 8px; border-radius:999px; margin-left:6px;">🧪 ក្នុងបញ្ជី Lab</span>' : (isLabStepName(s.step) ? `<button type="button" class="kh" data-lab-add="1" onclick="addLabOrderForStep(${s.idx})" style="font-size:10.5px; color:#5B21B6; background:#fff; border:1px solid #7C3AED; padding:1px 9px; border-radius:999px; margin-left:6px; cursor:pointer;">🧪 បញ្ចូល Dental Lab</button>` : '')}
             </div>
             <button type="button" onclick="deleteProcedureStep(${s.idx})" style="width:20px; height:20px; border-radius:50%; background:var(--coral-soft); color:var(--coral-dark); border:none; cursor:pointer; font-size:10.5px; line-height:1; flex-shrink:0;">✕</button>
           </div>
@@ -5654,150 +5761,6 @@ function renderProcedureStepsCards(){
       </div>
     `;
   }).join('');
-}
-
-/* ---------- Lab steps <-> Dental Lab orders ----------
-   Adding a step called "Lab" records a Dental Lab order automatically and books its cost in Income & Expense
-   (a "DL" expense). The step remembers its order in `labOrderId`, so deleting the step / case / patient can
-   remove the order and its expense together (with a warning). Only steps ADDED after this change create orders. */
-function isLabStepName(name){
-  const hl = stepHighlightFor(name);
-  return !!(hl && hl.id === 'lab');
-}
-
-function findLabPrice(name){
-  const n = cleanStr(name).toLowerCase();
-  return n ? ((appLabPrices || []).find(p => cleanStr(p.name).toLowerCase() === n) || null) : null;
-}
-
-// The Lab-work suggestions shown as a dropdown list in the Note box (works from Settings -> Lab Price).
-function labWorkListHTML(){
-  return (appLabPrices || []).map(p => {
-    const price = parseFloat(p.price);
-    const label = (isFinite(price) && price > 0) ? `$${price}/ធ្មេញ` : '(គ្មានតម្លៃ)';
-    return `<option value="${escHTML(p.name)}" label="${escHTML(label)}"></option>`;
-  }).join('');
-}
-
-// price per tooth x number of teeth, for a lab work name (typed or picked)
-function labCostPreview(record, workName){
-  const pr = findLabPrice(workName);
-  const perTooth = pr ? parseFloat(pr.price) : NaN;
-  const hasPrice = isFinite(perTooth) && perTooth > 0;
-  const teethCount = countTeeth(record && record.teeth) || 1;
-  return { pr, perTooth, hasPrice, teethCount, cost: hasPrice ? Math.round(perTooth * teethCount * 100) / 100 : '' };
-}
-
-// Says, right under the Add Step row, what will be recorded in Dental Lab when the step is added.
-function updateLabHint(){
-  const hint = document.getElementById('procStepLabHint');
-  const noteEl = document.getElementById('procStepNote');
-  if(!hint || !noteEl || hint.style.display === 'none') return;
-  const r = allRecords.find(x => x._id === activeProcStepsRecordId);
-  const work = noteEl.value.trim();
-  let msg = '🧪 នឹងកត់ចូល Dental Lab ស្វ័យប្រវត្តិ ពេលចុចបន្ថែម';
-  if(!work){
-    msg += ' · ជ្រើសប្រភេទការងារពីបញ្ជី ឬវាយឈ្មោះខ្លួនឯង (ឧ. Post core)';
-  } else {
-    const p = labCostPreview(r, work);
-    msg += p.hasPrice
-      ? ` · ${p.pr.name}: $${p.perTooth}/ធ្មេញ × ${p.teethCount} = $${p.cost.toFixed(2)} (ចំណាយ DL)`
-      : ' · គ្មានតម្លៃក្នុង Lab Price → មិនមានចំណាយ (អាចបន្ថែមតម្លៃក្នុង Settings → Lab Price)';
-  }
-  hint.textContent = msg;
-}
-
-// For a Lab step the Note box becomes the "lab work" box: type any name, or pick one from the dropdown list.
-function refreshStepNoteMode(){
-  const sel = document.getElementById('procStepSelect');
-  const custom = document.getElementById('procStepCustomInput');
-  const noteEl = document.getElementById('procStepNote');
-  const listEl = document.getElementById('procStepLabList');
-  const hint = document.getElementById('procStepLabHint');
-  const btn = document.getElementById('addProcStepBtn');
-  if(!sel || !noteEl || !hint || !listEl || !btn) return;
-  if(noteEl.dataset.ph === undefined) noteEl.dataset.ph = noteEl.placeholder;
-  if(btn.dataset.label === undefined) btn.dataset.label = btn.textContent;
-  const name = sel.value === 'custom' ? custom.value.trim() : sel.value;
-  const lab = isLabStepName(name);
-  if(lab){
-    listEl.innerHTML = labWorkListHTML();
-    noteEl.setAttribute('list', 'procStepLabList');
-    noteEl.placeholder = 'ប្រភេទការងារ Lab (ឧ. Post core) — ជ្រើសពីបញ្ជី ឬវាយ';
-    btn.textContent = '＋ បន្ថែម & ចូល Lab';
-    hint.style.display = 'block';
-  } else {
-    noteEl.removeAttribute('list');
-    noteEl.placeholder = noteEl.dataset.ph;
-    btn.textContent = btn.dataset.label;
-    hint.style.display = 'none';
-  }
-  updateLabHint();
-}
-
-// Create the Dental Lab order (and its DL expense) for a Lab step. Cost = price per tooth x number of teeth.
-function createLabOrderFromStep(record, step, workName){
-  workName = cleanStr(workName);
-  const p = labCostPreview(record, workName);
-  const work = p.pr ? p.pr.name : workName;                 // the price list's spelling when it matches
-  const sentYMD = cleanStr(sheetTextToStepDate(step.date)).slice(0, 10) || getLocalTodayYMD();
-  const order = {
-    id: genCode(), created: getLocalTodayYMD(), sourceRecordId: record.code || '',
-    patient: record.name, work: work || 'Lab', lab: '', teeth: record.teeth || '', shade: '',
-    sent: sentYMD, due: '', receivedDate: '', deliveredDate: '', cost: p.cost,
-    status: 'sent', note: 'Auto (Step Lab · Case ' + (record.code || '') + ')'
-  };
-  stampLabStatus(order);
-  labOrders.push(order);
-  saveLab();
-  pushToSheet('addLabo', order);
-  upsertAutoLabExpense(order, true);            // books the cost as a "DL" expense (only when there is a price)
-  if(typeof renderLab === 'function') renderLab();
-  const noteText = work ? (p.hasPrice ? `${work} · $${p.perTooth}/ធ្មេញ × ${p.teethCount} = $${p.cost.toFixed(2)}` : work) : '';
-  return { order, noteText };
-}
-
-// For a Lab step that was added BEFORE this feature (no order yet): the user can put it into Dental Lab with one click.
-function addLabOrderForStep(idx){
-  const r = allRecords.find(x => x._id === activeProcStepsRecordId);
-  if(!r || !Array.isArray(r.procedureSteps)) return;
-  const s = r.procedureSteps[idx];
-  if(!s || !isLabStepName(s.step)) return;
-  if(s.labOrderId && labOrders.some(o => o.id === s.labOrderId)) return;          // already in Dental Lab
-  const made = createLabOrderFromStep(r, s, s.note);                              // its Note is the lab work (e.g. Post core)
-  s.note = made.noteText || s.note;
-  s.labOrderId = made.order.id;
-  saveProcedureStepsToRecord(r);
-  renderProcedureStepsCards();
-}
-
-// Delete an order together with the DL expense(s) it booked.
-function removeLabOrderCascade(orderId){
-  labOrders = labOrders.filter(x => x.id !== orderId);
-  saveLab();
-  pushToSheet('deleteLabo', { id: orderId });
-  loadExpenses();
-  const before = expensesList.length;
-  expensesList = expensesList.filter(e => e.sourceOrderId !== orderId);
-  if(expensesList.length !== before) saveExpenses();
-  if(typeof renderLab === 'function') renderLab();
-}
-
-// The automatic lab orders (and their DL expenses) that belong to these cases' Lab steps.
-function autoLabLinkedTo(records){
-  const orders = [];
-  (records || []).forEach(r => (r.procedureSteps || []).forEach(s => {
-    if(s && s.labOrderId){ const o = labOrders.find(x => x.id === s.labOrderId); if(o && !orders.includes(o)) orders.push(o); }
-  }));
-  loadExpenses();
-  const ids = new Set(orders.map(o => o.id));
-  const exp = expensesList.filter(e => ids.has(e.sourceOrderId));
-  return { orders, expenseCount: exp.length, expenseSum: exp.reduce((s, e) => s + (parseFloat(e.amount) || 0), 0) };
-}
-function autoLabWarning(linked){
-  if(!linked || !linked.orders.length) return '';
-  const money = linked.expenseCount ? ` · ចំណាយ DL (${linked.expenseCount}) $${linked.expenseSum.toFixed(2)}` : '';
-  return `\nបញ្ជា Lab ស្វ័យប្រវត្តិ (${linked.orders.length})${money} នឹងត្រូវលុបផង`;
 }
 
 function updateRecordStatusFromLatestStep(r){
@@ -5809,7 +5772,6 @@ function updateRecordStatusFromLatestStep(r){
 
 function saveProcedureStepsToRecord(r){
   r.doing = (r.procedureSteps || []).map(s => s.step).join(', ');
-  r.doingDateTime = latestStepDateText(r.procedureSteps || []);
   saveLocalRecords();
   const payload = {...r, payments: JSON.stringify(r.payments || []), procedureStepsJSON: JSON.stringify(r.procedureSteps || [])};
   try{ pushToSheet('updateRecord', payload); }catch(err){ console.warn('Sync queue error:', err); }
@@ -5818,29 +5780,15 @@ function saveProcedureStepsToRecord(r){
 function deleteProcedureStep(idx){
   const r = allRecords.find(x => x._id === activeProcStepsRecordId);
   if(!r) return;
-  const s = r.procedureSteps[idx];
-  const doDelete = () => {
-    const pos = r.procedureSteps.indexOf(s);
-    if(pos >= 0) r.procedureSteps.splice(pos, 1);
-    updateRecordStatusFromLatestStep(r);
-    saveProcedureStepsToRecord(r);
-    renderProcedureStepsCards();
-  };
-  const linked = (s && s.labOrderId) ? autoLabLinkedTo([{ procedureSteps: [s] }]) : null;
-  if(!linked || !linked.orders.length){ doDelete(); return; }      // an ordinary step: deleted as before
-  // A Lab step that owns a Dental Lab order: deleting it also removes the order and its expense -> PIN + confirmation.
-  requestClinicPin(() => showConfirm(`តើលុបជំហាន "${s.step}" នេះមែនទេ?${autoLabWarning(linked)}`, () => {
-    linked.orders.forEach(o => removeLabOrderCascade(o.id));
-    doDelete();
-  }));
+  r.procedureSteps.splice(idx, 1);
+  updateRecordStatusFromLatestStep(r);
+  saveProcedureStepsToRecord(r);
+  renderProcedureStepsCards();
 }
 
 document.getElementById('procStepSelect').addEventListener('change', (e) => {
   document.getElementById('procStepCustomInput').style.display = e.target.value === 'custom' ? 'block' : 'none';
-  refreshStepNoteMode();
 });
-document.getElementById('procStepCustomInput').addEventListener('input', refreshStepNoteMode);
-document.getElementById('procStepNote').addEventListener('input', updateLabHint);
 
 document.getElementById('addProcStepBtn').addEventListener('click', () => {
   const r = allRecords.find(x => x._id === activeProcStepsRecordId);
@@ -5849,22 +5797,14 @@ document.getElementById('addProcStepBtn').addEventListener('click', () => {
   const stepName = sel.value === 'custom' ? document.getElementById('procStepCustomInput').value.trim() : sel.value;
   if(!stepName){ alert('សូមបញ្ចូលឈ្មោះជំហាន'); return; }
   const date = document.getElementById('procStepDate').value || stepDateDefaultValue();
-  let note = document.getElementById('procStepNote').value.trim();
+  const note = document.getElementById('procStepNote').value.trim();
   if(!Array.isArray(r.procedureSteps)) r.procedureSteps = [];
-  const newStep = { step: stepName, date, note };
-  if(isLabStepName(stepName)){
-    // A Lab step is recorded in Dental Lab automatically, and its cost goes to Income & Expense.
-    const made = createLabOrderFromStep(r, newStep, note);      // the Note box holds the lab work (typed or picked)
-    newStep.note = made.noteText;
-    newStep.labOrderId = made.order.id;
-  }
-  r.procedureSteps.push(newStep);
+  r.procedureSteps.push({ step: stepName, date, note });
   updateRecordStatusFromLatestStep(r);
   saveProcedureStepsToRecord(r);
   renderProcedureStepsCards();
   document.getElementById('procStepCustomInput').value = '';
   document.getElementById('procStepNote').value = '';
-  refreshStepNoteMode();
   // Start the next step from the current time, rather than reusing the previous step's date/time.
   document.getElementById('procStepDate').value = stepDateDefaultValue();
 });
@@ -6475,11 +6415,10 @@ function renderList(){
 function applyPatientFilter(){
   const list = document.getElementById('recordList');
   if(!list) return;
-  const counts = { all:0, appt:0, missing:0, planning:0, labo:0, done:0, yesterday:0 };
+  const counts = { all:0, appt:0, missing:0, planning:0, labo:0, done:0 };
   list.querySelectorAll('.record-card').forEach(c=>{
     counts.all++;
     if(counts[c.dataset.state] !== undefined) counts[c.dataset.state]++;
-    if(c.dataset.yesterday === '1') counts.yesterday++;
   });
   document.querySelectorAll('#patientFilters .chip').forEach(ch=>{
     const n = ch.querySelector('.chip-n');
@@ -6782,6 +6721,37 @@ function upsertAutoLabExpense(order, forceNew){
     sourceOrderId: order.id
   });
   saveExpenses();
+}
+
+function autoSyncLabFromStatus(record){
+  if(!record.labDate) return;
+  const existingLabOrder = labOrders.find(o => o.sourceRecordId === record.code);
+  if(existingLabOrder){
+    existingLabOrder.patient = record.name;
+    existingLabOrder.work = record.labDo || record.treatment;
+    existingLabOrder.teeth = record.teeth;
+    existingLabOrder.sent = record.labDate;
+    stampLabStatus(existingLabOrder);
+    saveLab();
+    pushToSheet('updateLabo', existingLabOrder);
+  } else {
+    const workName = record.labDo || record.treatment;
+    const priceMatch = appLabPrices.find(p => p.name === workName);
+    const autoCost = priceMatch && priceMatch.price ? (parseFloat(priceMatch.price) * (countTeeth(record.teeth) || 1)) : '';
+    const newLabOrder = {
+      id: genCode(), created: getLocalTodayYMD(), sourceRecordId: record.code,
+      patient: record.name, work: workName, lab: '',
+      teeth: record.teeth, shade: '',
+      sent: record.labDate, due: '', receivedDate: '', deliveredDate: '',
+      cost: autoCost, status: 'sent', note: 'Auto (from Case ' + record.code + ')'
+    };
+    stampLabStatus(newLabOrder);
+    labOrders.push(newLabOrder);
+    saveLab();
+    pushToSheet('addLabo', newLabOrder);
+    upsertAutoLabExpense(newLabOrder, true);
+  }
+  if(typeof renderLab === 'function') renderLab();
 }
 
 function renderLab(){
@@ -7260,16 +7230,10 @@ function updateOpsBadges(){
     if(act === 'del'){
       const o = labOrders.find(x => x.id === id); if(!o) return;
       requestClinicPin(() => {
-        // The lab cost this order booked as a "DL" expense goes with it, so the money isn't left counted as spent.
-        loadExpenses();
-        const linkedExp = expensesList.filter(e => e.sourceOrderId === id);
-        const linkedSum = linkedExp.reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
-        const extra = linkedExp.length ? `\nចំណាយ DL ដែលភ្ជាប់ (${linkedExp.length}) $${linkedSum.toFixed(2)} នឹងត្រូវលុបផង` : '';
-        showConfirm(`តើអ្នកពិតជាចង់លុបបញ្ជា Labo នេះមែនទេ?\n${o.patient} · ${o.work}${extra}`, () => {
+        showConfirm(`តើអ្នកពិតជាចង់លុបបញ្ជា Labo នេះមែនទេ?\n${o.patient} · ${o.work}`, () => {
           const patientName = o.patient;
           labOrders = labOrders.filter(x => x.id !== id); saveLab(); renderLab();
           pushToSheet('deleteLabo', { id });
-          if(linkedExp.length){ loadExpenses(); expensesList = expensesList.filter(e => e.sourceOrderId !== id); saveExpenses(); }
           const stillHasOrders = labOrders.some(x => cleanStr(x.patient).toLowerCase() === patientName.toLowerCase());
           if(stillHasOrders) openLaboPatientDetail(patientName);
           else document.getElementById('laboPatientDetailOverlay').classList.add('hidden');
