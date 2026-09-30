@@ -809,6 +809,9 @@
   #laboFormOverlay, #invFormOverlay{ z-index:86 !important; }
   #invHistoryOverlay{ z-index:87 !important; }
   #invAdjustOverlay{ z-index:88 !important; }
+  .appt-split { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:20px; align-items:start; }
+  .appt-split .appt-panel { width:100%; min-width:0; }
+  @media (max-width: 900px){ .appt-split { grid-template-columns:1fr; } }
 </style>
 <style id="dynamicPageStyle">@page{ size: A4 portrait; margin: 15mm; }</style>
 </head>
@@ -849,19 +852,15 @@
     <nav class="sb-nav">
       <div class="sb-section">
         <div class="sb-group kh">ទូទៅ</div>
-        <button type="button" class="sb-item" data-nav="dashboard" title="ផ្ទាំងសរុប · Dashboard">
+        <button type="button" class="sb-item" data-nav="dashboard" title="ផ្ទាំងសរុប · Dashboard (ចំនួនលេខ = ការណាត់ជួប)">
           <span class="sb-ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg></span>
           <span class="sb-label"><span class="sb-kh">ផ្ទាំងសរុប</span><span class="sb-en">Dashboard</span></span>
+          <span class="sb-badge amber" id="nbAppointments" title="ចំនួនការណាត់ជួប · Appointments"></span>
         </button>
         <button type="button" class="sb-item" data-nav="patients" title="អ្នកជំងឺ · Patients">
           <span class="sb-ico"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
           <span class="sb-label"><span class="sb-kh">អ្នកជំងឺ</span><span class="sb-en">Patients</span></span>
           <span class="sb-badge" id="nbPatients"></span>
-        </button>
-        <button type="button" class="sb-item" data-nav="appointments" title="ការណាត់ជួប · Appointments">
-          <span class="sb-ico"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="m9 16 2 2 4-4"/></svg></span>
-          <span class="sb-label"><span class="sb-kh">ការណាត់ជួប</span><span class="sb-en">Appointments</span></span>
-          <span class="sb-badge amber" id="nbAppointments"></span>
         </button>
       </div>
 
@@ -892,6 +891,7 @@
         <button type="button" class="sb-item" data-nav="invoices" title="វិក្កយបត្រ · Invoices">
           <span class="sb-ico"><svg viewBox="0 0 24 24"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/></svg></span>
           <span class="sb-label"><span class="sb-kh">វិក្កយបត្រ</span><span class="sb-en">Invoices</span></span>
+          <span class="sb-badge coral" id="nbInvoices" title="អ្នកជំងឺមិនទាន់បង់ប្រាក់ · Unpaid"></span>
         </button>
         <button type="button" class="sb-item" data-nav="income-expense" title="ចំណូលចំណាយ · Income &amp; Expense">
           <span class="sb-ico"><svg viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg></span>
@@ -945,6 +945,23 @@
             <span class="count-pill" id="queueTodayCount">0</span>
           </div>
           <div id="queueTodayBody"></div>
+        </div>
+
+        <div class="appt-split">
+          <div class="appt-panel">
+            <div class="appt-panel-head">
+              <h3 class="kh">📅 ការណាត់ថ្ងៃនេះ · Today</h3>
+              <span class="count-pill" id="apptTodayCount">0</span>
+            </div>
+            <div id="apptTodayBody"></div>
+          </div>
+          <div class="appt-panel">
+            <div class="appt-panel-head">
+              <h3 class="kh">⏭️ ការណាត់ខាងមុខ · Next 2 days</h3>
+              <span class="count-pill" id="apptUpcomingCount">0</span>
+            </div>
+            <div id="apptUpcomingBody"></div>
+          </div>
         </div>
       </section>
 
@@ -1006,7 +1023,7 @@
           <div class="emr-table-wrap">
             <table class="emr-table labo-table-compact">
               <thead><tr>
-                <th style="width:80px;">ថ្ងៃផ្ញើ</th><th>ឈ្មោះជំងឺ</th><th>ប្រភេទធ្វើ</th><th style="width:75px;">លេខធ្មេញ</th><th style="width:65px;">ពណ៌ធ្មេញ</th><th style="width:65px;text-align:center;">ចំនួនថ្ងៃ</th><th style="width:150px;">ស្ថានភាព</th>
+                <th style="width:80px;">ថ្ងៃផ្ញើ</th><th>ឈ្មោះជំងឺ</th><th>ប្រភេទធ្វើ</th><th style="width:75px;">លេខធ្មេញ</th><th style="width:65px;">ពណ៌ធ្មេញ</th><th style="width:65px;text-align:center;">ចំនួនថ្ងៃ</th><th style="width:210px;">ស្ថានភាព</th>
               </tr></thead>
               <tbody id="laboCardGrid"></tbody>
             </table>
@@ -1484,6 +1501,7 @@
             <div>
               <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">តម្លៃសរុប (Total)</div>
               <input type="text" id="f_payTotal" placeholder="$0.00" class="mono">
+              <div id="payTotalAutoHint" class="kh" style="font-size:10.5px; color:var(--primary-dark); margin-top:3px; min-height:13px;"></div>
             </div>
             <div>
               <div style="font-size:10.5px;color:var(--ink-dim);margin-bottom:4px;font-weight:700;">បញ្ចុះតម្លៃ (Discount)</div>
@@ -2272,32 +2290,59 @@ document.getElementById('f_payTotal').addEventListener('input', calcBal);
 document.getElementById('f_payPaid').addEventListener('input', calcBal);
 document.getElementById('f_payDiscount').addEventListener('input', calcBal);
 
-// Auto-fill/recompute Total = តម្លៃ Procedure × ចំនួនគ្រាប់ធ្មេញ
-function countTeeth(str){
-  if(!str) return 0;
-  const tokens = str.split(/[,\s]+/).map(s => s.trim()).filter(Boolean);
-  let total = 0;
-  tokens.forEach(t => {
-    // A pure numeric range like "24-27" means 24,25,26,27 = 4 teeth.
-    const rangeMatch = t.match(/^(\d+)\s*-\s*(\d+)$/);
-    if(rangeMatch){
-      const a = parseInt(rangeMatch[1], 10);
-      const b = parseInt(rangeMatch[2], 10);
-      total += Math.abs(b - a) + 1;
+// Auto-fill/recompute Total = តម្លៃ Procedure ទី១ × ចំនួនគ្រាប់ធ្មេញ
+// Teeth: "33-36" = 33,34,35,36 (4), "13-23" crosses the midline = 13,12,11,21,22,23 (6), "16, 24" = 2.
+// Spaces around "-" and the long dash "–" are accepted; a tooth written twice is counted once.
+function expandTeeth(str){
+  if(!str) return [];
+  const txt = String(str).replace(/[–—~]/g, '-').replace(/\s*-\s*/g, '-');
+  const out = [];
+  txt.split(/[,;\s\/]+/).map(t => t.trim()).filter(Boolean).forEach(t => {
+    const m = t.match(/^(\d{2})-(\d{2})$/);
+    if(!m){ out.push(t); return; }
+    const a = +m[1], b = +m[2];
+    const qa = Math.floor(a / 10), qb = Math.floor(b / 10), ua = a % 10, ub = b % 10;
+    const pairs = { 1:2, 2:1, 4:3, 3:4, 5:6, 6:5, 8:7, 7:8 };      // left <-> right of the same arch
+    if(qa === qb){
+      for(let u = Math.min(ua, ub); u <= Math.max(ua, ub); u++) out.push(String(qa * 10 + u));
+    } else if(pairs[qa] === qb && ua >= 1 && ub >= 1){
+      for(let u = 1; u <= ua; u++) out.push(String(qa * 10 + u));
+      for(let u = 1; u <= ub; u++) out.push(String(qb * 10 + u));
     } else {
-      total += 1;
+      for(let n = Math.min(a, b); n <= Math.max(a, b); n++) out.push(String(n));
     }
   });
-  return total;
+  return [...new Set(out)];
+}
+function countTeeth(str){ return expandTeeth(str).length; }
+
+// Price of one procedure: from Settings → Procedures; else a price written in its name ("PFM-70" → 70).
+function procedurePrice(name){
+  const n = cleanStr(name);
+  if(!n) return NaN;
+  const pr = appProcedures.find(p => cleanStr(p.name).toLowerCase() === n.toLowerCase());
+  const fromList = pr ? parseFloat(pr.price) : NaN;
+  if(!isNaN(fromList) && fromList > 0) return fromList;
+  const m = n.match(/[-\s]\$?(\d+(?:\.\d+)?)\s*\$?$/);
+  return m ? parseFloat(m[1]) : NaN;
+}
+// The first procedure of the case (the select may hold "PFM-70, Post core" for an existing case).
+function firstProcedureName(){
+  return cleanStr(String(procSelect.value || '').split(',')[0]);
 }
 
 function updateProcedurePriceTotal(){
-  const selectedOpt = procSelect.selectedOptions[0];
-  const price = selectedOpt ? selectedOpt.getAttribute('data-price') : '';
-  if(!price) return; // this procedure has no known price — leave Total as the user set it
+  const name = firstProcedureName();
+  const price = procedurePrice(name);
+  const hint = document.getElementById('payTotalAutoHint');
   const teethCount = countTeeth(document.getElementById('f_teeth').value) || 1;
-  const total = parseFloat(price) * teethCount;
+  if(isNaN(price)){                       // no known price: leave Total as the user typed it
+    if(hint) hint.textContent = name ? `គ្មានតម្លៃសម្រាប់ "${name}" → បញ្ចូល Total ដោយដៃ` : '';
+    return;
+  }
+  const total = price * teethCount;
   document.getElementById('f_payTotal').value = '$' + total.toFixed(2);
+  if(hint) hint.textContent = `Auto: ${name} $${price} × ${teethCount} ធ្មេញ = $${total.toFixed(2)}`;
   calcBal();
 }
 
@@ -2505,45 +2550,106 @@ function savePendingQueue(queue){
   }catch(e){}
 }
 
+/* ---------- Sync queue ----------
+   - one item is sent at a time (Apps Script handles one write per request)
+   - repeated updates of the SAME record / lab order are merged into one request (only the newest is sent)
+   - a failed send is retried automatically (5s, 15s, 30s, 60s) instead of waiting for the next save
+   - "Sync" (pull from the Sheet) first finishes sending, so it can no longer overwrite unsent local edits */
 let isFlushingQueue = false;
-async function flushPendingQueue(){
-  if(isFlushingQueue){ console.log('[SYNC] flush skipped — already flushing'); return; }
-  if(!navigator.onLine){ console.log('[SYNC] flush skipped — offline'); return; }
-  if(!webAppUrl){ console.log('[SYNC] flush skipped — no webAppUrl set'); return; }
-  isFlushingQueue = true;
-  console.log('[SYNC] flush started');
-  const badge = document.getElementById('syncBadge');
+let flushPromise = null;
+let inFlightStamp = null;         // timestamp of the item currently being sent (never merged/replaced)
+let syncRetryTimer = null, syncRetryN = 0;
+const SYNC_RETRY_MS = [5000, 15000, 30000, 60000];
 
-  while(true){
-    // Re-read from localStorage on every iteration (not a stale snapshot) — this way,
-    // items pushed by other pushToSheet() calls WHILE this loop is mid-flight (e.g. saving
-    // Treatments/Diagnosis/Procedures back-to-back) are never silently overwritten/lost.
-    const queue = getPendingQueue();
-    if(queue.length === 0){ console.log('[SYNC] queue empty, stopping'); break; }
-    badge.textContent = `⏳ កំពុង Sync (${queue.length})...`;
-    const item = queue[0];
-    console.log('[SYNC] sending:', item.action, JSON.stringify(item.data).slice(0,120));
-    try{
-      await fetch(webAppUrl, {
-        method:'POST',
-        mode:'no-cors',
-        headers:{'Content-Type':'text/plain;charset=utf-8'},
-        body: JSON.stringify(item)
-      });
-      console.log('[SYNC] sent OK:', item.action);
-      const freshQueue = getPendingQueue();
-      freshQueue.shift();
-      savePendingQueue(freshQueue);
-    } catch(err){
-      console.log('[SYNC] send FAILED:', item.action, err);
-      break;
+function queueItemKey(it){
+  const d = it && it.data || {};
+  if(it.action === 'addRecord' || it.action === 'updateRecord') return d.code ? 'rec:' + d.code : null;
+  if(it.action === 'addLabo' || it.action === 'updateLabo') return d.id ? 'lab:' + d.id : null;
+  if(it.action === 'addPlan' || it.action === 'updatePlan') return d.id ? 'plan:' + d.id : null;
+  if(it.action === 'updateInv') return d.id ? 'inv:' + d.id : null;
+  if(it.action === 'updateConfig') return d.key ? 'cfg:' + d.key : null;     // only the newest list matters
+  return null;
+}
+
+// Put a new item on the queue, merging it into an older unsent item for the same record.
+function enqueueSync(payload){
+  const queue = getPendingQueue();
+  const key = queueItemKey(payload);
+  const isUpdate = /^update/.test(payload.action);
+  if(key && isUpdate){
+    for(let i = queue.length - 1; i >= 0; i--){
+      const q = queue[i];
+      if(q.timestamp === inFlightStamp) break;                      // already on its way: keep it, add ours after
+      if(queueItemKey(q) !== key) continue;
+      if(/^delete/.test(q.action)) break;
+      if(/^add/.test(q.action)){
+        q.data = { ...q.data, ...payload.data };                   // not yet created: send the add with the newest data
+        savePendingQueue(queue);
+        return queue.length;
+      }
+      if(q.action === payload.action){
+        queue.splice(i, 1);                                        // an older update of the same record is now useless
+        break;
+      }
     }
   }
+  queue.push(payload);
+  savePendingQueue(queue);
+  return queue.length;
+}
 
-  isFlushingQueue = false;
-  console.log('[SYNC] flush finished');
-  badge.textContent = '✓ ស្វ័យប្រវត្តិរួចរាល់';
-  setTimeout(()=>{ badge.textContent = '🔄 Sync'; }, 2000);
+function scheduleSyncRetry(){
+  if(syncRetryTimer) return;
+  const ms = SYNC_RETRY_MS[Math.min(syncRetryN, SYNC_RETRY_MS.length - 1)];
+  syncRetryN++;
+  console.log('[SYNC] retry in', ms / 1000, 's');
+  syncRetryTimer = setTimeout(() => { syncRetryTimer = null; flushPendingQueue(); }, ms);
+}
+
+function flushPendingQueue(){
+  if(flushPromise) return flushPromise;
+  if(!navigator.onLine){ console.log('[SYNC] flush skipped — offline'); return Promise.resolve(false); }
+  if(!webAppUrl){ console.log('[SYNC] flush skipped — no webAppUrl set'); return Promise.resolve(false); }
+  flushPromise = (async () => {
+    isFlushingQueue = true;
+    const badge = document.getElementById('syncBadge');
+    let ok = true;
+    while(true){
+      const queue = getPendingQueue();
+      if(queue.length === 0) break;
+      badge.textContent = `⏳ កំពុង Sync (${queue.length})...`;
+      const item = queue[0];
+      inFlightStamp = item.timestamp;
+      try{
+        await fetch(webAppUrl, {
+          method:'POST', mode:'no-cors',
+          headers:{'Content-Type':'text/plain;charset=utf-8'},
+          body: JSON.stringify(item)
+        });
+        const fresh = getPendingQueue();
+        const pos = fresh.findIndex(q => q.timestamp === item.timestamp && q.action === item.action);
+        if(pos >= 0) fresh.splice(pos, 1);
+        savePendingQueue(fresh);
+        syncRetryN = 0;
+      } catch(err){
+        console.log('[SYNC] send FAILED:', item.action, err);
+        ok = false;
+        break;
+      } finally {
+        inFlightStamp = null;
+      }
+    }
+    isFlushingQueue = false;
+    if(ok){
+      badge.textContent = '✓ ស្វ័យប្រវត្តិរួចរាល់';
+      setTimeout(()=>{ if(!isFlushingQueue) badge.textContent = '🔄 Sync'; }, 2000);
+    } else {
+      badge.textContent = `⚠️ មិនទាន់ Sync (${getPendingQueue().length}) · នឹងព្យាយាមម្តងទៀត`;
+      scheduleSyncRetry();
+    }
+    return ok;
+  })().finally(() => { flushPromise = null; });
+  return flushPromise;
 }
 
 /* ---------- Step dates <-> the Sheet's "doing" column ----------
@@ -2682,11 +2788,13 @@ function pushToSheet(action, data){
   if((action === 'addRecord' || action === 'updateRecord') && data && typeof data === 'object'){
     data = normalizeRecordForSheet(data);
   }
-  const payload = { action, data, timestamp: Date.now() };
-  const queue = getPendingQueue();
-  queue.push(payload);
-  savePendingQueue(queue);
-  console.log('[SYNC] queued:', action, '| queue length now:', queue.length);
+  // unique stamp even for saves made in the same millisecond
+  let stamp = Date.now();
+  if(stamp <= (pushToSheet._last || 0)) stamp = pushToSheet._last + 1;
+  pushToSheet._last = stamp;
+  const payload = { action, data, timestamp: stamp };
+  const n = enqueueSync(payload);
+  console.log('[SYNC] queued:', action, '| queue length now:', n);
   flushPendingQueue();
 }
 
@@ -2695,6 +2803,14 @@ window.addEventListener('online', flushPendingQueue);
 async function fetchFromSheet(isSilent = false){
   if(!webAppUrl) return;
   const badge = document.getElementById('syncBadge');
+  // Send everything still waiting FIRST; otherwise the Sheet's older copy would overwrite local edits.
+  if(getPendingQueue().length){
+    await flushPendingQueue();
+    if(getPendingQueue().length){
+      badge.textContent = `⚠️ មិនទាន់ Sync (${getPendingQueue().length}) · រក្សាទុកទិន្នន័យក្នុងម៉ាស៊ីន`;
+      return;                                       // keep local data; the retry timer will send it later
+    }
+  }
   if(!isSilent) badge.textContent = '⏳ កំពុង Sync...';
   try {
     const res = await fetch(webAppUrl);
@@ -3034,6 +3150,80 @@ function renderQueueRow(item){
     </div>`;
 }
 
+// Patients whose status is "appointment" (same rule as the sidebar count), soonest first.
+function getUpcomingAppointments(){
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+  return buildPatientGroups(null)
+    .filter(p => patientState(p, startOfToday) === 'appt')
+    .map(p => {
+      let d = p.activeAppt ? p.activeAppt.date : null, rec = p.activeAppt ? p.activeAppt.record : p.latest;
+      if(!d){
+        // step-based appointment: the latest "Appointment" step of the patient
+        p.list.forEach(r => (r.procedureSteps || []).forEach(s => {
+          const hl = stepHighlightFor(s.step);
+          const sd = parseAnyDate(s.date);
+          if(hl && hl.id === 'appt' && sd && (!d || sd > d)){ d = sd; rec = r; }
+        }));
+      }
+      return { p, rec, d };
+    })
+    .sort((a,b) => (a.d ? a.d.getTime() : Infinity) - (b.d ? b.d.getTime() : Infinity));
+}
+
+function apptRowHTML({p, rec, d}, showDay){
+  let dayLbl = '', timeStr = '—', dateStr = '';
+  if(d){
+    const today = new Date(); today.setHours(0,0,0,0);
+    const d0 = new Date(d); d0.setHours(0,0,0,0);
+    const n = Math.round((d0 - today) / 86400000);
+    dayLbl = n === 0 ? 'ថ្ងៃនេះ' : n === 1 ? 'ស្អែក' : `${n} ថ្ងៃទៀត`;
+    let hr = d.getHours(); const ap = hr >= 12 ? 'PM' : 'AM'; hr = hr % 12 || 12;
+    timeStr = `${String(hr).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')} ${ap}`;
+    dateStr = `${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
+  }
+  const passed = d && d < new Date();
+  const plan = cleanStr(rec.treatment) || cleanStr(rec.diagnosis) || cleanStr(rec.doing) || 'ពិនិត្យព្យាបាល';
+  return `
+    <div class="appt-row appt-upcoming" data-name="${encodeURIComponent(p.latest.name)}">
+      <div class="appt-time" style="min-width:84px;">
+        <div class="mono" style="color:var(--primary-dark); font-weight:700;">${timeStr}</div>
+        ${showDay ? `<div class="mono" style="font-size:10.5px; color:var(--ink-dim);">${dateStr}</div>` : ''}
+      </div>
+      <div class="appt-main">
+        <div class="appt-name kh">${escHTML(p.latest.name)}</div>
+        <div class="appt-meta">${formatPhoneDisplay(p.latest.phone)||'គ្មានលេខ'} · <span class="kh">${escHTML(plan)}${rec.teeth ? ' · ធ្មេញ ' + escHTML(rec.teeth) : ''}</span></div>
+      </div>
+      <div class="kh" style="font-size:11px; font-weight:700; white-space:nowrap; padding:4px 10px; border-radius:999px; ${
+        showDay ? 'background:#FEF3C7;color:#92400E;' : passed ? 'background:var(--surface-2);color:var(--ink-dim);' : 'background:#D97706;color:#fff;'}">${
+        showDay ? dayLbl : passed ? 'ហួសម៉ោង' : 'រង់ចាំ'}</div>
+    </div>`;
+}
+
+// Today's appointments (left) and the next 2 days (right). Returns the total for the sidebar badge.
+function renderUpcomingAppointments(){
+  const todayBody = document.getElementById('apptTodayBody');
+  const nextBody = document.getElementById('apptUpcomingBody');
+  const items = getUpcomingAppointments();
+  const t0 = new Date(); t0.setHours(0,0,0,0);
+  const t1 = new Date(t0); t1.setDate(t1.getDate() + 1);          // tomorrow 00:00
+  const t3 = new Date(t0); t3.setDate(t3.getDate() + 3);          // end of the day after tomorrow
+  const todayItems = items.filter(x => x.d && x.d >= t0 && x.d < t1);
+  const nextItems  = items.filter(x => x.d && x.d >= t1 && x.d < t3);
+  if(!todayBody || !nextBody) return todayItems.length + nextItems.length;
+
+  document.getElementById('apptTodayCount').textContent = todayItems.length;
+  document.getElementById('apptUpcomingCount').textContent = nextItems.length;
+  const empty = (kh, en) => `<div class="empty-state kh" style="padding:20px;font-size:12px;">${kh}<br><span style="opacity:.7">${en}</span></div>`;
+  todayBody.innerHTML = todayItems.length ? todayItems.map(x => apptRowHTML(x, false)).join('') : empty('មិនមានការណាត់ថ្ងៃនេះទេ', 'No appointments today');
+  nextBody.innerHTML  = nextItems.length  ? nextItems.map(x => apptRowHTML(x, true)).join('')   : empty('មិនមានការណាត់ ២ ថ្ងៃខាងមុខទេ', 'No appointments in the next 2 days');
+
+  [todayBody, nextBody].forEach(b => b.querySelectorAll('.appt-upcoming').forEach(el => {
+    el.addEventListener('click', () => openPatientRecord(decodeURIComponent(el.dataset.name)));
+  }));
+  return todayItems.length + nextItems.length;
+}
+
 function renderAppointments(){
   const queue = getTodayQueue();
 
@@ -3044,9 +3234,10 @@ function renderAppointments(){
     ? queue.map(renderQueueRow).join('')
     : `<div class="empty-state kh" style="padding:20px;font-size:12px;">មិនមានអ្នកជំងឺណាត់ជួប ឬព្យាបាលថ្ងៃនេះទេ<br><span style="opacity:.7">No patients scheduled or treated today</span></div>`;
 
-  document.querySelectorAll('.appt-row').forEach(el=>{
+  queueBody.querySelectorAll('.appt-row').forEach(el=>{
     el.addEventListener('click', ()=> openPatientRecord(decodeURIComponent(el.dataset.name)));
   });
+  renderUpcomingAppointments();
 }
 
 function renderPatientDemographics(){
@@ -3276,6 +3467,13 @@ function buildPatientGroups(filterFn){
           if(!activeAppt || d < activeAppt.date) activeAppt = {date: d, record: r};
         }
       }
+      // Appointments are now added as an "Appointment" step (the old Last Visit/Appt field is hidden)
+      (r.procedureSteps || []).forEach(st => {
+        const hl = stepHighlightFor(st && st.step);
+        if(!hl || hl.id !== 'appt') return;
+        const d = parseAnyDate(st.date);
+        if(d && d >= startOfToday && (!activeAppt || d < activeAppt.date)) activeAppt = {date: d, record: r};
+      });
     });
 
     const stepLatest = patientHasSteps(list) ? patientLatestStepDate(list) : null;
@@ -4383,6 +4581,8 @@ function openForm(editRecord, prefill){
     // Payment fields pre-fill
     document.getElementById('f_payDate').value = editRecord.payDate || todayDateOnly;
     document.getElementById('f_payTotal').value = editRecord.payTotal || '';
+    document.getElementById('payTotalAutoHint').textContent = '';
+    if(!cleanStr(editRecord.payTotal)) setTimeout(updateProcedurePriceTotal, 0);
     document.getElementById('f_payDiscount').value = editRecord.payDiscount || '';
     document.getElementById('f_payPaid').value = editRecord.payPaid || '';
     document.getElementById('f_payBalance').value = editRecord.payBalance || '';
@@ -5613,6 +5813,15 @@ const STEP_HIGHLIGHTS = [
   { id:'miss', keys:['miss','missing'],      solid:'#DC2626', bg:'#FEE2E2', fg:'#991B1B' },  // red
   { id:'lab',  keys:['lab','labo'],          solid:'#7C3AED', bg:'#EDE9FE', fg:'#5B21B6' }   // purple
 ];
+// Colours for the Dental Lab timeline (same pill/circle style as Procedure Steps).
+const LAB_STEP_STYLE = {
+  sent:      { solid:'#7C3AED', bg:'#EDE9FE', fg:'#5B21B6' },   // purple  - sent to lab
+  due:       { solid:'#D97706', bg:'#FEF3C7', fg:'#92400E' },   // amber   - expected back
+  overdue:   { solid:'#DC2626', bg:'#FEE2E2', fg:'#991B1B' },   // red     - late
+  received:  { solid:'#0B5ED7', bg:'#E1EFFF', fg:'#0B5ED7' },   // blue    - lab finished
+  delivered: { solid:'#16A34A', bg:'#DCFCE7', fg:'#166534' }    // green   - fitted to patient
+};
+
 function stepHighlightFor(name){
   const n = cleanStr(name).toLowerCase();
   return STEP_HIGHLIGHTS.find(h => h.keys.includes(n)) || null;
@@ -6477,7 +6686,13 @@ function patientState(p, startOfToday){
     const ad = parseAnyDate(p.latest.timeLast);
     if(ad && ad < startOfToday) isMissed = true;
   }
-  const st = p.latest.status === 'Doing' ? 'Appt' : (p.latest.status || 'Missing');
+  // Status may be a step name ("Appointment", "Done", "Lab"...): map it to the status buckets.
+  const hl = stepHighlightFor(p.latest.status);
+  const mapped = hl ? ({ appt:'Appt', done:'Done', miss:'Missing', lab:'Labo' })[hl.id] : null;
+  const st = p.latest.status === 'Doing' ? 'Appt' : (mapped || p.latest.status || 'Missing');
+  // an Appointment step whose date has passed with nothing after it = missed
+  if(mapped === 'Appt' && !p.hasActiveAppt && !p.latest.timeLast) isMissed = true;
+  if(isMissed && p.hasActiveAppt) isMissed = false;
   if(isMissed || st === 'Missing') return 'missing';
   if(p.hasActiveAppt || st === 'Appt') return 'appt';
   if(st === 'Planning') return 'planning';
@@ -6519,7 +6734,7 @@ function setPatientFilter(f, skipNavSync){
 }
 
 function activeNavKey(){
-  if(currentView === 'patients') return patientFilter === 'appt' ? 'appointments' : 'patients';
+  if(currentView === 'patients') return 'patients';
   return currentView;
 }
 
@@ -6558,8 +6773,7 @@ function updateShell(){
   const groups = buildPatientGroups(null);
   const now = new Date();
   const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
-  let appt = 0;
-  groups.forEach(p=>{ if(patientState(p, startOfToday) === 'appt') appt++; });
+  const appt = renderUpcomingAppointments();
   document.getElementById('nbPatients').textContent = groups.length || '';
   document.getElementById('nbAppointments').textContent = appt || '';
   updateOpsBadges();
@@ -6802,13 +7016,95 @@ function upsertAutoLabExpense(order, forceNew){
   saveExpenses();
 }
 
+/* ---------- Dental Lab: grouping + status from the case's Lab steps ----------
+   Orders with the same patient + treatment + teeth are shown as ONE row / card.
+   Status = the latest Procedure Step of the linked case from its first "Lab" step on
+   (e.g. Lab -> លគ្រោង -> Done), shown as "លគ្រោង (2026/09/30 13:00:00)". */
+function normTeethKey(t){
+  return cleanStr(t).split(/[\s,;\/]+/).filter(Boolean).sort().join(',');
+}
+function labLinkedRecord(o){
+  if(o.sourceRecordId){
+    const r = allRecords.find(x => x.code === o.sourceRecordId || x._id === o.sourceRecordId);
+    if(r) return r;
+  }
+  // older / manual orders: the patient's case with the same teeth that has a Lab step
+  const name = cleanStr(o.patient).toLowerCase(), teeth = normTeethKey(o.teeth);
+  const cands = allRecords.filter(r => cleanStr(r.name).toLowerCase() === name && (!teeth || normTeethKey(r.teeth) === teeth));
+  return cands.find(r => (r.procedureSteps || []).some(s => s.labOrderId === o.id))
+      || cands.find(r => (r.procedureSteps || []).some(s => isLabStepName(s.step)))
+      || null;
+}
+// The case's steps from its first Lab step onward, oldest first.
+function labCaseSteps(rec){
+  if(!rec || !Array.isArray(rec.procedureSteps)) return [];
+  const sorted = [...rec.procedureSteps].sort((a,b) => (parseAnyDate(a.date)||0) - (parseAnyDate(b.date)||0));
+  const i = sorted.findIndex(s => isLabStepName(s.step));
+  return i >= 0 ? sorted.slice(i) : [];
+}
+function labDateText(str){
+  const v = cleanStr(str);
+  if(!v) return '';
+  return /[T\s]\d{1,2}:\d{2}/.test(v) ? toYMDHMS24(v) : fmtYMD(v.slice(0,10));
+}
+function labGroupKey(o){
+  const rec = labLinkedRecord(o);
+  const tx = cleanStr(rec ? (rec.treatment || rec.diagnosis || o.work) : o.work).toLowerCase();
+  return [cleanStr(o.patient).toLowerCase(), tx, normTeethKey(o.teeth)].join('|');
+}
+function groupLabOrders(orders){
+  const map = new Map();
+  orders.forEach(o => {
+    const k = labGroupKey(o);
+    if(!map.has(k)) map.set(k, []);
+    map.get(k).push(o);
+  });
+  return Array.from(map.values()).map(list => {
+    list.sort((a,b) => (b.sent||b.created||'').localeCompare(a.sent||a.created||''));
+    const latest = list[0];
+    const rec = list.map(labLinkedRecord).find(Boolean) || null;
+    const steps = labCaseSteps(rec);
+    const works = [...new Set(list.map(o => cleanStr(o.work)).filter(Boolean))];
+    const firstSent = list.map(o => o.sent).filter(isYMD).sort()[0] || '';
+    const shade = (list.find(o => cleanStr(o.shade)) || {}).shade || '';
+    return { list, latest, rec, steps, works, firstSent, shade,
+             treatment: rec ? (rec.treatment || rec.diagnosis || '') : '' };
+  });
+}
+// Status pill for a group: latest Lab step of the case, else the order's own lab status.
+function labGroupStatus(g){
+  const o = g.latest;
+  if(g.steps.length){
+    const last = g.steps[g.steps.length - 1];
+    const hl = stepHighlightFor(last.step) || { bg:'#E1EFFF', fg:'#0B5ED7', solid:'#0B5ED7' };
+    return { name: last.step, dateText: labDateText(last.date), hl };
+  }
+  // steps added by hand in the Dental Lab popup (orders with no linked case)
+  const manual = [].concat(...g.list.map(x => Array.isArray(x.labSteps) ? x.labSteps : []))
+                   .sort((a,b) => (parseAnyDate(a.date)||0) - (parseAnyDate(b.date)||0));
+  if(manual.length){
+    const last = manual[manual.length - 1];
+    const hl = stepHighlightFor(last.step) || { bg:'#E1EFFF', fg:'#0B5ED7', solid:'#0B5ED7' };
+    return { name: last.step, dateText: labDateText(last.date), hl };
+  }
+  const st = LAB_STATUS[o.status] ? o.status : 'sent';
+  const od = labOverdue(o);
+  const key = od ? 'overdue' : st;
+  const date = st === 'delivered' ? o.deliveredDate : st === 'received' ? o.receivedDate : o.sent;
+  return { name: od ? 'Overdue' : LAB_STATUS[st].en, dateText: labDateText(date), hl: LAB_STEP_STYLE[key] };
+}
+function labStatusPillHTML(si){
+  return `<span class="cn-status kh" style="background:${si.hl.bg}; color:${si.hl.fg}; border:1px solid ${si.hl.solid}55;"><b>${escHTML(si.name)}</b>${si.dateText ? ` <span class="mono">(${si.dateText})</span>` : ''}</span>`;
+}
+
 function renderLab(){
   const today = getLocalTodayYMD();
   const q = labSearchTerm.trim().toLowerCase();
   const base = q ? labOrders.filter(o => [o.patient, o.work, o.teeth, o.shade, o.lab, o.note].join(' ').toLowerCase().includes(q)) : labOrders.slice();
 
-  const counts = { all: base.length, sent: 0, received: 0, delivered: 0, overdue: 0 };
-  base.forEach(o => { if(counts[o.status] !== undefined) counts[o.status]++; if(labOverdue(o)) counts.overdue++; });
+  const allGroups = groupLabOrders(base);
+  const counts = { all: allGroups.length, sent: 0, received: 0, delivered: 0, overdue: 0 };
+  allGroups.forEach(g => { const o = g.latest; if(counts[o.status] !== undefined) counts[o.status]++; if(labOverdue(o)) counts.overdue++; });
   document.querySelectorAll('#laboFilters .chip').forEach(ch => {
     ch.querySelector('.chip-n').textContent = counts[ch.dataset.filter];
     ch.setAttribute('aria-pressed', ch.dataset.filter === labFilter ? 'true' : 'false');
@@ -6825,60 +7121,41 @@ function renderLab(){
     { kh: 'ចំណាយ Lab ខែនេះ', en: 'Lab cost this month', val: '$' + monthCost.toFixed(2), cls: 'amber' }
   ]);
 
-  let shown = base.filter(o => labFilter === 'all' ? true : labFilter === 'overdue' ? labOverdue(o) : o.status === labFilter);
-  shown = [...shown].sort((a,b) => (b.sent||b.created||'').localeCompare(a.sent||a.created||''));
+  // One row per patient + treatment + teeth; the filter looks at the group's most recent order.
+  let groups = groupLabOrders(base);
+  groups = groups.filter(g => labFilter === 'all' ? true : labFilter === 'overdue' ? labOverdue(g.latest) : g.latest.status === labFilter);
+  groups.sort((a,b) => (b.latest.sent||b.latest.created||'').localeCompare(a.latest.sent||a.latest.created||''));
+  const shown = groups;
 
-  el('laboCardGrid').innerHTML = shown.map(o => {
-    const st = LAB_STATUS[o.status] ? o.status : 'sent';
+  el('laboCardGrid').innerHTML = groups.map(g => {
+    const o = g.latest;
     const od = labOverdue(o);
-    const sentDate = parseAnyDate(o.sent);
+    const sentDate = parseAnyDate(g.firstSent || o.sent);
     let daysSince = '—';
     if(sentDate){
       const d0 = new Date(sentDate); d0.setHours(0,0,0,0);
       const d1 = new Date(); d1.setHours(0,0,0,0);
       daysSince = Math.round((d1 - d0) / 86400000);
     }
-    const isSent = st === 'sent' || st === 'received' || st === 'delivered';
-    const isReceived = st === 'received' || st === 'delivered';
-    const isDelivered = st === 'delivered';
+    const workText = g.treatment
+      ? `${escHTML(g.treatment)}${g.works.length ? `<div class="cell-sub kh">${g.works.map(escHTML).join(', ')}</div>` : ''}`
+      : (g.works.map(escHTML).join(', ') || '—');
+    const countBadge = g.list.length > 1 ? ` <span class="badge-mini kh" style="background:var(--primary-soft);color:var(--primary-dark);">${g.list.length} ដង</span>` : '';
     return `
       <tr class="emr-tr${od ? ' is-overdue' : ''}" data-id="${o.id}">
-        <td data-label="ថ្ងៃផ្ញើ" class="mono">${fmtYMD(o.sent)}</td>
-        <td data-label="ឈ្មោះជំងឺ" class="kh" style="font-weight:700; cursor:pointer; color:var(--primary-dark);" data-act="openpatient">${escHTML(o.patient)}</td>
-        <td data-label="ប្រភេទធ្វើ" class="kh">${escHTML(o.work) || '—'}</td>
+        <td data-label="ថ្ងៃផ្ញើ" class="mono">${fmtYMD(g.firstSent || o.sent)}</td>
+        <td data-label="ឈ្មោះជំងឺ" class="kh" style="font-weight:700; cursor:pointer; color:var(--primary-dark);" data-act="openpatient">${escHTML(o.patient)}${countBadge}</td>
+        <td data-label="ប្រភេទធ្វើ" class="kh">${workText}</td>
         <td data-label="លេខធ្មេញ" class="mono">${escHTML(o.teeth) || '—'}</td>
-        <td data-label="ពណ៌ធ្មេញ" class="mono">${escHTML(o.shade) || '—'}</td>
+        <td data-label="ពណ៌ធ្មេញ" class="mono">${escHTML(g.shade) || '—'}</td>
         <td data-label="ចំនួនថ្ងៃ" class="mono" style="text-align:center; ${od ? 'color:var(--coral-dark);font-weight:700;' : ''}">${daysSince}</td>
-        <td data-label="ស្ថានភាព">
-          <div style="display:flex; gap:6px; align-items:center;">
-            <label class="kh" style="display:flex;align-items:center;gap:2px;cursor:pointer;font-size:10.5px;">
-              <input type="checkbox" data-stage="sent" ${isSent ? 'checked' : ''} style="width:13px;height:13px;accent-color:var(--amber-dark);">ទៅ
-            </label>
-            <label class="kh" style="display:flex;align-items:center;gap:2px;cursor:pointer;font-size:10.5px;">
-              <input type="checkbox" data-stage="received" ${isReceived ? 'checked' : ''} style="width:13px;height:13px;accent-color:#1D4ED8;">មក
-            </label>
-            <label class="kh" style="display:flex;align-items:center;gap:2px;cursor:pointer;font-size:10.5px;">
-              <input type="checkbox" data-stage="delivered" ${isDelivered ? 'checked' : ''} style="width:13px;height:13px;accent-color:var(--primary-dark);">រួច
-            </label>
-          </div>
-        </td>
+        <td data-label="ស្ថានភាព">${labStatusPillHTML(labGroupStatus(g))}</td>
       </tr>
     `;
   }).join('');
 
   document.querySelectorAll('#laboCardGrid tr[data-id]').forEach(row => {
     const id = row.dataset.id;
-    row.querySelectorAll('input[type="checkbox"][data-stage]').forEach(cb => {
-      cb.addEventListener('change', () => {
-        const o = labOrders.find(x => x.id === id);
-        if(!o) return;
-        o.status = cb.dataset.stage;
-        stampLabStatus(o);
-        saveLab();
-        pushToSheet('updateLabo', o);
-        renderLab();
-      });
-    });
     const nameCell = row.querySelector('[data-act="openpatient"]');
     if(nameCell){
       nameCell.addEventListener('click', () => {
@@ -6900,34 +7177,160 @@ function renderLab(){
   updateOpsBadges();
 }
 
+
+// One lab order -> ordered list of steps (past rounds first, then the current round).
+function labOrderSteps(o){
+  const steps = [];
+  const rounds = Array.isArray(o.rounds) ? o.rounds : [];
+  const multi = rounds.length > 0;
+  rounds.forEach((r, i) => {
+    const tag = ` (ជុំ ${i+1})`;
+    if(r.sent) steps.push({ key:'sent', name:'Sent · ផ្ញើទៅ Lab' + tag, date:r.sent });
+    if(r.received) steps.push({ key:'received', name:'Received · Lab ធ្វើរួច' + tag, date:r.received });
+  });
+  const tag = multi ? ` (ជុំ ${rounds.length + 1})` : '';
+  const st = LAB_STATUS[o.status] ? o.status : 'sent';
+  if(o.sent) steps.push({ key:'sent', name:'Sent · ផ្ញើទៅ Lab' + tag, date:o.sent });
+  if(st === 'sent' && o.due){
+    const od = labOverdue(o);
+    steps.push({ key: od ? 'overdue' : 'due', name: (od ? 'Overdue · យឺត' : 'Due · ថ្ងៃត្រូវទទួល') + tag, date:o.due, pending:true,
+                 extra: od ? `យឺត ${-daysUntil(o.due)} ថ្ងៃ` : '' });
+  }
+  if(o.receivedDate) steps.push({ key:'received', name:'Received · Lab ធ្វើរួច' + tag, date:o.receivedDate });
+  if(o.deliveredDate) steps.push({ key:'delivered', name:'Delivered · ជូនអ្នកជំងឺរួច', date:o.deliveredDate });
+  return steps;
+}
+
+// Options for the Add-Step box in the Dental Lab popup: common lab steps first, then the clinic's procedure list.
+function labAddStepOptionsHTML(){
+  const common = ['Lab', 'លគ្រោង', 'Appointment', 'Done'];
+  const rest = (appProcedures || []).map(p => p.name).filter(n => n && !common.some(c => c.toLowerCase() === String(n).toLowerCase()));
+  return [...common, ...rest].map(n => `<option value="${escHTML(n)}">${escHTML(n)}</option>`).join('')
+       + '<option value="custom">ផ្សេងទៀត / Custom…</option>';
+}
+
+// Add a step from the Dental Lab popup. With a linked case it becomes a normal Procedure Step of that case
+// (so Clinical Notes, status and the Sheet all update); without one it is kept on the lab order itself.
+function addLabGroupStep(orderId, box){
+  const o = labOrders.find(x => x.id === orderId);
+  if(!o || !box) return;
+  const sel = box.querySelector('[data-role="stepsel"]');
+  const stepName = sel.value === 'custom' ? box.querySelector('[data-role="stepcustom"]').value.trim() : sel.value;
+  if(!stepName){ alert('សូមបញ្ចូលឈ្មោះជំហាន'); return; }
+  const date = box.querySelector('[data-role="stepdate"]').value || getLocalNowDateTime();
+  const note = box.querySelector('[data-role="stepnote"]').value.trim();
+
+  const g = groupLabOrders(labOrders.filter(x => cleanStr(x.patient).toLowerCase() === cleanStr(o.patient).toLowerCase()))
+            .find(gr => gr.list.some(x => x.id === orderId));
+  const rec = g && g.rec;
+  const newStep = { step: stepName, date, note };
+
+  if(rec){
+    if(!Array.isArray(rec.procedureSteps)) rec.procedureSteps = [];
+    if(isLabStepName(stepName)){
+      // another Lab step = a new trip to the lab: recorded in Dental Lab (+ DL expense), same as in Procedure Steps
+      const made = createLabOrderFromStep(rec, newStep, note || o.work);
+      newStep.note = made.noteText || note;
+      newStep.labOrderId = made.order.id;
+    }
+    rec.procedureSteps.push(newStep);
+    updateRecordStatusFromLatestStep(rec);
+    saveProcedureStepsToRecord(rec);
+  } else {
+    if(!Array.isArray(o.labSteps)) o.labSteps = [];
+    o.labSteps.push(newStep);
+    saveLab();
+    pushToSheet('updateLabo', o);
+  }
+  renderLab();
+  openLaboPatientDetail(o.patient);
+}
+
 function openLaboPatientDetail(patientName){
   const orders = labOrders.filter(o => cleanStr(o.patient).toLowerCase() === patientName.toLowerCase());
   document.getElementById('laboPatientDetailTitle').textContent = `🧪 ${patientName} — ពុម្ភធ្មេញ`;
 
   const sorted = [...orders].sort((a,b) => (b.sent || b.created || '').localeCompare(a.sent || a.created || ''));
   const totalTrips = sorted.reduce((s,o) => s + labRoundCount(o), 0);
+  const groups = groupLabOrders(sorted).sort((a,b) => (b.latest.sent||'').localeCompare(a.latest.sent||''));
 
-  const rows = sorted.map(o => {
+  const rows = groups.map(g => {
+    const o = g.latest;
     const st = LAB_STATUS[o.status] ? o.status : 'sent';
     const od = labOverdue(o);
     const opts = Object.keys(LAB_STATUS).map(k => `<option value="${k}"${k === st ? ' selected' : ''}>${LAB_STATUS[k].en} · ${LAB_STATUS[k].kh}</option>`).join('');
     const roundNum = labRoundCount(o);
-    const pastRounds = Array.isArray(o.rounds) ? o.rounds : [];
-    const historyHtml = pastRounds.length ? `
-      <div class="kh" style="font-size:11px; color:var(--ink-dim); margin-top:6px; padding-top:6px; border-top:1px dashed var(--border-soft);">
-        ប្រវត្តិផ្ញើពីមុន៖ ${pastRounds.map((r,i) => `ជុំ${i+1} (${fmtYMD(r.sent)} → ${fmtYMD(r.received) || 'មិនទាន់ទទួល'})`).join(' · ')}
-      </div>
-    ` : '';
-    return `
-      <div class="lab-row${od ? ' is-overdue' : ''}" data-id="${o.id}" style="border:1px solid var(--border); border-radius:10px; padding:12px; margin-bottom:10px;">
-        <div>
-          <div class="kh" style="font-weight:700; font-size:13.5px;">${escHTML(o.work)} ${roundNum > 1 ? `<span class="badge-mini kh" style="background:var(--primary-soft);color:var(--primary-dark);">ជុំទី ${roundNum}</span>` : ''}</div>
-          <div class="mono" style="font-size:11.5px; color:var(--ink-dim); margin-top:2px;">${escHTML(o.teeth) || '—'}${o.shade ? ' · ' + escHTML(o.shade) : ''} · ${escHTML(o.lab) || '—'}</div>
-          <div class="mono" style="font-size:11.5px; color:var(--ink-soft); margin-top:4px;">${fmtYMD(o.sent)} → <span class="${od ? 'is-bad' : ''}">${fmtYMD(o.due)}</span>${od ? ` <span class="badge-mini out kh">យឺត ${-daysUntil(o.due)} ថ្ងៃ</span>` : ''}</div>
-          ${o.note ? `<div class="kh cell-sub" style="margin-top:4px;">${escHTML(o.note)}</div>` : ''}
-          ${historyHtml}
+    // Timeline: the case's own steps from "Lab" on (Lab, លគ្រោង, Done...), else the order's Sent/Received dates.
+    const steps = g.steps.length
+      ? g.steps.map(cs => { const hl = stepHighlightFor(cs.step); return { key:'case', name: escHTML(cs.step), date: cs.date, note: cs.note,
+          style: hl ? { solid:hl.solid, bg:hl.bg, fg:hl.fg } : { solid:'#0B5ED7', bg:'#E1EFFF', fg:'#0B5ED7' } }; })
+      : [].concat(...g.list.slice().reverse().map(labOrderSteps),
+                  ...g.list.map(ord => (Array.isArray(ord.labSteps) ? ord.labSteps : []).map(ls => { const hl = stepHighlightFor(ls.step);
+                     return { key:'case', name: escHTML(ls.step), date: ls.date, note: ls.note,
+                              style: hl ? { solid:hl.solid, bg:hl.bg, fg:hl.fg } : { solid:'#0B5ED7', bg:'#E1EFFF', fg:'#0B5ED7' } }; })))
+          .sort((a,b) => (parseAnyDate(a.date)||0) - (parseAnyDate(b.date)||0));
+    const sub = [escHTML(o.teeth) ? `ធ្មេញ ${escHTML(o.teeth)}` : '', o.shade ? `Shade ${escHTML(o.shade)}` : '', escHTML(o.lab)].filter(Boolean).join(' · ');
+
+    // Root node: "LAB" circle + the lab work name (like the "TX" node of Procedure Steps)
+    const root = `
+      <div style="display:flex; gap:12px;">
+        <div style="display:flex; flex-direction:column; align-items:center; flex-shrink:0;">
+          <div style="width:28px; height:28px; border-radius:50%; background:var(--primary-dark); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:9.5px; letter-spacing:.02em;">LAB</div>
+          ${steps.length ? '<div style="width:2px; flex:1; min-height:14px; background:var(--border); margin:2px 0;"></div>' : ''}
         </div>
-        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:10px; flex-wrap:wrap;">
+        <div style="flex:1; padding-bottom:${steps.length ? '12px' : '0'};">
+          <div class="kh" style="min-height:28px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; font-weight:800; font-size:14.5px; color:var(--ink); font-style:italic;">
+            ${escHTML(g.treatment || g.works.join(', ')) || '—'}
+            ${g.treatment && g.works.length ? `<span class="kh" style="font-size:12px; font-weight:600; font-style:normal; color:var(--ink-soft);">· ${g.works.map(escHTML).join(', ')}</span>` : ''}
+            ${roundNum > 1 ? `<span class="badge-mini kh" style="background:var(--primary-soft);color:var(--primary-dark);font-style:normal;">ជុំទី ${roundNum}</span>` : ''}
+          </div>
+          ${sub ? `<div class="mono" style="font-size:11.5px; color:var(--ink-dim);">${sub}</div>` : ''}
+          <div style="margin-top:6px;">${labStatusPillHTML(labGroupStatus(g))}</div>
+        </div>
+      </div>`;
+
+    const stepHtml = steps.map((s, i) => {
+      const isLast = i === steps.length - 1;
+      const c = s.style || LAB_STEP_STYLE[s.key];
+      return `
+      <div style="display:flex; gap:12px;">
+        <div style="display:flex; flex-direction:column; align-items:center; flex-shrink:0;">
+          <div style="width:28px; height:28px; border-radius:50%; background:${s.pending ? '#fff' : c.solid}; color:${s.pending ? c.solid : '#fff'}; border:2px ${s.pending ? 'dashed' : 'solid'} ${c.solid}; box-sizing:border-box; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px;">${i+1}</div>
+          ${!isLast ? '<div style="width:2px; flex:1; min-height:14px; background:var(--border); margin:2px 0;"></div>' : ''}
+        </div>
+        <div class="kh" style="flex:1; padding-bottom:${isLast ? '0' : '12px'}; font-size:13px; min-height:28px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+          <span style="font-weight:800; color:${c.fg}; background:${c.bg}; padding:2px 10px; border-radius:999px;">${s.name}</span>
+          <span style="color:var(--ink-dim);">-</span>
+          <span class="mono" style="color:var(--ink-soft);">${labDateText(s.date) || '—'}</span>
+          ${s.extra ? `<span class="badge-mini out kh">${s.extra}</span>` : ''}
+          ${s.note ? `<div style="flex-basis:100%; font-size:12px; color:var(--ink-soft); background:var(--surface-2); padding:4px 8px; border-radius:6px;">${escHTML(s.note)}</div>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+
+    return `
+      <div class="lab-row lab-step-card${od ? ' is-overdue' : ''}" data-id="${o.id}" style="border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:12px; display:block;">
+        ${root}
+        ${stepHtml || '<div class="kh" style="color:var(--ink-dim); padding:6px 0 0 40px;">មិនទាន់មានកាលបរិច្ឆេទ</div>'}
+        ${o.note ? `<div class="kh" style="font-size:12px; color:var(--ink-soft); margin:10px 0 0 40px; background:var(--surface-2); padding:5px 8px; border-radius:6px;">${escHTML(o.note)}</div>` : ''}
+        <div class="lab-addstep" style="margin-top:12px; padding:10px; border:1px dashed var(--border); border-radius:10px; background:var(--surface-2);">
+          <div class="kh" style="font-size:12px; font-weight:700; color:var(--ink-soft); margin-bottom:6px;">＋ បន្ថែមជំហានថ្មី · Add Step${g.rec ? '' : ' <span style="font-weight:400; color:var(--ink-dim);">(គ្មាន case ភ្ជាប់ → រក្សាទុកក្នុងបញ្ជា Lab)</span>'}</div>
+          <div style="display:flex; gap:6px; align-items:flex-end; flex-wrap:wrap;">
+            <div style="flex:2; min-width:130px;">
+              <select data-role="stepsel" class="kh" style="width:100%; height:36px;">${labAddStepOptionsHTML()}</select>
+              <input type="text" data-role="stepcustom" class="kh" placeholder="សរសេរជំហានផ្សេង..." style="display:none; width:100%; margin-top:6px; height:34px;">
+            </div>
+            <div style="width:175px;">
+              <label class="kh" style="display:block; font-size:10.5px; color:var(--ink-dim);">ថ្ងៃខែឆ្នាំ និង ម៉ោង</label>
+              <input type="datetime-local" data-role="stepdate" class="mono" value="${getLocalNowDateTime()}" style="width:100%; height:36px;">
+            </div>
+            <div style="flex:2; min-width:130px;">
+              <input type="text" data-role="stepnote" class="kh" placeholder="ចំណាំ (Note) — ស្រេចចិត្ត..." style="width:100%; height:36px;">
+            </div>
+            <button type="button" class="btn btn-primary btn-sm kh" data-act="addstep" style="height:36px;">＋ បន្ថែម</button>
+          </div>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:12px; padding-top:10px; border-top:1px dashed var(--border); flex-wrap:wrap;">
           <select class="st-select st-${st}" data-act="status" aria-label="Status">${opts}</select>
           <div class="row-actions">
             ${st === 'received' ? `<button type="button" class="btn btn-outline btn-sm kh" data-act="sendagain" title="ផ្ញើទៅ Lab ម្តងទៀត">🔁 ផ្ញើម្តងទៀត</button>` : ''}
@@ -6941,7 +7344,7 @@ function openLaboPatientDetail(patientName){
   }).join('');
 
   document.getElementById('laboPatientDetailBody').innerHTML = `
-    <div style="margin-bottom:10px; font-size:12.5px; color:var(--ink-soft);">${sorted.length} ការងារ &nbsp;·&nbsp; ${totalTrips} ដងផ្ញើសរុប (រួមទាំងទៅ-មកឡើងវិញ)</div>
+    <div class="kh" style="margin-bottom:10px; font-size:12.5px; color:var(--ink-soft);">${sorted.length} ការងារ &nbsp;·&nbsp; ${totalTrips} ដងផ្ញើសរុប (រួមទាំងទៅ-មកឡើងវិញ)</div>
     ${rows}
   `;
   document.getElementById('laboPatientDetailOverlay').classList.remove('hidden');
@@ -7229,7 +7632,25 @@ function exportInvCSV(){
 }
 
 /* sidebar badges for the two pages */
+// Patients who still owe money (same grouping and rule as the "unpaid" table on the Invoices page).
+function unpaidInvoiceSummary(){
+  const byPatient = {};
+  allRecords.forEach(r => {
+    if(!(cleanStr(r.payTotal) || cleanStr(r.payBalance) || cleanStr(r.payPaid))) return;
+    const key = cleanStr(r.name).toLowerCase(); if(!key) return;
+    byPatient[key] = (byPatient[key] || 0) + (parseFloat(String(r.payBalance || '').replace(/[^\d.]/g, '')) || 0);
+  });
+  const owing = Object.values(byPatient).filter(b => b > 0.004);
+  return { count: owing.length, amount: owing.reduce((a, b) => a + b, 0) };
+}
+
 function updateOpsBadges(){
+  const unpaid = unpaidInvoiceSummary();
+  const nbInv = el('nbInvoices');
+  if(nbInv){
+    nbInv.textContent = unpaid.count || '';
+    nbInv.title = unpaid.count ? `${unpaid.count} នាក់មិនទាន់បង់ · នៅខ្វះសរុប $${unpaid.amount.toFixed(2)}` : '';
+  }
   const open = labOrders.filter(o => o.status !== 'delivered').length;
   setBadge('nbLabo', open, labOrders.some(labOverdue));
   const flags = invItems.map(invFlags);
@@ -7274,7 +7695,12 @@ function updateOpsBadges(){
     const row = e.target.closest('[data-id]'); if(!row) return;
     const id = row.dataset.id;
     const actEl = e.target.closest('[data-act]');
-    const act = actEl ? actEl.dataset.act : 'edit';
+    if(!actEl) return;   // clicking the timeline itself does nothing; use the ✎ button to edit
+    const act = actEl.dataset.act;
+    if(act === 'addstep'){
+      addLabGroupStep(id, actEl.closest('.lab-addstep'));
+      return;
+    }
     if(act === 'del'){
       const o = labOrders.find(x => x.id === id); if(!o) return;
       requestClinicPin(() => {
@@ -7312,6 +7738,12 @@ function updateOpsBadges(){
     });
   });
   el('laboPatientDetailBody').addEventListener('change', e => {
+    const stepSel = e.target.closest('select[data-role="stepsel"]');
+    if(stepSel){
+      const custom = stepSel.parentElement.querySelector('[data-role="stepcustom"]');
+      if(custom){ custom.style.display = stepSel.value === 'custom' ? 'block' : 'none'; if(stepSel.value === 'custom') custom.focus(); }
+      return;
+    }
     const sel = e.target.closest('select[data-act="status"]'); if(!sel) return;
     const id = sel.closest('[data-id]').dataset.id;
     const o = labOrders.find(x => x.id === id); if(!o) return;
