@@ -12,7 +12,7 @@
     --bg:#F5F9FC; --surface:#FFFFFF; --surface-2:#EDF3FA;
     --border:#D9E6F2; --border-soft:#E8F1FA;
     --ink:#132539; --ink-soft:#4C6178; --ink-dim:#8DA0B3;
-    --primary:#2166D6; --primary-dark:#164C9E; --primary-soft:#DCEAFB; --primary-softer:#EEF5FD;
+    --primary:#40E0D0; --primary-dark:#20B2AA; --primary-soft:#AFEEEE; --primary-softer:#E0FFFF;
     --amber:#E8A317; --amber-soft:#FBEFCB; --amber-dark:#8A5C16;
     --coral:#E4574C; --coral-soft:#FBE1DE; --coral-dark:#A43227;
     --shadow:0 12px 30px -16px rgba(19,37,57,0.16);
@@ -224,24 +224,11 @@
     background: var(--surface-2);
   }
 
-  .record-card.has-active-appt {
-    border: 1.8px solid var(--amber) !important;
-    background: linear-gradient(90deg, rgba(232,163,23,0.08) 0%, var(--surface) 40%) !important;
-    box-shadow: 0 4px 14px -6px rgba(232,163,23,0.35) !important;
-  }
   .record-card.has-active-appt .appt-time .mono,
   .record-card.has-active-appt .appt-day {
     color: var(--amber-dark) !important;
   }
   
-  .record-card.has-missing-appt {
-    border: 1.8px solid var(--coral) !important;
-    background: rgba(228,87,76,0.08) !important;
-    box-shadow: 0 4px 14px -6px rgba(228,87,76,0.35) !important;
-  }
-  .record-card.has-missing-appt:hover {
-    background: rgba(228,87,76,0.12) !important;
-  }
   .record-card.has-missing-appt .appt-time .mono,
   .record-card.has-missing-appt .appt-day,
   .record-card.has-missing-appt .appt-name {
@@ -586,13 +573,17 @@
   }
 
   /* =====================================================================
-     APP SHELL — left sidebar (EMR layout)
-     ===================================================================== */
-  :root{
-    --sb-w:264px; --sb-w-min:76px;
-    --sb-bg:#0F2540; --sb-ink:#EAF2FA; --sb-dim:#8FB0D3;
-    --sb-line:rgba(255,255,255,.08); --sb-hover:rgba(255,255,255,.06); --sb-active:rgba(232,163,23,.16);
-  }
+   APP SHELL — left sidebar (EMR layout)
+   ===================================================================== */
+:root{
+  --sb-w:264px; --sb-w-min:76px;
+  --sb-bg:#20B2AA; /* ពណ៌ផ្ទៃ Sidebar (Dark Turquoise) */
+  --sb-ink:#FFFFFF; /* ពណ៌អក្សរធម្មតា */
+  --sb-dim:#E0FFFF; /* ពណ៌អក្សររាងព្រាល */
+  --sb-line:rgba(255,255,255,.2); 
+  --sb-hover:rgba(255,255,255,.15); 
+  --sb-active:rgba(0,0,0,.15);
+}
   .sidebar{
     position:fixed; top:0; left:0; bottom:0; width:var(--sb-w); z-index:50;
     background:var(--sb-bg); color:var(--sb-ink);
@@ -622,7 +613,7 @@
   .sb-item[aria-current="page"]::before{
     content:""; position:absolute; left:-10px; top:9px; bottom:9px; width:3px; border-radius:0 3px 3px 0; background:var(--amber);
   }
-  .sb-ico{ width:20px; height:20px; flex:none; display:grid; place-items:center; color:#7FBFA6; }
+  .sb-ico{ width:20px; height:20px; flex:none; display:grid; place-items:center; color:#FFD700; }
   .sb-item[aria-current="page"] .sb-ico{ color:var(--amber); }
   .sb-ico svg{ width:20px; height:20px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
   .sb-label{ display:flex; flex-direction:column; line-height:1.3; min-width:0; flex:1; }
@@ -697,6 +688,26 @@
   .chip-dot.done{ background:var(--primary); }
   .chip-dot.yesterday{ background:#0F766E; }
   .chip[aria-pressed="true"] .chip-dot{ box-shadow:0 0 0 2px rgba(255,255,255,.85); }
+
+  /* ---- Patients: highlight each card by its category ---- */
+  .record-card[data-state]:not([data-state="done"]){ --st:var(--primary); --st-bg:rgba(22,76,158,0.06); --st-sh:rgba(22,76,158,0.28);
+    border:1.8px solid var(--st) !important; border-left-width:6px !important;
+    background:linear-gradient(90deg, var(--st-bg) 0%, var(--surface) 55%) !important;
+    box-shadow:0 4px 14px -8px var(--st-sh) !important; }
+  .record-card[data-state]:not([data-state="done"]):hover{ background:linear-gradient(90deg, var(--st-bg) 0%, var(--surface-2) 70%) !important; transform:translateY(-1px); }
+  
+  .record-card[data-state="appt"]:not([data-state="done"])    { --st:var(--amber);  --st-bg:rgba(232,163,23,0.12); --st-sh:rgba(232,163,23,0.40); }
+  .record-card[data-state="missing"]:not([data-state="done"]) { --st:var(--coral);  --st-bg:rgba(228,87,76,0.12);  --st-sh:rgba(228,87,76,0.40); }
+  .record-card[data-state="planning"]:not([data-state="done"]){ --st:#6D28D9;       --st-bg:rgba(109,40,217,0.10); --st-sh:rgba(109,40,217,0.35); }
+  .record-card[data-state="labo"]:not([data-state="done"])    { --st:#1D4ED8;       --st-bg:rgba(29,78,216,0.10);  --st-sh:rgba(29,78,216,0.35); }
+  
+  /* when looking at Yesterday / ជំពាក់, the cards take that list's colour */
+  #recordList[data-filter="yesterday"] .record-card[data-state]:not([data-state="done"]){ --st:#0F766E; --st-bg:rgba(15,118,110,0.10); --st-sh:rgba(15,118,110,0.35); }
+  #recordList[data-filter="debt"] .record-card[data-state]:not([data-state="done"]){ --st:#DB2777; --st-bg:rgba(219,39,119,0.09); --st-sh:rgba(219,39,119,0.35); }
+  /* បន្ទាត់ប្ដូរពណ៌អក្សរត្រូវបានលុបចេញ ដូចនេះអក្សរនឹងមានពណ៌ធម្មតាជានិច្ច */
+  .chip-dot.debt{ background:#DB2777; }
+  #recordList[data-filter="debt"] .record-card:not([data-debt="1"]){ display:none; }
+  #recordList[data-filter="debt"] .section-title{ display:none; }
   .chip-n{ font-family:'IBM Plex Mono',monospace; font-size:11px; opacity:.8; }
 
   #recordList[data-filter="appt"] .record-card:not([data-state="appt"]),
@@ -941,7 +952,7 @@
 
         <div class="appt-panel" style="width:100%;">
           <div class="appt-panel-head">
-            <h3 class="kh">🗓️ ជួរអ្នកជំងឺថ្ងៃនេះ · Today's Patient Queue</h3>
+            <h3 class="kh">🗓️ Today's Patient procedures</h3>
             <span class="count-pill" id="queueTodayCount">0</span>
           </div>
           <div id="queueTodayBody"></div>
@@ -979,6 +990,7 @@
           <button type="button" class="chip" data-filter="labo" aria-pressed="false"><span class="chip-dot labo"></span>ពុម្ភធ្មេញ<span class="chip-n">0</span></button>
           <button type="button" class="chip" data-filter="done" aria-pressed="false"><span class="chip-dot done"></span>Done<span class="chip-n">0</span></button>
           <button type="button" class="chip" data-filter="yesterday" aria-pressed="false"><span class="chip-dot yesterday"></span>Yesterday<span class="chip-n">0</span></button>
+          <button type="button" class="chip" data-filter="debt" aria-pressed="false"><span class="chip-dot debt"></span><span class="kh">ជំពាក់</span><span class="chip-n">0</span></button>
         </div>
         <div class="record-list" id="recordList" data-filter="all"></div>
         <div class="empty-state kh hidden" id="filterEmpty">មិនមានអ្នកជំងឺក្នុងស្ថានភាពនេះទេ<br><span style="opacity:.7">No patients with this status</span></div>
@@ -3562,7 +3574,7 @@ function buildPatientRowHTML(p, startOfToday){
     }
 
     return `
-    <div class="appt-row record-card${cardClass}" data-name="${nameKey}" data-state="${stateKey}" data-yesterday="${(() => { const y = new Date(startOfToday); y.setDate(y.getDate() - 1); return patientHasActivityBetween(p, y, startOfToday) ? '1' : '0'; })()}">
+    <div class="appt-row record-card${cardClass}" data-name="${nameKey}" data-state="${stateKey}" data-debt="${sumBal > 0.004 ? '1' : '0'}" data-yesterday="${(() => { const y = new Date(startOfToday); y.setDate(y.getDate() - 1); return patientHasActivityBetween(p, y, startOfToday) ? '1' : '0'; })()}">
       <div class="appt-time">
         <div class="mono">${tStr}</div>
         <div class="appt-day mono">${dStr}</div>
@@ -6708,11 +6720,12 @@ function renderList(){
 function applyPatientFilter(){
   const list = document.getElementById('recordList');
   if(!list) return;
-  const counts = { all:0, appt:0, missing:0, planning:0, labo:0, done:0, yesterday:0 };
+  const counts = { all:0, appt:0, missing:0, planning:0, labo:0, done:0, yesterday:0, debt:0 };
   list.querySelectorAll('.record-card').forEach(c=>{
     counts.all++;
     if(counts[c.dataset.state] !== undefined) counts[c.dataset.state]++;
     if(c.dataset.yesterday === '1') counts.yesterday++;
+    if(c.dataset.debt === '1') counts.debt++;
   });
   document.querySelectorAll('#patientFilters .chip').forEach(ch=>{
     const n = ch.querySelector('.chip-n');
