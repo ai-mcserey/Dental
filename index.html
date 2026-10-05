@@ -864,8 +864,6 @@
   #view-invoices .emr-table tr.emr-tr{ cursor:pointer; }
   #view-inventory .stat-card, #view-invoices .stat-card, #view-income-expense .stat-card{ padding:10px 12px; border-radius:12px; }
   #view-invoices .stat-value, #view-income-expense .stat-value{ font-size:16px; margin-top:3px; }
-  #incomeExpenseStats{ grid-template-columns:repeat(3, 1fr) !important; gap:10px; }
-  @media (max-width:640px){ #incomeExpenseStats{ grid-template-columns:repeat(2, 1fr) !important; } }
   #view-inventory .stat-card{ padding:10px 12px; border-radius:12px; }
   #view-inventory .stat-value{ font-size:16px; margin-top:3px; }
   #medTreatmentStats{ grid-template-columns:repeat(auto-fill, minmax(170px, 1fr)); gap:8px; }
@@ -901,6 +899,125 @@
   .appt-split { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-top:20px; align-items:start; }
   .appt-split .appt-panel { width:100%; min-width:0; }
   @media (max-width: 900px){ .appt-split { grid-template-columns:1fr; } }
+
+  /* ===== Billing & Finance (ហិរញ្ញវត្ថុ) ===== */
+  .fin{ --fin-green:#0E9F6E; --fin-green-soft:#DEF7EC; --fin-red:#C2410C; --fin-red-soft:#FFEDD5; }
+  .fin-kpis{ display:grid; grid-template-columns:repeat(5, minmax(0,1fr)); gap:12px; margin-bottom:16px; }
+  .fin-kpi{ position:relative; background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:14px 16px 12px; box-shadow:var(--shadow-sm); overflow:hidden; }
+  .fin-kpi::before{ content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--k, var(--primary-dark)); }
+  .fin-kpi .k-label{ font-size:12px; font-weight:700; color:var(--ink-soft); display:flex; align-items:center; gap:6px; }
+  .fin-kpi .k-label .k-ico{ width:24px; height:24px; border-radius:8px; display:inline-flex; align-items:center; justify-content:center; font-size:13px; background:var(--kb, var(--primary-softer)); }
+  .fin-kpi .k-val{ font-family:'IBM Plex Mono',monospace; font-size:22px; font-weight:600; color:var(--ink); margin-top:8px; letter-spacing:-.02em; }
+  .fin-kpi .k-en{ font-size:10.5px; color:var(--ink-dim); text-transform:uppercase; letter-spacing:.05em; margin-top:2px; }
+  .fin-kpi .k-foot{ margin-top:8px; padding-top:8px; border-top:1px dashed var(--border); font-size:11.5px; color:var(--ink-soft); display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .fin-delta{ font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:11px; padding:1px 7px; border-radius:999px; }
+  .fin-delta.up{ background:var(--fin-green-soft); color:var(--fin-green); }
+  .fin-delta.down{ background:var(--fin-red-soft); color:var(--fin-red); }
+  .fin-delta.flat{ background:var(--surface-2); color:var(--ink-dim); }
+  .fin-card{ background:var(--surface); border:1px solid var(--border); border-radius:14px; box-shadow:var(--shadow-sm); margin-bottom:16px; overflow:hidden; }
+  .fin-card-head{ display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; padding:14px 16px; border-bottom:1px solid var(--border-soft); }
+  .fin-title{ font-size:14.5px; font-weight:700; color:var(--ink); display:flex; align-items:center; gap:6px; }
+  .fin-count{ font-size:11.5px; font-weight:600; background:var(--coral-soft); color:var(--coral-dark); padding:1px 8px; border-radius:999px; }
+  .fin-count:empty{ display:none; }
+  .fin-sub{ font-size:11px; color:var(--ink-dim); text-transform:uppercase; letter-spacing:.05em; margin-top:2px; }
+  .fin-head-actions{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .fin-head-actions .tb-search{ min-width:220px; }
+  .fin-aging{ display:grid; grid-template-columns:repeat(4, 1fr); gap:0; border-bottom:1px solid var(--border-soft); }
+  .fin-aging .ag{ padding:10px 16px; border-right:1px solid var(--border-soft); }
+  .fin-aging .ag:last-child{ border-right:0; }
+  .fin-aging .ag .ag-l{ font-size:11px; color:var(--ink-dim); display:flex; align-items:center; gap:6px; }
+  .fin-aging .ag .ag-l i{ width:8px; height:8px; border-radius:50%; display:inline-block; }
+  .fin-aging .ag .ag-v{ font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:15px; margin-top:2px; }
+  .fin-aging .ag .ag-n{ font-size:11px; color:var(--ink-dim); }
+  .fin-table-wrap{ overflow:auto; }
+  .fin-table{ width:100%; border-collapse:collapse; font-size:13px; }
+  .fin-table thead th{ position:sticky; top:0; z-index:1; background:var(--surface-2); color:var(--ink-soft); font-size:11px; font-weight:700; text-align:left; padding:9px 14px; border-bottom:1px solid var(--border); white-space:nowrap; line-height:1.3; }
+  .fin-table thead th span{ font-weight:500; color:var(--ink-dim); font-size:10px; text-transform:uppercase; letter-spacing:.04em; }
+  .fin-table td{ padding:10px 14px; border-bottom:1px solid var(--border-soft); vertical-align:middle; }
+  .fin-table .r{ text-align:right; } .fin-table .c{ text-align:center; }
+  .fin-table td.num{ font-family:'IBM Plex Mono',monospace; font-variant-numeric:tabular-nums; text-align:right; white-space:nowrap; }
+  .fin-table tbody tr{ cursor:pointer; transition:background .12s; }
+  .fin-table tbody tr:hover{ background:var(--primary-softer); }
+  .fin-table tfoot td{ background:var(--surface-2); font-weight:700; border-top:2px solid var(--border); border-bottom:0; }
+  .fin-pt-name{ font-weight:700; color:var(--ink); }
+  .fin-pt-phone{ font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-dim); }
+  .fin-bar{ height:5px; border-radius:99px; background:var(--coral-soft); margin-top:5px; overflow:hidden; min-width:70px; }
+  .fin-bar > b{ display:block; height:100%; background:var(--fin-green); border-radius:99px; }
+  .fin-due{ color:var(--coral-dark); font-weight:700; }
+  .fin-age{ display:inline-block; font-size:11px; font-weight:700; padding:2px 9px; border-radius:999px; white-space:nowrap; }
+  .fin-age.a0{ background:#E0F2FE; color:#0369A1; } .fin-age.a1{ background:var(--amber-soft); color:var(--amber-dark); }
+  .fin-age.a2{ background:#FFEDD5; color:#C2410C; } .fin-age.a3{ background:var(--coral-soft); color:var(--coral-dark); }
+  .fin-grid2{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .fin-chart{ padding:14px; display:flex; flex-direction:column; align-items:center; }
+  .fin-entry{ margin:14px 16px 4px; padding:12px; border:1px dashed var(--border); border-radius:12px; background:var(--surface-2); }
+  .fin-entry-title{ font-size:12.5px; font-weight:700; color:var(--ink-soft); margin-bottom:8px; }
+  .fin-entry-grid{ display:grid; grid-template-columns:150px 1.2fr 120px 2fr auto; gap:10px; align-items:flex-end; }
+  .fin-filters{ display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; padding:12px 16px 0; }
+  .fin-seg{ display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+  .fin-summary{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; padding:12px 16px; }
+  .fin-sum{ border:1px solid var(--border); border-radius:10px; padding:8px 12px; background:var(--surface); }
+  .fin-sum .s-l{ font-size:11px; color:var(--ink-dim); }
+  .fin-sum .s-v{ font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:16px; margin-top:2px; }
+  .fin-ledger tbody td:first-child{ font-family:'IBM Plex Mono',monospace; font-size:11.5px; color:var(--ink-soft); white-space:nowrap; }
+  .fin-amt-in{ color:var(--fin-green); font-weight:700; } .fin-amt-out{ color:var(--coral-dark); font-weight:700; }
+  .fin-tag{ display:inline-block; font-size:11px; font-weight:700; padding:2px 9px; border-radius:999px; }
+  .fin-tag.in{ background:var(--fin-green-soft); color:var(--fin-green); } .fin-tag.out{ background:var(--coral-soft); color:var(--coral-dark); }
+  .fin-del{ border:0; background:transparent; color:var(--ink-dim); cursor:pointer; font-size:13px; padding:4px 6px; border-radius:6px; }
+  .fin-del:hover{ background:var(--coral-soft); color:var(--coral-dark); }
+  @media (max-width:1100px){ .fin-kpis{ grid-template-columns:repeat(3, minmax(0,1fr)); } .fin-entry-grid{ grid-template-columns:1fr 1fr 1fr; } .fin-entry-desc{ grid-column:1 / -1; } }
+  @media (max-width:760px){
+    .fin-kpis{ grid-template-columns:repeat(2, minmax(0,1fr)); }
+    .fin-grid2, .fin-summary{ grid-template-columns:1fr; }
+    .fin-aging{ grid-template-columns:repeat(2,1fr); }
+    .fin-aging .ag:nth-child(2){ border-right:0; } .fin-aging .ag:nth-child(-n+2){ border-bottom:1px solid var(--border-soft); }
+    .fin-entry-grid{ grid-template-columns:1fr 1fr; }
+    .fin-head-actions .tb-search{ min-width:0; width:100%; }
+    .fin-table td, .fin-table thead th{ padding:8px 10px; }
+  }
+
+  /* ===== Dental Lab case workflow ===== */
+  .lab-chips{ padding:10px 16px; border-bottom:1px solid var(--border-soft); margin:0; }
+  .lab-table td{ font-size:12.5px; }
+  .lab-caseno{ font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:12px; color:var(--primary-dark); white-space:nowrap; }
+  .lab-sub{ font-size:11.5px; color:var(--ink-dim); margin-top:2px; }
+  .lab-loc{ display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:700; padding:3px 10px; border-radius:999px; white-space:nowrap; border:1px solid; }
+  .lab-trips{ display:flex; align-items:center; gap:3px; flex-wrap:nowrap; }
+  .lab-trips .tp{ width:22px; height:22px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; }
+  .lab-trips .tp.out{ background:#EDE9FE; color:#5B21B6; } .lab-trips .tp.in{ background:#E1EFFF; color:#0B5ED7; } .lab-trips .tp.dlv{ background:#DCFCE7; color:#166534; }
+  .lab-trips .tn{ font-size:11px; color:var(--ink-dim); margin-left:4px; white-space:nowrap; }
+  .lab-table tr.is-overdue td:first-child{ box-shadow:inset 3px 0 0 var(--coral); }
+  .lc-facts{ display:grid; grid-template-columns:repeat(4,1fr); gap:0; border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-bottom:14px; }
+  .lc-facts > div{ padding:8px 12px; border-right:1px solid var(--border-soft); border-bottom:1px solid var(--border-soft); }
+  .lc-facts > div:nth-child(4n){ border-right:0; }
+  .lc-facts .l{ font-size:10.5px; color:var(--ink-dim); text-transform:uppercase; letter-spacing:.04em; }
+  .lc-facts .v{ font-size:13px; font-weight:700; color:var(--ink); margin-top:2px; word-break:break-word; }
+  .lc-journey{ display:flex; align-items:center; gap:10px; padding:14px; border-radius:12px; border:1.5px solid; margin-bottom:14px; flex-wrap:wrap; }
+  .lc-node{ display:flex; flex-direction:column; align-items:center; gap:2px; min-width:70px; opacity:.45; }
+  .lc-node.on{ opacity:1; } .lc-node .i{ font-size:24px; } .lc-node .t{ font-size:11px; font-weight:700; }
+  .lc-path{ flex:1; min-width:60px; height:2px; background:repeating-linear-gradient(90deg, var(--ink-dim) 0 6px, transparent 6px 12px); position:relative; }
+  .lc-path b{ position:absolute; top:-11px; font-size:16px; }
+  .lc-status{ flex-basis:100%; display:flex; justify-content:space-between; gap:8px; flex-wrap:wrap; align-items:center; font-size:12.5px; }
+  .lc-act{ border:1px dashed var(--border); border-radius:12px; padding:12px; background:var(--surface-2); margin-bottom:14px; }
+  .lc-act-title{ font-size:13px; font-weight:700; margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+  .lc-act-grid{ display:grid; grid-template-columns:1.6fr 140px 140px; gap:8px; align-items:end; }
+  .lc-act-grid label{ display:block; font-size:10.5px; color:var(--ink-dim); margin-bottom:2px; }
+  .lc-act-grid input, .lc-act-grid select{ width:100%; height:36px; }
+  .lc-act-row{ display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; align-items:center; }
+  .lc-act-row input[type=text]{ flex:1; min-width:160px; height:36px; }
+  .lc-or{ text-align:center; font-size:11px; color:var(--ink-dim); margin:10px 0; }
+  .lc-log{ border:1px solid var(--border); border-radius:12px; overflow:hidden; margin-bottom:14px; }
+  .lc-log-h{ padding:9px 12px; background:var(--surface-2); font-size:12.5px; font-weight:700; color:var(--ink-soft); border-bottom:1px solid var(--border); }
+  .lc-trip{ display:grid; grid-template-columns:30px 120px 1fr auto; gap:10px; align-items:center; padding:9px 12px; border-bottom:1px solid var(--border-soft); font-size:12.5px; }
+  .lc-trip:last-child{ border-bottom:0; }
+  .lc-trip .n{ width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:11px; color:#fff; }
+  .lc-trip .dir{ font-weight:700; font-size:11.5px; }
+  .lc-trip .st{ font-weight:600; color:var(--ink); }
+  .lc-trip .meta{ font-size:11px; color:var(--ink-dim); font-family:'IBM Plex Mono',monospace; }
+  @media (max-width:760px){
+    .lc-facts{ grid-template-columns:repeat(2,1fr); } .lc-facts > div:nth-child(2n){ border-right:0; }
+    .lc-act-grid{ grid-template-columns:1fr 1fr; } .lc-act-grid > div:first-child{ grid-column:1 / -1; }
+    .lc-trip{ grid-template-columns:28px 1fr auto; } .lc-trip .dir{ grid-column:2; } .lc-trip .body{ grid-column:2 / -1; }
+  }
 </style>
 <style id="dynamicPageStyle">@page{ size: A4 portrait; margin: 15mm; }</style>
 </head>
@@ -974,14 +1091,10 @@
 
       <div class="sb-section">
         <div class="sb-group kh">គ្រប់គ្រង</div>
-        <button type="button" class="sb-item" data-nav="invoices" title="វិក្កយបត្រ · Invoices">
-          <span class="sb-ico"><svg viewBox="0 0 24 24"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/></svg></span>
-          <span class="sb-label"><span class="sb-kh">វិក្កយបត្រ</span><span class="sb-en">Invoices</span></span>
-          <span class="sb-badge coral" id="nbInvoices" title="អ្នកជំងឺមិនទាន់បង់ប្រាក់ · Unpaid"></span>
-        </button>
-        <button type="button" class="sb-item" data-nav="income-expense" title="ចំណូលចំណាយ · Income &amp; Expense">
+        <button type="button" class="sb-item" data-nav="income-expense" title="ហិរញ្ញវត្ថុ · Billing &amp; Finance">
           <span class="sb-ico"><svg viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg></span>
-          <span class="sb-label"><span class="sb-kh">ចំណូលចំណាយ</span><span class="sb-en">Income &amp; Expense</span></span>
+          <span class="sb-label"><span class="sb-kh">ហិរញ្ញវត្ថុ</span><span class="sb-en">Billing &amp; Finance</span></span>
+          <span class="sb-badge coral" id="nbInvoices" title="អ្នកជំងឺមិនទាន់បង់ប្រាក់ · Unpaid"></span>
         </button>
         <button type="button" class="sb-item" data-nav="reports" title="របាយការណ៍ · Reports">
           <span class="sb-ico"><svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg></span>
@@ -1078,8 +1191,7 @@
             <input type="month" id="treatmentReportMonthYear" class="tb-search mono" style="height:34px; padding:0 8px; min-width: 130px;">
             <button class="btn btn-outline btn-sm kh" id="exportTreatmentPdfBtn" title="ទាញយក PDF ស្ថិតិការព្យាបាល តាមខែ/ឆ្នាំ">📄 ទាញយក PDF</button>
           </div>
-          <button class="btn btn-outline btn-sm kh" id="invoiceBtn" title="បញ្ជីវិក្កយបត្រ">🧾 វិក្កយបត្រ (Invoices)</button>
-          <button class="btn btn-outline btn-sm kh" id="expenseBtn" title="គ្រប់គ្រងចំណាយ">💸 ចំណាយ (Expenses)</button>
+          <button class="btn btn-outline btn-sm kh" id="expenseBtn" title="ហិរញ្ញវត្ថុ · Billing &amp; Finance">💰 ហិរញ្ញវត្ថុ (Billing)</button>
           <button class="btn btn-primary btn-sm kh" id="exportBtn" title="នាំចេញ Excel">📊 នាំចេញទិន្នន័យ (Export Excel)</button>
         </div>
 
@@ -1093,34 +1205,46 @@
         </div>
       </section>
 
-      <!-- Dental Lab -->
-      <section class="view" id="view-labo">
-        <div class="stats2 dash-stats" id="laboStats"></div>
-        <div class="page-toolbar">
-          <div class="filter-chips" id="laboFilters" role="group" aria-label="Filter lab orders">
+      <!-- Dental Lab (standard case workflow: many trips Clinic <-> Lab) -->
+      <section class="view fin" id="view-labo">
+        <div class="fin-kpis" id="laboStats"></div>
+
+        <div class="fin-card">
+          <div class="fin-card-head">
+            <div>
+              <div class="fin-title kh">🧪 បញ្ជីការងារ Lab <span class="fin-count mono" id="laboCaseCount" style="background:var(--primary-softer); color:var(--primary-dark);"></span></div>
+              <div class="fin-sub">Lab work orders · tracking Clinic ⇄ Lab</div>
+            </div>
+            <div class="fin-head-actions">
+              <input type="text" class="tb-search kh" id="laboSearch" placeholder="🔍 ស្វែងរក ឈ្មោះ, ការងារ, Lab, Case #...">
+              <button type="button" class="btn btn-outline btn-sm kh" id="laboExportBtn">⬇ CSV</button>
+              <button type="button" class="btn btn-primary btn-sm kh" id="laboAddBtn">＋ Case Lab ថ្មី</button>
+            </div>
+          </div>
+          <div class="filter-chips lab-chips" id="laboFilters" role="group" aria-label="Filter lab cases">
             <button type="button" class="chip" data-filter="all" aria-pressed="true"><span class="kh">ទាំងអស់</span><span class="chip-n">0</span></button>
-            <button type="button" class="chip" data-filter="sent" aria-pressed="false"><span class="chip-dot labo"></span>Sent<span class="chip-n">0</span></button>
-            <button type="button" class="chip" data-filter="received" aria-pressed="false"><span class="chip-dot appt"></span>Received<span class="chip-n">0</span></button>
-            <button type="button" class="chip" data-filter="delivered" aria-pressed="false"><span class="chip-dot done"></span>Delivered<span class="chip-n">0</span></button>
-            <button type="button" class="chip" data-filter="overdue" aria-pressed="false"><span class="chip-dot missing"></span>Overdue<span class="chip-n">0</span></button>
+            <button type="button" class="chip" data-filter="sent" aria-pressed="false"><span class="chip-dot labo"></span><span class="kh">🏭 នៅ Lab</span><span class="chip-n">0</span></button>
+            <button type="button" class="chip" data-filter="received" aria-pressed="false"><span class="chip-dot appt"></span><span class="kh">🏥 នៅគ្លីនិក</span><span class="chip-n">0</span></button>
+            <button type="button" class="chip" data-filter="overdue" aria-pressed="false"><span class="chip-dot missing"></span><span class="kh">⚠ យឺត</span><span class="chip-n">0</span></button>
+            <button type="button" class="chip" data-filter="delivered" aria-pressed="false"><span class="chip-dot done"></span><span class="kh">✅ ដាក់រួច</span><span class="chip-n">0</span></button>
           </div>
-          <div class="toolbar-actions">
-            <input type="text" class="tb-search kh" id="laboSearch" placeholder="🔍 ស្វែងរក ឈ្មោះ, ការងារ, Lab...">
-            <button type="button" class="btn btn-outline btn-sm kh" id="laboExportBtn">⬇ CSV</button>
-            <button type="button" class="btn btn-primary btn-sm kh" id="laboAddBtn">＋ បញ្ជា Labo ថ្មី</button>
-          </div>
-        </div>
-        <div class="emr-notes-section">
-          <div class="emr-table-wrap">
-            <table class="emr-table labo-table-compact">
+          <div class="fin-table-wrap">
+            <table class="fin-table lab-table">
               <thead><tr>
-                <th style="width:220px;">ឈ្មោះអ្នកជំងឺ</th><th>ជំហាន · Steps</th>
+                <th>Case #<br><span>ថ្ងៃបើក</span></th>
+                <th>អ្នកជំងឺ · Patient</th>
+                <th>ការងារ · Work<br><span>Teeth · Units · Shade</span></th>
+                <th>Lab</th>
+                <th>ទីតាំង / ដំណាក់កាល<br><span>Location · Stage</span></th>
+                <th>ការបញ្ជូន<br><span>Trips</span></th>
+                <th>ថ្ងៃត្រូវយក<br><span>Due</span></th>
+                <th class="r">ចំណាយ DL<br><span>Lab fee</span></th>
               </tr></thead>
               <tbody id="laboCardGrid"></tbody>
             </table>
           </div>
+          <div class="empty-state kh hidden" id="laboEmpty" style="margin:12px;"></div>
         </div>
-        <div class="empty-state kh hidden" id="laboEmpty" style="margin-top:12px;"></div>
       </section>
 
       <!-- Inventory -->
@@ -1153,127 +1277,118 @@
         <div class="empty-state kh hidden" id="invEmpty" style="margin-top:12px;"></div>
       </section>
 
-      <!-- Invoices -->
-      <section class="view" id="view-invoices">
-        <div class="stats2 dash-stats" id="invoiceStats"></div>
+      <!-- Billing & Finance (was Invoices + Income & Expense) -->
+      <section class="view fin" id="view-income-expense">
 
-        <div class="page-toolbar">
-          <input type="text" class="tb-search kh" id="invoicePatientSearch" placeholder="🔍 ស្វែងរកអ្នកជំងឺ...">
-        </div>
+        <!-- KPI strip -->
+        <div class="fin-kpis" id="incomeExpenseStats"></div>
 
-        <div style="margin-bottom:20px;">
-          <div class="kh" style="font-size:13px; font-weight:700; color:var(--coral-dark); margin-bottom:8px; display:flex; align-items:center; gap:6px;">⏳ មិនទាន់បង់លុយអស់ <span class="mono" id="invUnpaidCount" style="font-weight:400; color:var(--ink-dim); font-size:11.5px;"></span></div>
-          <div class="emr-notes-section">
-            <div class="emr-table-wrap">
-              <table class="emr-table">
-                <thead><tr>
-                  <th>ឈ្មោះអ្នកជំងឺ</th><th>លេខទូរស័ព្ទ</th><th style="text-align:center;">ចំនួនករណី (Cases)</th><th style="text-align:right;">សរុបចំណាយ ($)</th><th style="text-align:right;">នៅខ្វះ ($)</th>
-                </tr></thead>
-                <tbody id="invoiceUnpaidTableBody"></tbody>
-              </table>
+        <!-- Accounts Receivable: only patients who still owe money -->
+        <div class="fin-card fin-ar">
+          <div class="fin-card-head">
+            <div>
+              <div class="fin-title kh">⏳ បញ្ជីមិនទាន់បង់លុយអស់ <span class="fin-count mono" id="invUnpaidCount"></span></div>
+              <div class="fin-sub">Accounts Receivable · Outstanding balances</div>
+            </div>
+            <div class="fin-head-actions">
+              <input type="text" class="tb-search kh" id="invoicePatientSearch" placeholder="🔍 ស្វែងរកអ្នកជំងឺ / លេខទូរស័ព្ទ...">
             </div>
           </div>
-          <div class="empty-state kh hidden" id="invoiceUnpaidEmpty" style="margin-top:12px;"></div>
+          <div class="fin-aging" id="finAging"></div>
+          <div class="fin-table-wrap">
+            <table class="fin-table">
+              <thead><tr>
+                <th>អ្នកជំងឺ · Patient</th>
+                <th class="c">Cases</th>
+                <th class="r">ចេញវិក្កយបត្រ<br><span>Billed</span></th>
+                <th class="r">បានបង់<br><span>Paid</span></th>
+                <th class="r">នៅខ្វះ<br><span>Balance due</span></th>
+                <th class="c">អាយុបំណុល<br><span>Aging</span></th>
+              </tr></thead>
+              <tbody id="invoiceUnpaidTableBody"></tbody>
+              <tfoot id="invoiceUnpaidFoot"></tfoot>
+            </table>
+          </div>
+          <div class="empty-state kh hidden" id="invoiceUnpaidEmpty" style="margin:12px;"></div>
         </div>
 
-        <div>
-          <div class="kh" style="font-size:13px; font-weight:700; color:var(--primary-dark); margin-bottom:8px; display:flex; align-items:center; gap:6px;">✅ បានបង់លុយរួច <span class="mono" id="invPaidCount" style="font-weight:400; color:var(--ink-dim); font-size:11.5px;"></span></div>
-          <div class="emr-notes-section">
-            <div class="emr-table-wrap">
-              <table class="emr-table">
-                <thead><tr>
-                  <th>ឈ្មោះអ្នកជំងឺ</th><th>លេខទូរស័ព្ទ</th><th style="text-align:center;">ចំនួនករណី (Cases)</th><th style="text-align:right;">សរុបចំណាយ ($)</th>
-                </tr></thead>
-                <tbody id="invoicePaidTableBody"></tbody>
-              </table>
+        <!-- Charts -->
+        <div class="fin-grid2">
+          <div class="fin-card">
+            <div class="fin-card-head"><div><div class="fin-title kh">ចំណូល vs ចំណាយ · ខែ</div><div class="fin-sub">Last month vs this month</div></div></div>
+            <div id="chartMonthCompare" class="fin-chart"></div>
+          </div>
+          <div class="fin-card">
+            <div class="fin-card-head"><div><div class="fin-title kh">ចំណូល vs ចំណាយ · ឆ្នាំ</div><div class="fin-sub">Last year vs this year</div></div></div>
+            <div id="chartYearCompare" class="fin-chart"></div>
+          </div>
+        </div>
+
+        <!-- General Ledger -->
+        <div class="fin-card">
+          <div class="fin-card-head">
+            <div>
+              <div class="fin-title kh">📒 បញ្ជីប្រតិបត្តិការ ចំណូល-ចំណាយ</div>
+              <div class="fin-sub">General Ledger · Revenue &amp; Expenses</div>
+            </div>
+            <div class="fin-head-actions">
+              <input type="month" id="reportMonthYear" class="tb-search mono" style="height:34px; padding:0 8px; min-width:130px;">
+              <button type="button" class="btn btn-primary btn-sm kh" id="exportPdfBtn" title="ទាញយក PDF ចំណូល/ចំណាយ តាមខែ/ឆ្នាំ">📄 PDF របាយការណ៍</button>
+              <button type="button" class="btn btn-outline btn-sm kh" id="printExpenseBtn" style="display:none;">🖨 Print របាយការណ៍</button>
             </div>
           </div>
-          <div class="empty-state kh hidden" id="invoicePaidEmpty" style="margin-top:12px;"></div>
-        </div>
-      </section>
 
-      <!-- Income & Expense -->
-      <section class="view" id="view-income-expense">
-        <div class="stats2 dash-stats" id="incomeExpenseStats"></div>
-
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:14px 0;">
-          <div class="card-type-stats-panel">
-            <div class="card-type-stats-head"><h4 class="kh">ចំណូល vs ចំណាយ · ខែនេះ vs ខែមុន</h4></div>
-            <div id="chartMonthCompare" style="padding:14px;"></div>
-          </div>
-          <div class="card-type-stats-panel">
-            <div class="card-type-stats-head"><h4 class="kh">ចំណូល vs ចំណាយ · ឆ្នាំនេះ vs ឆ្នាំមុន</h4></div>
-            <div id="chartYearCompare" style="padding:14px;"></div>
-          </div>
-        </div>
-
-        <div style="background: var(--surface-2); border: 1.5px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 16px;">
-          <label class="kh" style="display:block;font-size:13px;font-weight:700;color:var(--ink-soft);margin-bottom:8px;">💸 កត់ត្រាចំណាយ · Add Expense</label>
-          <div style="display: grid; grid-template-columns: 1.2fr 1.5fr 1fr auto; gap: 10px; align-items: flex-end;">
-            <div class="field" style="margin:0;">
-              <label>ថ្ងៃខែឆ្នាំ (Date)</label>
-              <input type="date" id="exp_date" class="mono">
+          <!-- Add expense (journal entry) -->
+          <div class="fin-entry">
+            <div class="fin-entry-title kh">💸 កត់ត្រាចំណាយ · New Expense</div>
+            <div class="fin-entry-grid">
+              <div class="field" style="margin:0;"><label>ថ្ងៃខែឆ្នាំ (Date)</label><input type="date" id="exp_date" class="mono"></div>
+              <div class="field" style="margin:0;"><label>ប្រភេទចំណាយ (Account)</label>
+                <select id="exp_type" class="kh">
+                  <option value="DL">DL (Dental Lab)</option>
+                  <option value="Lab">Lab (មន្ទីរពិសោធន៍)</option>
+                  <option value="គ្រឿងធ្មេញ">DM · គ្រឿងធ្មេញ (Dental Materials)</option>
+                  <option value="ផ្សេងៗ">ផ្សេងៗ (Other)</option>
+                </select>
+              </div>
+              <div class="field" style="margin:0;"><label>ទឹកប្រាក់ (Amount $)</label><input type="number" id="exp_amount" step="0.01" placeholder="0.00" class="mono"></div>
+              <div class="field fin-entry-desc" style="margin:0;"><label>បរិយាយ (Description)</label><input type="text" id="exp_desc" class="kh" placeholder="ឧ. ថ្លៃផ្ញើធ្មេញធ្វើ Crown របស់ឈ្មោះ..."></div>
+              <button type="button" class="btn btn-primary btn-sm kh" id="addExpenseBtn" style="height:38px;">＋ កត់ត្រា</button>
             </div>
-            <div class="field" style="margin:0;">
-              <label>ប្រភេទចំណាយ (Type)</label>
-              <select id="exp_type" class="kh">
-                <option value="DL">DL (Dental Lab)</option>
-                <option value="Lab">Lab (មន្ទីរពិសោធន៍)</option>
-                <option value="គ្រឿងធ្មេញ">DM · គ្រឿងធ្មេញ (Dental Materials)</option>
-                <option value="ផ្សេងៗ">ផ្សេងៗ (Other)</option>
-              </select>
+          </div>
+
+          <div class="fin-filters">
+            <div class="fin-seg" id="ieTypeFilter">
+              <button type="button" class="chip" data-type="all" aria-pressed="true"><span class="kh">ទាំងអស់</span></button>
+              <button type="button" class="chip" data-type="income" aria-pressed="false"><span class="kh">ចំណូល</span></button>
+              <button type="button" class="chip" data-type="expense" aria-pressed="false"><span class="kh">ចំណាយ</span></button>
             </div>
-            <div class="field" style="margin:0;">
-              <label>តម្លៃ (Cost $)</label>
-              <input type="number" id="exp_amount" step="0.01" placeholder="0.00" class="mono">
+            <div class="fin-seg" id="iePeriodFilter">
+              <button type="button" class="chip" data-period="day" aria-pressed="false"><span class="kh">ថ្ងៃ</span></button>
+              <button type="button" class="chip" data-period="month" aria-pressed="true"><span class="kh">ខែ</span></button>
+              <button type="button" class="chip" data-period="year" aria-pressed="false"><span class="kh">ឆ្នាំ</span></button>
+              <button type="button" class="chip" data-period="all" aria-pressed="false"><span class="kh">ទាំងអស់</span></button>
+              <input type="date" id="iePeriodDate" class="mono" style="display:none; height:32px; padding:0 8px;">
+              <input type="month" id="iePeriodMonth" class="mono" style="height:32px; padding:0 8px;">
+              <input type="number" id="iePeriodYear" class="mono" style="display:none; width:90px; height:32px; padding:0 8px;" placeholder="2026">
             </div>
-            <button type="button" class="btn btn-primary btn-sm kh" id="addExpenseBtn" style="height: 38px;">＋ បន្ថែម</button>
           </div>
-          <div class="field" style="margin-top: 8px;">
-            <input type="text" id="exp_desc" class="kh" placeholder="បរិយាយបន្ថែម / Note (ឧ. ថ្លៃផ្ញើធ្មេញធ្វើ Crown របស់ឈ្មោះ...)" style="font-size: 12px; padding: 6px 10px;">
-          </div>
-        </div>
 
-        <div class="kh" style="font-size:13px; font-weight:700; color:var(--ink-soft); margin-bottom:8px;">📊 បញ្ជីចំណូល-ចំណាយ · Income &amp; Expense List</div>
+          <div class="fin-summary" id="ieSummaryCards"></div>
 
-        <div style="display:flex; gap:16px; flex-wrap:wrap; align-items:center; margin-bottom:12px;">
-          <div style="display:flex; gap:6px;" id="ieTypeFilter">
-            <button type="button" class="chip" data-type="all" aria-pressed="true"><span class="kh">ទាំងអស់</span></button>
-            <button type="button" class="chip" data-type="income" aria-pressed="false"><span class="kh">ចំណូល</span></button>
-            <button type="button" class="chip" data-type="expense" aria-pressed="false"><span class="kh">ចំណាយ</span></button>
+          <div class="fin-table-wrap" style="max-height:460px;">
+            <table class="fin-table fin-ledger">
+              <thead><tr>
+                <th style="width:100px;">ថ្ងៃខែ · Date</th>
+                <th style="width:80px;">ប្រភេទ</th>
+                <th style="width:140px;">គណនី · Account</th>
+                <th>បរិយាយ · Description</th>
+                <th class="r" style="width:110px;">ទឹកប្រាក់ ($)</th>
+                <th class="c" style="width:44px;"></th>
+              </tr></thead>
+              <tbody id="ieCombinedTableBody"></tbody>
+            </table>
           </div>
-          <div style="display:flex; gap:6px; align-items:center;" id="iePeriodFilter">
-            <button type="button" class="chip" data-period="day" aria-pressed="false"><span class="kh">ថ្ងៃ</span></button>
-            <button type="button" class="chip" data-period="month" aria-pressed="true"><span class="kh">ខែ</span></button>
-            <button type="button" class="chip" data-period="year" aria-pressed="false"><span class="kh">ឆ្នាំ</span></button>
-            <button type="button" class="chip" data-period="all" aria-pressed="false"><span class="kh">ទាំងអស់</span></button>
-            <input type="date" id="iePeriodDate" class="mono" style="display:none; height:32px; padding:0 8px;">
-            <input type="month" id="iePeriodMonth" class="mono" style="height:32px; padding:0 8px;">
-            <input type="number" id="iePeriodYear" class="mono" style="display:none; width:90px; height:32px; padding:0 8px;" placeholder="2026">
-          </div>
-          <div style="display:flex; align-items:center; gap:8px; margin-left:auto;">
-            <input type="month" id="reportMonthYear" class="tb-search mono" style="height:34px; padding:0 8px; min-width: 130px;">
-            <button type="button" class="btn btn-primary btn-sm kh" id="exportPdfBtn" title="ទាញយក PDF ចំណូល/ចំណាយ តាមខែ/ឆ្នាំ">📄 ទាញយក PDF របាយការណ៍</button>
-            <button type="button" class="btn btn-outline btn-sm kh" id="printExpenseBtn" style="display:none;">🖨 Print របាយការណ៍</button>
-          </div>
-        </div>
-
-        <div id="ieSummaryCards" style="display:flex; gap:24px; flex-wrap:wrap; align-items:center; background:var(--surface-2); border:1px solid var(--border); border-radius:10px; padding:10px 16px; margin-bottom:14px;"></div>
-
-        <div style="max-height: 420px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 14px;">
-          <table class="med-table" style="width: 100%; margin: 0;">
-            <thead>
-              <tr>
-                <th style="width: 100px;">ថ្ងៃខែ</th>
-                <th style="width: 65px;">ប្រភេទ</th>
-                <th style="width: 130px;">ប្រភពចេញចូល</th>
-                <th>បរិយាយ</th>
-                <th style="width: 95px; text-align: right;">ចំនួន ($)</th>
-                <th style="width: 40px; text-align: center;">លុប</th>
-              </tr>
-            </thead>
-            <tbody id="ieCombinedTableBody"></tbody>
-          </table>
         </div>
       </section>
 
@@ -1325,10 +1440,10 @@
         <div class="field"><label>Lab</label><input type="text" id="lab_lab" class="kh" list="lab_lab_list" autocomplete="off"><datalist id="lab_lab_list"></datalist></div>
         <div class="field"><label>លេខធ្មេញ (Teeth)</label><input type="text" id="lab_teeth" class="mono" placeholder="11, 21"></div>
         <div class="field"><label>ពណ៌ (Shade)</label><input type="text" id="lab_shade" class="mono" placeholder="A2"></div>
-        <div class="field"><label>ថ្ងៃផ្ញើ (Sent)</label><input type="date" id="lab_sent" class="mono"></div>
+        <div class="field"><label>ថ្ងៃផ្ញើពុម្ពដំបូង (Sent)</label><input type="date" id="lab_sent" class="mono"></div>
         <div class="field"><label>ថ្ងៃត្រូវយក (Due)</label><input type="date" id="lab_due" class="mono"></div>
-        <div class="field"><label>តម្លៃ (Cost $)</label><input type="number" id="lab_cost" class="mono" step="0.01" min="0" placeholder="0.00"></div>
-        <div class="field"><label>ស្ថានភាព (Status)</label><select id="lab_status" class="kh"></select></div>
+        <div class="field"><label>ចំណាយ DL (Auto = តម្លៃ × ធ្មេញ)</label><input type="number" id="lab_cost" class="mono" step="0.01" min="0" placeholder="0.00"></div>
+        <div class="field" style="display:none;"><label>ស្ថានភាព (Status)</label><select id="lab_status" class="kh"></select></div>
         <div class="field full"><label>កំណត់ចំណាំ (Note)</label><textarea id="lab_note" class="kh"></textarea></div>
       </div>
       <div class="form-error kh hidden" id="labFormError"></div>
@@ -1938,7 +2053,7 @@
 
 <!-- Labo patient detail drill-in (small overlay, opened by clicking a patient card in ពុម្ភធ្មេញ) -->
 <div class="overlay hidden" id="laboPatientDetailOverlay">
-  <div class="modal" style="max-width: 680px;">
+  <div class="modal" style="max-width: 780px;">
     <div class="modal-head">
       <h2 class="kh" id="laboPatientDetailTitle">🧪 ពុម្ភធ្មេញអ្នកជំងឺ</h2>
       <button class="x" id="closeLaboPatientDetail">✕</button>
@@ -5814,88 +5929,74 @@ async function uploadXrayImage(){
 /* ========================================================
    🧾 មុខងារគ្រប់គ្រងវិក្កយបត្រ (INVOICE MANAGEMENT)
 ======================================================== */
+function finMoney(v){ return '$' + (Number(v) || 0).toLocaleString('en-US', { minimumFractionDigits:2, maximumFractionDigits:2 }); }
+function finAgeBucket(days){ return days <= 30 ? 0 : days <= 60 ? 1 : days <= 90 ? 2 : 3; }
+const FIN_AGE_LABELS = ['0–30 ថ្ងៃ', '31–60 ថ្ងៃ', '61–90 ថ្ងៃ', '90+ ថ្ងៃ'];
+const FIN_AGE_COLORS = ['#0369A1', '#8A5C16', '#C2410C', '#A43227'];
+
+// Accounts Receivable: only patients who still owe money (Balance > 0).
 function renderInvoicesTable(searchQ) {
-  const paidTbody = document.getElementById('invoicePaidTableBody');
-  const unpaidTbody = document.getElementById('invoiceUnpaidTableBody');
-  const paidEmpty = document.getElementById('invoicePaidEmpty');
-  const unpaidEmpty = document.getElementById('invoiceUnpaidEmpty');
-  paidTbody.innerHTML = '';
-  unpaidTbody.innerHTML = '';
+  const tbody = document.getElementById('invoiceUnpaidTableBody');
+  const foot = document.getElementById('invoiceUnpaidFoot');
+  const empty = document.getElementById('invoiceUnpaidEmpty');
+  if(!tbody) return;
+  if(searchQ === undefined){ const s = document.getElementById('invoicePatientSearch'); searchQ = s ? s.value : ''; }
+  const money = v => parseFloat(String(v || '').replace(/[^\d.]/g, '')) || 0;
 
-  const invoiceRecords = allRecords.filter(r => cleanStr(r.payTotal) || cleanStr(r.payBalance) || cleanStr(r.payPaid));
-
-  // Group by patient name (case-insensitive, trimmed).
   const byPatient = {};
-  invoiceRecords.forEach(r => {
+  allRecords.filter(r => cleanStr(r.payTotal) || cleanStr(r.payBalance) || cleanStr(r.payPaid)).forEach(r => {
     const key = cleanStr(r.name).toLowerCase();
     if(!key) return;
-    if(!byPatient[key]) byPatient[key] = { name: r.name, phone: r.phone, cases: [], total: 0, balance: 0 };
-    const totVal = parseFloat(String(r.payTotal || '').replace(/[^\d.]/g, '')) || 0;
-    const balVal = parseFloat(String(r.payBalance || '').replace(/[^\d.]/g, '')) || 0;
-    byPatient[key].cases.push(r);
-    byPatient[key].total += totVal;
-    byPatient[key].balance += balVal;
-    if(!byPatient[key].phone && r.phone) byPatient[key].phone = r.phone;
+    if(!byPatient[key]) byPatient[key] = { name: r.name, phone: r.phone, cases: [], total: 0, paid: 0, balance: 0, oldest: null };
+    const p = byPatient[key];
+    const bal = money(r.payBalance);
+    p.cases.push(r);
+    p.total += money(r.payTotal);
+    p.paid += money(r.payPaid);
+    p.balance += bal;
+    if(bal > 0.004){ const d = parseAnyDate(r.timestamp) || parseAnyDate(r.payDate); if(d && (!p.oldest || d < p.oldest)) p.oldest = d; }
+    if(!p.phone && r.phone) p.phone = r.phone;
   });
 
-  let patients = Object.values(byPatient);
+  const now = new Date();
+  let owing = Object.values(byPatient).filter(p => p.balance > 0.004);
+  owing.forEach(p => { p.days = p.oldest ? Math.max(0, Math.floor((now - p.oldest) / 86400000)) : 0; p.bucket = finAgeBucket(p.days); });
+
+  // Aging summary (always over all owing patients, not the search)
+  const ag = [0,1,2,3].map(i => ({ amt: 0, n: 0 }));
+  owing.forEach(p => { ag[p.bucket].amt += p.balance; ag[p.bucket].n++; });
+  const agEl = document.getElementById('finAging');
+  if(agEl) agEl.innerHTML = ag.map((a, i) => `
+    <div class="ag"><div class="ag-l kh"><i style="background:${FIN_AGE_COLORS[i]}"></i>${FIN_AGE_LABELS[i]}</div>
+    <div class="ag-v" style="color:${a.amt ? FIN_AGE_COLORS[i] : 'var(--ink-dim)'}">${finMoney(a.amt)}</div>
+    <div class="ag-n kh">${a.n} នាក់</div></div>`).join('');
+
   if(searchQ){
     const q = searchQ.trim().toLowerCase();
-    patients = patients.filter(p => p.name.toLowerCase().includes(q) || String(p.phone||'').includes(q));
+    owing = owing.filter(p => p.name.toLowerCase().includes(q) || String(p.phone||'').includes(q));
   }
+  owing.sort((a,b) => b.balance - a.balance);
 
-  const paidPatients = patients.filter(p => p.balance <= 0.004).sort((a,b) => b.total - a.total);
-  const unpaidPatients = patients.filter(p => p.balance > 0.004).sort((a,b) => b.balance - a.balance);
+  document.getElementById('invUnpaidCount').textContent = owing.length ? `${owing.length} នាក់` : '';
+  empty.classList.toggle('hidden', owing.length > 0);
+  empty.textContent = searchQ ? 'រកមិនឃើញអ្នកជំងឺនៅខ្វះលុយ ត្រូវនឹងការស្វែងរកនេះទេ' : 'មិនមានអ្នកជំងឺនៅខ្វះលុយទេ 🎉';
 
-  document.getElementById('invPaidCount').textContent = paidPatients.length ? `(${paidPatients.length})` : '';
-  document.getElementById('invUnpaidCount').textContent = unpaidPatients.length ? `(${unpaidPatients.length})` : '';
-
-  paidEmpty.classList.toggle('hidden', paidPatients.length > 0);
-  paidEmpty.textContent = 'មិនទាន់មានអ្នកជំងឺបានបង់លុយរួចនៅឡើយទេ';
-  unpaidEmpty.classList.toggle('hidden', unpaidPatients.length > 0);
-  unpaidEmpty.textContent = 'មិនមានអ្នកជំងឺនៅខ្វះលុយទេ 🎉';
-
-  let sumTotal = 0;
-  let sumBalance = 0;
-
-  paidPatients.forEach(p => {
-    sumTotal += p.total;
+  tbody.innerHTML = '';
+  owing.forEach(p => {
+    const pct = p.total > 0 ? Math.min(100, Math.round(p.paid / p.total * 100)) : 0;
     const tr = document.createElement('tr');
-    tr.className = 'emr-tr';
     tr.onclick = () => openInvoiceDetail(p);
     tr.innerHTML = `
-      <td class="kh" style="font-weight:700; color:var(--ink);">${p.name || '—'}</td>
-      <td class="mono" style="font-size:12px;">${formatPhoneDisplay(p.phone) || '—'}</td>
-      <td class="mono" style="text-align:center; font-weight:700;">${p.cases.length}</td>
-      <td class="mono" style="text-align:right; font-weight:700; color:var(--primary-dark);">$${p.total.toFixed(2)}</td>
-    `;
-    paidTbody.appendChild(tr);
+      <td class="kh"><div class="fin-pt-name">${escHTML(p.name) || '—'}</div><div class="fin-pt-phone">${formatPhoneDisplay(p.phone) || '—'}</div></td>
+      <td class="c mono" style="font-weight:700;">${p.cases.length}</td>
+      <td class="num">${finMoney(p.total)}</td>
+      <td class="num">${finMoney(p.paid)}<div class="fin-bar" title="បានបង់ ${pct}%"><b style="width:${pct}%"></b></div></td>
+      <td class="num fin-due">${finMoney(p.balance)}</td>
+      <td class="c"><span class="fin-age a${p.bucket} kh">${p.days} ថ្ងៃ</span></td>`;
+    tbody.appendChild(tr);
   });
-
-  unpaidPatients.forEach(p => {
-    sumTotal += p.total;
-    sumBalance += p.balance;
-    const tr = document.createElement('tr');
-    tr.className = 'emr-tr';
-    tr.onclick = () => openInvoiceDetail(p);
-    tr.innerHTML = `
-      <td class="kh" style="font-weight:700; color:var(--ink);">${p.name || '—'}</td>
-      <td class="mono" style="font-size:12px;">${formatPhoneDisplay(p.phone) || '—'}</td>
-      <td class="mono" style="text-align:center; font-weight:700;">${p.cases.length}</td>
-      <td class="mono" style="text-align:right; font-weight:700; color:var(--primary-dark);">$${p.total.toFixed(2)}</td>
-      <td class="mono" style="text-align:right; font-weight:700; color:var(--coral-dark);">$${p.balance.toFixed(2)}</td>
-    `;
-    unpaidTbody.appendChild(tr);
-  });
-
-  const sumPaid = invoiceRecords.reduce((s,r) => s + (parseFloat(String(r.payPaid||'').replace(/[^\d.]/g,'')) || 0), 0);
-
-  document.getElementById('invoiceStats').innerHTML = statCardsHTML([
-    { kh: 'ចំនួន Invoice សរុប', en: 'Total Invoices', val: invoiceRecords.length, cls: '' },
-    { kh: 'សរុបទឹកប្រាក់', en: 'Total Amount', val: '$' + sumTotal.toFixed(2), cls: '' },
-    { kh: 'សរុបប្រាក់បានបង់', en: 'Total Paid', val: '$' + sumPaid.toFixed(2), cls: '' },
-    { kh: 'សរុបប្រាក់នៅមិនទាន់បង់', en: 'Total Outstanding', val: '$' + sumBalance.toFixed(2), cls: 'debt' }
-  ]);
+  const T = owing.reduce((s,p) => ({ total: s.total + p.total, paid: s.paid + p.paid, bal: s.bal + p.balance, n: s.n + p.cases.length }), { total:0, paid:0, bal:0, n:0 });
+  foot.innerHTML = owing.length ? `<tr><td class="kh">សរុប · Total</td><td class="c mono">${T.n}</td><td class="num">${finMoney(T.total)}</td><td class="num">${finMoney(T.paid)}</td><td class="num fin-due">${finMoney(T.bal)}</td><td></td></tr>` : '';
 }
 
 let activeProcStepsRecordId = null;
@@ -6105,13 +6206,24 @@ function createLabOrderFromStep(record, step, workName){
   const p = labCostPreview(record, workName);
   const work = p.pr ? p.pr.name : workName;                 // the price list's spelling when it matches
   const sentYMD = cleanStr(sheetTextToStepDate(step.date)).slice(0, 10) || getLocalTodayYMD();
+  // The case already has an open lab work (not delivered yet): this "Lab" step is another trip of the SAME case,
+  // so the impression goes back to the lab without opening a new case or charging the DL fee twice.
+  const open = labOrders.find(x => record.code && x.sourceRecordId === record.code && !x.deliveredDate && x.status !== 'delivered'
+                                   && (!work || !x.work || cleanStr(x.work).toLowerCase() === work.toLowerCase()));
+  if(open){
+    labAddTrip(open, { dir:'out', stage: LAB_STAGES_OUT[1], date: sentYMD, due:'', note: 'Auto (Step Lab)' });
+    if(typeof renderLab === 'function') renderLab();
+    return { order: open, noteText: `${open.work || work} · ផ្ញើទៅ Lab ម្តងទៀត (ដងទី ${labTrips(open).filter(t => t.dir === 'out').length})` };
+  }
   const order = {
     id: genCode(), created: getLocalTodayYMD(), sourceRecordId: record.code || '',
     patient: record.name, work: work || 'Lab', lab: '', teeth: record.teeth || '', shade: '',
     sent: sentYMD, due: '', receivedDate: '', deliveredDate: '', cost: p.cost,
-    status: 'sent', note: 'Auto (Step Lab · Case ' + (record.code || '') + ')'
+    status: 'sent', note: 'Auto (Step Lab · Case ' + (record.code || '') + ')',
+    dlTeethCount: p.teethCount, dlPerTooth: p.hasPrice ? p.perTooth : '',
+    trips: [{ id: genCode(), dir:'out', stage: LAB_STAGES_OUT[0], date: sentYMD, due:'', note:'' }]
   };
-  stampLabStatus(order);
+  labSyncFields(order);
   labOrders.push(order);
   saveLab();
   pushToSheet('addLabo', order);
@@ -6399,7 +6511,6 @@ function printCombinedInvoice(){
 }
 
 
-document.getElementById('invoiceBtn').addEventListener('click', () => requestClinicPin(() => showView('invoices')));
 
 document.getElementById('closeInvoiceDetail').addEventListener('click', () => {
   document.getElementById('invoiceDetailOverlay').classList.add('hidden');
@@ -6516,9 +6627,9 @@ function renderCombinedIETable(){
   const net = totalIncome - totalExpense;
 
   document.getElementById('ieSummaryCards').innerHTML = `
-    <div class="kh" style="font-size:13px; color:var(--ink-soft);">សរុបចំណូល៖ <b class="mono" style="font-size:15px; color:var(--primary-dark);">$${totalIncome.toFixed(2)}</b></div>
-    <div class="kh" style="font-size:13px; color:var(--ink-soft);">សរុបចំណាយ៖ <b class="mono" style="font-size:15px; color:var(--coral-dark);">$${totalExpense.toFixed(2)}</b></div>
-    <div class="kh" style="font-size:13px; color:var(--ink-soft);">ចំណេញសរុប៖ <b class="mono" style="font-size:15px; color:${net>=0?'var(--primary-dark)':'var(--coral-dark)'};">${net>=0?'$':'-$'}${Math.abs(net).toFixed(2)}</b></div>
+    <div class="fin-sum"><div class="s-l kh">សរុបចំណូល · Total Revenue</div><div class="s-v fin-amt-in">${finMoney(totalIncome)}</div></div>
+    <div class="fin-sum"><div class="s-l kh">សរុបចំណាយ · Total Expenses</div><div class="s-v fin-amt-out">${finMoney(totalExpense)}</div></div>
+    <div class="fin-sum"><div class="s-l kh">ចំណេញសុទ្ធ · Net</div><div class="s-v" style="color:${net>=0?'var(--primary-dark)':'var(--coral-dark)'};">${net<0?'-':''}${finMoney(Math.abs(net))}</div></div>
   `;
 
   if(rows.length === 0){
@@ -6527,15 +6638,13 @@ function renderCombinedIETable(){
   }
 
   tbody.innerHTML = rows.map((row, idx) => `
-    <tr class="emr-tr" data-idx="${idx}" style="cursor:pointer;">
-      <td class="mono" style="font-size:11.5px;">${row.date}</td>
-      <td><span class="badge-mini kh" style="background:${row.kind==='income'?'var(--primary-soft)':'var(--coral-soft)'};color:${row.kind==='income'?'var(--primary-dark)':'var(--coral-dark)'};">${row.kind==='income'?'ចំណូល':'ចំណាយ'}</span></td>
+    <tr data-idx="${idx}">
+      <td>${row.date}</td>
+      <td><span class="fin-tag ${row.kind==='income'?'in':'out'} kh">${row.kind==='income'?'ចំណូល':'ចំណាយ'}</span></td>
       <td class="kh" style="font-weight:600;">${escHTML(row.category)}</td>
       <td class="kh" style="font-size:12px;color:var(--ink-soft);">${escHTML(row.desc)}</td>
-      <td class="mono" style="text-align:right;font-weight:700;color:${row.kind==='income'?'var(--primary-dark)':'var(--coral-dark)'};">${row.kind==='income'?'+':'-'}$${row.amount.toFixed(2)}</td>
-      <td style="text-align:center;">
-        <button type="button" class="btn btn-danger btn-sm" style="padding:2px 6px;font-size:10px;" data-act="delie">✕</button>
-      </td>
+      <td class="num ${row.kind==='income'?'fin-amt-in':'fin-amt-out'}">${row.kind==='income'?'+':'−'}${finMoney(row.amount)}</td>
+      <td class="c"><button type="button" class="fin-del" data-act="delie" title="លុប (ត្រូវការ PIN)">✕</button></td>
     </tr>
   `).join('');
 }
@@ -6774,14 +6883,32 @@ function renderIncomeExpensePage(){
   loadExpenses();
   const s = getIncomeExpenseStats();
 
-  document.getElementById('incomeExpenseStats').innerHTML = statCardsHTML([
-    { kh: 'ចំណូលថ្ងៃនេះ', en: 'Income Today', val: '$' + s.incomeToday.toFixed(2), cls: '' },
-    { kh: 'ចំណូលខែនេះ', en: 'Income This Month', val: '$' + s.incomeMonth.toFixed(2), cls: '' },
-    { kh: 'ចំណូលឆ្នាំនេះ', en: 'Income This Year', val: '$' + s.incomeYear.toFixed(2), cls: '' },
-    { kh: 'ចំណាយ DL', en: 'Dental Lab · this month', val: '$' + s.dlExpenseMonth.toFixed(2), cls: 'debt' },
-    { kh: 'ចំណាយ DM', en: 'Dental Materials · this month', val: '$' + s.dmExpenseMonth.toFixed(2), cls: 'debt' },
-    { kh: 'ចំណាយសរុប', en: 'Total expense · this month', val: '$' + s.expenseMonth.toFixed(2), cls: 'debt' }
-  ]);
+  const delta = (cur, prev, invert) => {
+    if(!prev) return `<span class="fin-delta flat">— ខែមុន</span>`;
+    const pc = Math.round((cur - prev) / prev * 100);
+    const good = invert ? pc <= 0 : pc >= 0;
+    return `<span class="fin-delta ${pc === 0 ? 'flat' : good ? 'up' : 'down'}">${pc > 0 ? '▲' : pc < 0 ? '▼' : '•'} ${Math.abs(pc)}%</span><span class="kh">ធៀបខែមុន</span>`;
+  };
+  const net = s.incomeMonth - s.expenseMonth, netLast = s.incomeLastMonth - s.expenseLastMonth;
+  const margin = s.incomeMonth > 0 ? Math.round(net / s.incomeMonth * 100) : 0;
+  const ar = unpaidInvoiceSummary();
+  const kpi = (o) => `<div class="fin-kpi" style="--k:${o.c}; --kb:${o.cb};">
+      <div class="k-label kh"><span class="k-ico">${o.i}</span>${o.kh}</div>
+      <div class="k-val" style="${o.vc ? 'color:' + o.vc : ''}">${o.v}</div>
+      <div class="k-en">${o.en}</div>
+      <div class="k-foot">${o.f}</div></div>`;
+  document.getElementById('incomeExpenseStats').innerHTML = [
+    kpi({ i:'💰', kh:'ចំណូលខែនេះ', en:'Revenue · MTD', v: finMoney(s.incomeMonth), c:'#0E9F6E', cb:'#DEF7EC', f: delta(s.incomeMonth, s.incomeLastMonth) }),
+    kpi({ i:'💸', kh:'ចំណាយខែនេះ', en:'Expenses · MTD', v: finMoney(s.expenseMonth), c:'var(--coral)', cb:'var(--coral-soft)',
+          f: `<span class="kh">DL <b class="mono">${finMoney(s.dlExpenseMonth)}</b></span><span class="kh">DM <b class="mono">${finMoney(s.dmExpenseMonth)}</b></span>` }),
+    kpi({ i:'📈', kh:'ចំណេញសុទ្ធ', en:'Net Income · MTD', v: (net < 0 ? '-' : '') + finMoney(Math.abs(net)), vc: net < 0 ? 'var(--coral-dark)' : '', c:'var(--primary-dark)', cb:'var(--primary-softer)',
+          f: `<span class="kh">Margin <b class="mono">${margin}%</b></span><span class="kh">ខែមុន <b class="mono">${netLast < 0 ? '-' : ''}${finMoney(Math.abs(netLast))}</b></span>` }),
+    kpi({ i:'⏳', kh:'ប្រាក់ត្រូវទទួល', en:'Accounts Receivable', v: finMoney(ar.amount), vc: ar.amount ? 'var(--coral-dark)' : '', c:'var(--amber)', cb:'var(--amber-soft)',
+          f: `<span class="kh">${ar.count} នាក់មិនទាន់បង់អស់</span>` }),
+    kpi({ i:'🧾', kh:'ប្រមូលបានថ្ងៃនេះ', en:'Collected Today', v: finMoney(s.incomeToday), c:'#2563EB', cb:'#DBEAFE',
+          f: `<span class="kh">ឆ្នាំនេះ <b class="mono">${finMoney(s.incomeYear)}</b></span>` })
+  ].join('');
+  renderInvoicesTable();
 
   renderCompareChart('chartMonthCompare', 'ខែមុន', 'ខែនេះ', s.incomeLastMonth, s.expenseLastMonth, s.incomeMonth, s.expenseMonth);
   renderCompareChart('chartYearCompare', 'ឆ្នាំមុន', 'ឆ្នាំនេះ', s.incomeLastYear, s.expenseLastYear, s.incomeYear, s.expenseYear);
@@ -6811,8 +6938,7 @@ const VIEW_META = {
   inventory:    { kh: 'បរិក្ខាធ្មេញ',         en: 'Inventory' },
   xray:         { kh: 'រូបធ្មេញ',             en: 'Dental X-Ray' },
   medication:   { kh: 'ថ្នាំធ្មេញ',            en: 'Medication' },
-  invoices:     { kh: 'វិក្កយបត្រ',           en: 'Invoices' },
-  'income-expense': { kh: 'ចំណូលចំណាយ',      en: 'Income & Expense' }
+  'income-expense': { kh: 'ហិរញ្ញវត្ថុ',       en: 'Billing & Finance' }
 };
 let currentView = 'dashboard';
 let patientFilter = 'all';
@@ -6894,12 +7020,12 @@ function syncNav(){
 
 function showView(key){
   let view = key;
+  if(key === 'invoices') view = 'income-expense';      // Invoices now live inside Billing & Finance
   if(key === 'appointments'){ view = 'patients'; setPatientFilter('appt', true); }
   else if(key === 'patients'){ setPatientFilter('all', true); }
   currentView = view;
   if(view === 'labo') renderLab();
   if(view === 'inventory') renderInventory();
-  if(view === 'invoices'){ renderInvoicesTable(); }
   if(view === 'income-expense') renderIncomeExpensePage();
   if(view === 'xray') renderXrayGrid();
   if(view === 'medication') renderMedicationPage();
@@ -7098,20 +7224,8 @@ function labRoundCount(o){
 function sendLabOrderAgain(id){
   const o = labOrders.find(x => x.id === id);
   if(!o) return;
-  if(!Array.isArray(o.rounds)) o.rounds = [];
-  o.rounds.push({ sent: o.sent || '', received: o.receivedDate || '' });
-  o.sent = getLocalTodayYMD();
-  o.receivedDate = '';
-  o.deliveredDate = '';
-  o.due = '';
-  o.status = 'sent';
-  saveLab();
-  pushToSheet('updateLabo', o);
+  labAddTrip(o, { dir:'out', stage: LAB_STAGES_OUT[1], date: getLocalTodayYMD(), due:'' });
   renderLab();
-  upsertAutoLabExpense(o, true);
-  if(document.getElementById('laboPatientDetailOverlay') && !document.getElementById('laboPatientDetailOverlay').classList.contains('hidden')){
-    openLaboPatientDetail(o.patient);
-  }
 }
 
 function stampLabStatus(o){
@@ -7127,7 +7241,7 @@ function upsertAutoLabExpense(order, forceNew){
   if(!forceNew){
     // Editing an existing order: update the most recent linked expense in place
     // instead of creating a duplicate (or losing the edit entirely).
-    const linked = expensesList.filter(e => e.sourceOrderId === order.id);
+    const linked = expensesList.filter(e => e.sourceOrderId === order.id && !e.chargeKind);   // the case's main lab fee (not remake charges)
     linked.sort((a,b) => (b.date||'').localeCompare(a.date||''));
     if(linked.length > 0){
       const e = linked[0];
@@ -7261,277 +7375,421 @@ function labTrailHTML(steps){
 
 let laboDetailCtx = null;   // { patient, orderId } — which case the Dental Lab popup is showing
 
+/* =====================================================================
+   DENTAL LAB · standard case workflow
+   One case (work order) = one piece of lab work. The impression / try-in can travel
+   Clinic -> Lab -> Clinic -> Lab ... many times; every movement is a "trip".
+   The DL fee (Lab price per tooth x teeth) is booked automatically ONCE per case;
+   only a Remake that the lab charges for adds an extra DL expense.
+===================================================================== */
+const LAB_STAGES_OUT = ['Impression · ពុម្ពដំបូង', 'Return after try-in · ផ្ញើត្រឡប់ក្រោយសាក', 'Remake · ធ្វើឡើងវិញ', 'Repair / Adjust · កែតម្រូវ'];
+const LAB_STAGES_IN  = ['Framework / Coping try-in · សាកគ្រោង', 'Wax try-in · សាកក្រមួន', 'Bisque try-in · សាករាង/ពណ៌', 'Final · ធ្មេញសម្រេច'];
+const LAB_FINAL_RE = /final|សម្រេច|finish/i;
+const LAB_REMAKE_RE = /remake|ឡើងវិញ/i;
+
+function labTrips(o){
+  if(Array.isArray(o.trips)) return o.trips;
+  if(typeof o.tripsJSON === 'string' && o.tripsJSON){
+    try{ const a = JSON.parse(o.tripsJSON); if(Array.isArray(a)){ o.trips = a; return a; } }catch(e){}
+  }
+  // Older orders: rebuild the trips from their Sent / Received dates and past rounds.
+  const t = [];
+  (Array.isArray(o.rounds) ? o.rounds : []).forEach((r, i) => {
+    if(r.sent) t.push({ id: genCode(), dir:'out', stage: i === 0 ? LAB_STAGES_OUT[0] : LAB_STAGES_OUT[1], date: r.sent, due:'', note:'' });
+    if(r.received) t.push({ id: genCode(), dir:'in', stage: LAB_STAGES_IN[0], date: r.received, note:'' });
+  });
+  if(o.sent) t.push({ id: genCode(), dir:'out', stage: t.length ? LAB_STAGES_OUT[1] : LAB_STAGES_OUT[0], date: o.sent, due: o.due || '', note:'' });
+  if(o.receivedDate) t.push({ id: genCode(), dir:'in', stage: LAB_STAGES_IN[3], date: o.receivedDate, note:'' });
+  o.trips = t;
+  return t;
+}
+// Keeps the order's simple fields (status, sent, due, receivedDate) in step with its trips.
+function labSyncFields(o){
+  const t = labTrips(o).slice().sort((a,b) => (a.date||'').localeCompare(b.date||''));
+  o.trips = t;
+  const outs = t.filter(x => x.dir === 'out'), ins = t.filter(x => x.dir === 'in');
+  const last = t[t.length - 1];
+  if(outs.length) o.sent = outs[0].date;
+  o.receivedDate = ins.length ? ins[ins.length - 1].date : '';
+  if(o.deliveredDate){ o.status = 'delivered'; }
+  else if(!last || last.dir === 'out'){ o.status = 'sent'; o.due = last ? (last.due || '') : (o.due || ''); }
+  else { o.status = 'received'; o.due = ''; }
+  o.tripsJSON = JSON.stringify(t);
+  return o;
+}
+function labAddTrip(o, trip){
+  labTrips(o).push(Object.assign({ id: genCode(), due:'', note:'' }, trip));
+  if(trip.dir === 'out') o.deliveredDate = '';
+  labSyncFields(o);
+  saveLab();
+  pushToSheet('updateLabo', o);
+}
+function labCaseNo(o){
+  const d = cleanStr(o.created || o.sent).replace(/-/g, '');
+  return 'LAB-' + (d ? d.slice(2, 6) : '0000') + '-' + String(o.id || '').slice(-4).toUpperCase();
+}
+function labUnits(o){ return parseInt(o.dlTeethCount, 10) || countTeeth(o.teeth) || 1; }
+// Lab fee = price per tooth (Settings -> Lab Price) x teeth. Returns '' when the work has no price.
+function labAutoCost(o){
+  const pr = findLabPrice(o.work);
+  let per = parseFloat(o.dlPerTooth);
+  if(!(per > 0)) per = pr ? parseFloat(pr.price) : NaN;
+  return per > 0 ? num2(per * labUnits(o)) : '';
+}
+function labLocation(o){
+  labSyncFields(o);
+  const t = o.trips, last = t[t.length - 1];
+  if(o.deliveredDate) return { key:'delivered', ico:'✅', kh:'ដាក់ជូនអ្នកជំងឺរួច', en:'Delivered', c: LAB_STEP_STYLE.delivered };
+  if(!last || last.dir === 'out'){
+    const od = labOverdue(o);
+    return od ? { key:'overdue', ico:'⚠', kh:'យឺត · នៅ Lab', en:'Overdue at lab', c: LAB_STEP_STYLE.overdue }
+              : { key:'atlab', ico:'🏭', kh:'នៅ Lab', en:'At lab', c: LAB_STEP_STYLE.sent };
+  }
+  if(LAB_FINAL_RE.test(last.stage || '')) return { key:'ready', ico:'📦', kh:'រួចរាល់ · រង់ចាំដាក់', en:'Ready to fit', c: LAB_STEP_STYLE.received };
+  return { key:'tryin', ico:'🏥', kh:'នៅគ្លីនិក · សាកល្បង', en:'Try-in at clinic', c: LAB_STEP_STYLE.due };
+}
+function labLocPill(loc){
+  return `<span class="lab-loc kh" style="background:${loc.c.bg}; color:${loc.c.fg}; border-color:${loc.c.solid}55;">${loc.ico} ${loc.kh}</span>`;
+}
+function labTripsMini(o){
+  const t = labTrips(o);
+  const MAX = 6, hidden = Math.max(0, t.length - MAX);
+  const dots = t.slice(-MAX).map(x => `<span class="tp ${x.dir}" title="${escHTML(x.stage || '')} · ${escHTML(x.date || '')}">${x.dir === 'out' ? '→' : '←'}</span>`).join('');
+  const dl = o.deliveredDate ? '<span class="tp dlv" title="Delivered">✓</span>' : '';
+  return `<div class="lab-trips">${hidden ? `<span class="tn">+${hidden}</span>` : ''}${dots}${dl}<span class="tn kh">${t.length} ដង</span></div>`;
+}
+function labMainExpense(o){
+  loadExpenses();
+  return expensesList.filter(e => e.sourceOrderId === o.id && !e.chargeKind).sort((a,b) => (b.date||'').localeCompare(a.date||''))[0] || null;
+}
+function labExtraExpenses(o){
+  loadExpenses();
+  return expensesList.filter(e => e.sourceOrderId === o.id && e.chargeKind);
+}
+// Make sure every case with a price has its DL fee booked (runs quietly; covers cases made before this change).
+// Booked only once per case (o.dlAuto), so a fee you deleted by hand in Billing & Finance is not re-created.
+function labEnsureAutoFee(o){
+  if(o.dlAuto) return;
+  if(labMainExpense(o)){ o.dlAuto = true; saveLab(); return; }
+  if(o.cost === '' || o.cost == null || !(num2(o.cost) > 0)){
+    const c = labAutoCost(o);
+    if(c !== '' && c > 0) o.cost = c;
+  }
+  if(num2(o.cost) > 0){ upsertAutoLabExpense(o, false); o.dlAuto = true; saveLab(); }
+}
+
+function labKpi(o){
+  return `<div class="fin-kpi" style="--k:${o.c}; --kb:${o.cb};">
+    <div class="k-label kh"><span class="k-ico">${o.i}</span>${o.kh}</div>
+    <div class="k-val" style="${o.vc ? 'color:' + o.vc : ''}">${o.v}</div>
+    <div class="k-en">${o.en}</div>
+    <div class="k-foot kh">${o.f}</div></div>`;
+}
+
 function renderLab(){
   const today = getLocalTodayYMD();
+  labOrders.forEach(o => { labSyncFields(o); labEnsureAutoFee(o); });
   const q = labSearchTerm.trim().toLowerCase();
-  const base = q ? labOrders.filter(o => [o.patient, o.work, o.teeth, o.shade, o.lab, o.note].join(' ').toLowerCase().includes(q)) : labOrders.slice();
-
-  // Chip counts = number of patients (the list shows one row per patient)
-  const allGroups = groupLabOrders(base);
-  const ptSets = { all: new Set(), sent: new Set(), received: new Set(), delivered: new Set(), overdue: new Set() };
-  allGroups.forEach(g => { const o = g.latest, k = cleanStr(o.patient).toLowerCase();
-    ptSets.all.add(k); if(ptSets[o.status]) ptSets[o.status].add(k); if(labOverdue(o)) ptSets.overdue.add(k); });
-  const counts = {}; Object.keys(ptSets).forEach(k => counts[k] = ptSets[k].size);
+  const base = q ? labOrders.filter(o => [labCaseNo(o), o.patient, o.work, o.teeth, o.shade, o.lab, o.note].join(' ').toLowerCase().includes(q)) : labOrders.slice();
+  const locOf = new Map(base.map(o => [o.id, labLocation(o)]));
+  const inFilter = (o, f) => {
+    const k = locOf.get(o.id).key;
+    return f === 'all' ? true
+      : f === 'sent' ? (k === 'atlab' || k === 'overdue')
+      : f === 'received' ? (k === 'tryin' || k === 'ready')
+      : f === 'overdue' ? k === 'overdue'
+      : f === 'delivered' ? k === 'delivered' : true;
+  };
   document.querySelectorAll('#laboFilters .chip').forEach(ch => {
-    ch.querySelector('.chip-n').textContent = counts[ch.dataset.filter];
+    ch.querySelector('.chip-n').textContent = base.filter(o => inFilter(o, ch.dataset.filter)).length;
     ch.setAttribute('aria-pressed', ch.dataset.filter === labFilter ? 'true' : 'false');
   });
 
-  const nSent = labOrders.filter(o => o.status === 'sent').length;
-  const nRecv = labOrders.filter(o => o.status === 'received').length;
-  const nOver = labOrders.filter(labOverdue).length;
-  const monthCost = labOrders.filter(o => (o.sent || o.created || '').slice(0, 7) === today.slice(0, 7)).reduce((s, o) => s + num2(o.cost), 0);
-  el('laboStats').innerHTML = statCardsHTML([
-    { kh: 'កំពុងធ្វើនៅ Lab', en: 'At the lab (Sent)', val: nSent, cls: 'highlight' },
-    { kh: 'ទទួលបានវិញ រង់ចាំដាក់', en: 'Received, not yet fitted', val: nRecv, cls: 'amber' },
-    { kh: 'យឺតជាងកំណត់', en: 'Overdue', val: nOver, cls: 'debt' },
-    { kh: 'ចំណាយ Lab ខែនេះ', en: 'Lab cost this month', val: '$' + monthCost.toFixed(2), cls: 'amber' }
-  ]);
+  // KPIs (all cases, not only the search)
+  const all = labOrders.map(o => ({ o, k: labLocation(o).key }));
+  const nAtLab = all.filter(x => x.k === 'atlab' || x.k === 'overdue').length;
+  const nOver = all.filter(x => x.k === 'overdue').length;
+  const nTry = all.filter(x => x.k === 'tryin').length;
+  const nReady = all.filter(x => x.k === 'ready').length;
+  const ym = today.slice(0, 7);
+  const nDelivMonth = labOrders.filter(o => (o.deliveredDate || '').slice(0, 7) === ym).length;
+  loadExpenses();
+  const dlMonth = expensesList.filter(e => e.type === 'DL' && (e.date || '').slice(0, 7) === ym).reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
+  const tripsMonth = labOrders.reduce((s, o) => s + labTrips(o).filter(t => (t.date || '').slice(0, 7) === ym).length, 0);
+  el('laboStats').innerHTML = [
+    labKpi({ i:'🏭', kh:'នៅ Lab', en:'At the lab', v: nAtLab, c:'#7C3AED', cb:'#EDE9FE', f: nOver ? `<span style="color:var(--coral-dark); font-weight:700;">⚠ យឺត ${nOver}</span>` : 'គ្មានយឺត' }),
+    labKpi({ i:'🏥', kh:'នៅគ្លីនិក · សាកល្បង', en:'Try-in at clinic', v: nTry, c:'#D97706', cb:'#FEF3C7', f: 'រង់ចាំអ្នកជំងឺមកសាក' }),
+    labKpi({ i:'📦', kh:'រួចរាល់ · រង់ចាំដាក់', en:'Ready to fit', v: nReady, c:'#0B5ED7', cb:'#E1EFFF', f: `ដាក់រួចខែនេះ <b class="mono">${nDelivMonth}</b>` }),
+    labKpi({ i:'🔁', kh:'ការបញ្ជូនខែនេះ', en:'Trips this month', v: tripsMonth, c:'var(--primary-dark)', cb:'var(--primary-softer)', f: `Case សរុប <b class="mono">${labOrders.length}</b>` }),
+    labKpi({ i:'💵', kh:'ចំណាយ DL ខែនេះ', en:'Lab fees · MTD', v: finMoney(dlMonth), vc:'var(--coral-dark)', c:'var(--coral)', cb:'var(--coral-soft)', f: 'កត់ត្រា Auto ចូលហិរញ្ញវត្ថុ' })
+  ].join('');
 
-  // One row per patient; the step trail shows the patient's most recent lab case.
-  const passes = g => labFilter === 'all' ? true : labFilter === 'overdue' ? labOverdue(g.latest) : g.latest.status === labFilter;
-  const byPatient = new Map();
-  groupLabOrders(base).forEach(g => {
-    const k = cleanStr(g.latest.patient).toLowerCase();
-    if(!byPatient.has(k)) byPatient.set(k, { name: g.latest.patient, groups: [] });
-    byPatient.get(k).groups.push(g);
+  const rank = { overdue:0, ready:1, tryin:2, atlab:3, delivered:4 };
+  const rows = base.filter(o => inFilter(o, labFilter)).sort((a, b) => {
+    const ra = rank[locOf.get(a.id).key], rb = rank[locOf.get(b.id).key];
+    if(ra !== rb) return ra - rb;
+    const la = labTrips(a), lb = labTrips(b);
+    return ((lb[lb.length-1] || {}).date || b.sent || '').localeCompare((la[la.length-1] || {}).date || a.sent || '');
   });
-  const sentKey = g => g.latest.sent || g.latest.created || '';
-  const patients = Array.from(byPatient.values())
-    .filter(p => p.groups.some(passes))
-    .map(p => { p.groups.sort((a,b) => sentKey(b).localeCompare(sentKey(a))); p.main = p.groups.find(passes) || p.groups[0]; return p; })
-    .sort((a,b) => sentKey(b.main).localeCompare(sentKey(a.main)));
-  const shown = patients;
+  el('laboCaseCount').textContent = rows.length ? rows.length + ' case' : '';
 
-  el('laboCardGrid').innerHTML = patients.map(p => {
-    const g = p.main, o = g.latest;
-    const od = p.groups.some(x => labOverdue(x.latest));
-    const nWorks = p.groups.length;
-    const workTxt = escHTML(g.treatment || g.works.join(', ')) || '';
+  el('laboCardGrid').innerHTML = rows.map(o => {
+    const loc = locOf.get(o.id);
+    const t = labTrips(o), last = t[t.length - 1];
+    const units = labUnits(o);
+    let dueTxt = '<span class="lab-sub">—</span>';
+    if(loc.key === 'atlab' || loc.key === 'overdue'){
+      if(isYMD(o.due)){
+        const d = daysUntil(o.due);
+        dueTxt = `<div class="mono" style="font-weight:600;">${fmtYMD(o.due)}</div><div class="lab-sub kh" style="${d < 0 ? 'color:var(--coral-dark); font-weight:700;' : ''}">${d < 0 ? `យឺត ${-d} ថ្ងៃ` : d === 0 ? 'ថ្ងៃនេះ' : `នៅ ${d} ថ្ងៃ`}</div>`;
+      } else dueTxt = '<span class="lab-sub kh">មិនកំណត់</span>';
+    } else if(loc.key === 'delivered') dueTxt = `<div class="lab-sub kh">ដាក់ ${fmtYMD(o.deliveredDate)}</div>`;
+    const fee = num2(o.cost) > 0 ? finMoney(o.cost) : '<span class="lab-sub kh">គ្មានតម្លៃ</span>';
+    const booked = labMainExpense(o) ? '<div class="lab-sub kh" style="color:#0E9F6E;">✓ កត់ត្រា DL</div>' : '';
+    const extra = labExtraExpenses(o).reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
     return `
-      <tr class="emr-tr lab-pt-row${od ? ' is-overdue' : ''}" data-patient="${escHTML(p.name)}">
-        <td data-label="ឈ្មោះអ្នកជំងឺ" class="kh">
-          <div style="font-weight:700; color:var(--primary-dark);">${escHTML(p.name)}</div>
-          <div class="cell-sub kh">${workTxt}${nWorks > 1 ? ` <span class="badge-mini kh" style="background:var(--primary-soft);color:var(--primary-dark);">${nWorks} ការងារ</span>` : ''}</div>
-        </td>
-        <td data-label="ជំហាន · Steps">${labTrailHTML(labGroupTimeline(g))}</td>
+      <tr class="${loc.key === 'overdue' ? 'is-overdue' : ''}" data-id="${o.id}">
+        <td><div class="lab-caseno">${labCaseNo(o)}</div><div class="lab-sub mono">${fmtYMD(o.created || o.sent) || '—'}</div></td>
+        <td class="kh"><div class="fin-pt-name">${escHTML(o.patient) || '—'}</div></td>
+        <td class="kh"><div style="font-weight:700;">${escHTML(o.work) || '—'}</div>
+          <div class="lab-sub">🦷 <span class="mono">${escHTML(o.teeth) || '—'}</span> · ${units} unit${units > 1 ? 's' : ''}${o.shade ? ` · Shade <b>${escHTML(o.shade)}</b>` : ''}</div></td>
+        <td class="kh">${escHTML(o.lab) || '<span class="lab-sub">—</span>'}</td>
+        <td>${labLocPill(loc)}<div class="lab-sub kh">${escHTML(last ? last.stage : '') || ''}</div></td>
+        <td>${labTripsMini(o)}</td>
+        <td>${dueTxt}</td>
+        <td class="num">${fee}${extra ? `<div class="lab-sub kh">+ Remake ${finMoney(extra)}</div>` : ''}${booked}</td>
       </tr>`;
   }).join('');
-
-  document.querySelectorAll('#laboCardGrid tr[data-patient]').forEach(row => {
-    row.addEventListener('click', () => openLaboPatientDetail(row.dataset.patient, null));
-  });
+  document.querySelectorAll('#laboCardGrid tr[data-id]').forEach(row => row.addEventListener('click', () => openLabCase(row.dataset.id)));
 
   const empty = el('laboEmpty');
-  if(shown.length === 0){
+  if(rows.length === 0){
     empty.innerHTML = labOrders.length === 0
-      ? 'មិនទាន់មានបញ្ជា Labo ទេ ចុច “＋ បញ្ជា Labo ថ្មី” ដើម្បីចាប់ផ្តើម<br><span style="opacity:.7">No lab orders yet</span>'
-      : 'មិនមានបញ្ជា Labo ត្រូវនឹងលក្ខខណ្ឌនេះទេ<br><span style="opacity:.7">No orders match this filter</span>';
+      ? 'មិនទាន់មាន Case Lab ទេ ចុច “＋ Case Lab ថ្មី” ឬបន្ថែមជំហាន “Lab” ក្នុង Clinical Notes<br><span style="opacity:.7">No lab cases yet</span>'
+      : 'មិនមាន Case ត្រូវនឹងលក្ខខណ្ឌនេះទេ<br><span style="opacity:.7">No cases match this filter</span>';
     empty.classList.remove('hidden');
   } else empty.classList.add('hidden');
 
   updateOpsBadges();
 }
 
+/* ---------- DL fee panel (automatic) ---------- */
+function labDLPanelHTML(o){
+  const teethN = labUnits(o);
+  const pr = findLabPrice(o.work);
+  let perTooth = parseFloat(o.dlPerTooth);
+  if(!(perTooth > 0)) perTooth = pr ? parseFloat(pr.price) : NaN;
+  if(!(perTooth > 0) && num2(o.cost) > 0) perTooth = num2(o.cost) / teethN;
+  const perVal = perTooth > 0 ? num2(perTooth) : '';
+  const total = perTooth > 0 ? num2(perTooth * teethN) : 0;
+  const curWork = pr ? pr.name : cleanStr(o.work);
+  let opts = (appLabPrices || []).map(p => {
+    const v = parseFloat(p.price);
+    return `<option value="${escHTML(p.name)}" data-price="${isFinite(v) && v > 0 ? v : ''}"${p.name === curWork ? ' selected' : ''}>${escHTML(p.name)}${isFinite(v) && v > 0 ? ` ($${v}/ធ្មេញ)` : ''}</option>`;
+  }).join('');
+  if(curWork && !(appLabPrices || []).some(p => p.name === curWork)) opts = `<option value="${escHTML(curWork)}" data-price="" selected>${escHTML(curWork)} (គ្មានតម្លៃ)</option>` + opts;
+  if(!opts) opts = '<option value="" data-price="">— បន្ថែមតម្លៃក្នុង Settings → Lab Price —</option>';
 
-// One lab order -> ordered list of steps (past rounds first, then the current round).
-function labOrderSteps(o){
-  const steps = [];
-  const rounds = Array.isArray(o.rounds) ? o.rounds : [];
-  const multi = rounds.length > 0;
-  rounds.forEach((r, i) => {
-    const tag = ` (ជុំ ${i+1})`;
-    if(r.sent) steps.push({ key:'sent', name:'Sent · ផ្ញើទៅ Lab' + tag, date:r.sent });
-    if(r.received) steps.push({ key:'received', name:'Received · Lab ធ្វើរួច' + tag, date:r.received });
-  });
-  const tag = multi ? ` (ជុំ ${rounds.length + 1})` : '';
-  const st = LAB_STATUS[o.status] ? o.status : 'sent';
-  if(o.sent) steps.push({ key:'sent', name:'Sent · ផ្ញើទៅ Lab' + tag, date:o.sent });
-  if(st === 'sent' && o.due){
-    const od = labOverdue(o);
-    steps.push({ key: od ? 'overdue' : 'due', name: (od ? 'Overdue · យឺត' : 'Due · ថ្ងៃត្រូវទទួល') + tag, date:o.due, pending:true,
-                 extra: od ? `យឺត ${-daysUntil(o.due)} ថ្ងៃ` : '' });
-  }
-  if(o.receivedDate) steps.push({ key:'received', name:'Received · Lab ធ្វើរួច' + tag, date:o.receivedDate });
-  if(o.deliveredDate) steps.push({ key:'delivered', name:'Delivered · ជូនអ្នកជំងឺរួច', date:o.deliveredDate });
-  return steps;
+  const main = labMainExpense(o), extra = labExtraExpenses(o);
+  const status = main
+    ? `<span class="badge-mini kh" style="background:#DCFCE7; color:#166534;">✓ កត់ត្រា Auto · ${finMoney(main.amount)} · ${fmtYMD(main.date)}</span>`
+    : `<span class="badge-mini kh" style="background:#FEF3C7; color:#92400E;">មិនទាន់មានតម្លៃ → មិនទាន់កត់ត្រា</span>`;
+  const lbl = 'display:block; font-size:10.5px; color:var(--ink-dim); margin-bottom:2px;';
+  return `
+    <div class="lab-dl" style="padding:12px; border:1px solid #FCD34D; border-radius:12px; background:#FFFBEB; margin-bottom:14px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:8px;">
+        <div class="kh" style="font-size:13px; font-weight:700; color:#92400E;">💵 ចំណាយ DL · Lab fee <span style="font-weight:400; font-size:11.5px;">(កត់ត្រាស្វ័យប្រវត្តិ ១ ដងក្នុង ១ Case)</span></div>
+        ${status}
+      </div>
+      <div style="display:flex; gap:6px; align-items:flex-end; flex-wrap:wrap;">
+        <div style="flex:2; min-width:150px;"><label class="kh" style="${lbl}">ប្រភេទ Lab Work</label>
+          <select data-role="dlwork" class="kh" style="width:100%; height:36px;">${opts}</select></div>
+        <div style="width:80px;"><label class="kh" style="${lbl}">ចំនួនធ្មេញ</label>
+          <input type="number" data-role="dlteeth" class="mono" min="1" step="1" value="${teethN}" style="width:100%; height:36px;"></div>
+        <div style="width:95px;"><label class="kh" style="${lbl}">តម្លៃ/ធ្មេញ ($)</label>
+          <input type="number" data-role="dlprice" class="mono" min="0" step="0.5" value="${perVal}" placeholder="0.00" style="width:100%; height:36px;"></div>
+        <div style="min-width:90px;"><label class="kh" style="${lbl}">សរុប (Total)</label>
+          <div data-role="dltotal" class="mono" style="height:36px; display:flex; align-items:center; font-weight:800; font-size:15px; color:#92400E;">$${total.toFixed(2)}</div></div>
+      </div>
+      <div class="kh" data-role="dlformula" style="margin-top:6px; font-size:11.5px; color:#92400E;">${o.teeth ? `ធ្មេញ ${escHTML(o.teeth)} · ` : ''}$${perVal || 0} × ${teethN} = $${total.toFixed(2)}</div>
+      ${extra.length ? `<div class="kh" style="margin-top:6px; font-size:11.5px; color:#92400E;">+ ថ្លៃ Remake ${extra.map(e => `${finMoney(e.amount)} (${fmtYMD(e.date)})`).join(', ')}</div>` : ''}
+      <div class="kh" style="margin-top:4px; font-size:11px; color:var(--ink-dim);">កែតម្លៃ ឬចំនួនធ្មេញ → ចំណាយ DL ក្នុងហិរញ្ញវត្ថុ កែតាមដោយស្វ័យប្រវត្តិ</div>
+    </div>`;
 }
-
-// Options for the Add-Step box in the Dental Lab popup: common lab steps first, then the clinic's procedure list.
-function labAddStepOptionsHTML(){
-  const common = ['Lab', 'លគ្រោង', 'Appointment', 'Done'];
-  const rest = (appProcedures || []).map(p => p.name).filter(n => n && !common.some(c => c.toLowerCase() === String(n).toLowerCase()));
-  return [...common, ...rest].map(n => `<option value="${escHTML(n)}">${escHTML(n)}</option>`).join('')
-       + '<option value="custom">ផ្សេងទៀត / Custom…</option>';
+function labDLRecalc(box){
+  if(!box) return;
+  const n = Math.max(0, parseInt(box.querySelector('[data-role="dlteeth"]').value, 10) || 0);
+  const per = parseFloat(box.querySelector('[data-role="dlprice"]').value) || 0;
+  const total = num2(per * n);
+  box.querySelector('[data-role="dltotal"]').textContent = '$' + total.toFixed(2);
+  const f = box.querySelector('[data-role="dlformula"]');
+  if(f) f.textContent = f.textContent.replace(/\$[\d.]+ × \d+ = \$[\d.]+$/, `$${num2(per)} × ${n} = $${total.toFixed(2)}`);
+  return { n, per, total };
 }
-
-// Add a step from the Dental Lab popup. With a linked case it becomes a normal Procedure Step of that case
-// (so Clinical Notes, status and the Sheet all update); without one it is kept on the lab order itself.
-function addLabGroupStep(orderId, box){
+// Auto-save: the case's fee = Total, and its "DL" expense is created / updated / removed to match.
+function saveLabDLCost(orderId, box){
   const o = labOrders.find(x => x.id === orderId);
   if(!o || !box) return;
-  const sel = box.querySelector('[data-role="stepsel"]');
-  const stepName = sel.value === 'custom' ? box.querySelector('[data-role="stepcustom"]').value.trim() : sel.value;
-  if(!stepName){ alert('សូមបញ្ចូលឈ្មោះជំហាន'); return; }
-  const date = box.querySelector('[data-role="stepdate"]').value || getLocalNowDateTime();
-  const note = box.querySelector('[data-role="stepnote"]').value.trim();
-
-  const g = groupLabOrders(labOrders.filter(x => cleanStr(x.patient).toLowerCase() === cleanStr(o.patient).toLowerCase()))
-            .find(gr => gr.list.some(x => x.id === orderId));
-  const rec = g && g.rec;
-  const newStep = { step: stepName, date, note };
-
-  if(rec){
-    if(!Array.isArray(rec.procedureSteps)) rec.procedureSteps = [];
-    if(isLabStepName(stepName)){
-      // another Lab step = a new trip to the lab: recorded in Dental Lab (+ DL expense), same as in Procedure Steps
-      const made = createLabOrderFromStep(rec, newStep, note || o.work);
-      newStep.note = made.noteText || note;
-      newStep.labOrderId = made.order.id;
-    }
-    rec.procedureSteps.push(newStep);
-    updateRecordStatusFromLatestStep(rec);
-    saveProcedureStepsToRecord(rec);
-  } else {
-    if(!Array.isArray(o.labSteps)) o.labSteps = [];
-    o.labSteps.push(newStep);
-    saveLab();
-    pushToSheet('updateLabo', o);
-  }
+  const c = labDLRecalc(box);
+  const work = box.querySelector('[data-role="dlwork"]').value;
+  if(work) o.work = work;
+  o.dlTeethCount = c.n > 0 ? c.n : '';
+  o.dlPerTooth = c.per > 0 ? c.per : '';
+  o.cost = c.n > 0 && c.per > 0 ? c.total : '';
+  saveLab();
+  pushToSheet('updateLabo', o);
+  upsertAutoLabExpense(o, false);
   renderLab();
-  openLaboPatientDetail(o.patient, orderId);
+  openLabCase(o.id);
 }
 
-// orderId: undefined = keep showing the same view (refresh); null = the patient's list; an id = that case's Add-Step view
+/* ---------- Case detail (work order) ---------- */
+function labStageOptions(list, sel){
+  return list.map(s => `<option value="${escHTML(s)}"${s === sel ? ' selected' : ''}>${escHTML(s)}</option>`).join('') + '<option value="custom">ផ្សេងទៀត / Custom…</option>';
+}
 function openLaboPatientDetail(patientName, orderId){
-  const ov = document.getElementById('laboPatientDetailOverlay');
-  const samePatient = laboDetailCtx && cleanStr(laboDetailCtx.patient).toLowerCase() === cleanStr(patientName).toLowerCase();
-  if(orderId === undefined) orderId = (samePatient && !ov.classList.contains('hidden')) ? laboDetailCtx.orderId : null;
-  laboDetailCtx = { patient: patientName, orderId: orderId || null };
+  if(orderId){ openLabCase(orderId); return; }
+  const o = labOrders.filter(x => cleanStr(x.patient).toLowerCase() === cleanStr(patientName).toLowerCase())
+                     .sort((a,b) => (b.sent || b.created || '').localeCompare(a.sent || a.created || ''))[0];
+  if(o) openLabCase(o.id);
+}
+function openLabCase(id){
+  const o = labOrders.find(x => x.id === id);
+  if(!o) return;
+  laboDetailCtx = { patient: o.patient, orderId: o.id };
+  const loc = labLocation(o);
+  const t = labTrips(o);
+  const today = getLocalTodayYMD();
+  const ins = t.filter(x => x.dir === 'in').length;
+  document.getElementById('laboPatientDetailTitle').innerHTML = `🧪 <span class="mono" style="color:var(--primary-dark);">${labCaseNo(o)}</span> · ${escHTML(o.patient)}`;
 
-  const orders = labOrders.filter(o => cleanStr(o.patient).toLowerCase() === patientName.toLowerCase());
-  document.getElementById('laboPatientDetailTitle').textContent = `🧪 ${patientName} — ពុម្ភធ្មេញ`;
+  const facts = [
+    ['Case #', `<span class="mono">${labCaseNo(o)}</span>`], ['អ្នកជំងឺ · Patient', escHTML(o.patient) || '—'],
+    ['ការងារ · Work', escHTML(o.work) || '—'], ['Lab', escHTML(o.lab) || '—'],
+    ['លេខធ្មេញ · Teeth', `<span class="mono">${escHTML(o.teeth) || '—'}</span>`], ['Units', labUnits(o)],
+    ['Shade', escHTML(o.shade) || '—'], ['បើក Case · Opened', `<span class="mono">${fmtYMD(o.created || o.sent) || '—'}</span>`]
+  ].map(f => `<div><div class="l kh">${f[0]}</div><div class="v kh">${f[1]}</div></div>`).join('');
 
-  const sorted = [...orders].sort((a,b) => (b.sent || b.created || '').localeCompare(a.sent || a.created || ''));
-  const totalTrips = sorted.reduce((s,o) => s + labRoundCount(o), 0);
-  let groups = groupLabOrders(sorted).sort((a,b) => (b.latest.sent||'').localeCompare(a.latest.sent||''));
+  const atLab = loc.key === 'atlab' || loc.key === 'overdue';
+  const arrow = atLab ? '<b style="right:-2px; color:#7C3AED;">▶</b>' : '<b style="left:-2px; color:#0B5ED7;">◀</b>';
+  let statusTxt = escHTML((t[t.length-1] || {}).stage || '');
+  if(atLab && isYMD(o.due)){ const d = daysUntil(o.due); statusTxt += ` · ត្រូវយក <b class="mono">${fmtYMD(o.due)}</b>${d < 0 ? ` <span class="badge-mini out kh">យឺត ${-d} ថ្ងៃ</span>` : ''}`; }
+  if(loc.key === 'delivered') statusTxt = `ដាក់ជូនអ្នកជំងឺថ្ងៃ <b class="mono">${fmtYMD(o.deliveredDate)}</b>`;
+  const journey = `
+    <div class="lc-journey" style="border-color:${loc.c.solid}55; background:${loc.c.bg}55;">
+      <div class="lc-node ${!atLab ? 'on' : ''}"><span class="i">🏥</span><span class="t kh">Clinic</span></div>
+      <div class="lc-path">${loc.key === 'delivered' ? '' : arrow}</div>
+      <div class="lc-node ${atLab ? 'on' : ''}"><span class="i">🏭</span><span class="t kh">${escHTML(o.lab) || 'Lab'}</span></div>
+      <div class="lc-path"></div>
+      <div class="lc-node ${loc.key === 'delivered' ? 'on' : ''}"><span class="i">😁</span><span class="t kh">អ្នកជំងឺ</span></div>
+      <div class="lc-status">${labLocPill(loc)}<span class="kh">${statusTxt}</span></div>
+    </div>`;
 
-  // Case chosen but gone (deleted / merged) → back to the list
-  if(orderId && !groups.some(g => g.list.some(x => x.id === orderId))){ orderId = null; laboDetailCtx.orderId = null; }
-
-  if(!orderId){
-    const listRows = groups.map(g => {
-      const o = g.latest;
-      const work = escHTML(g.treatment || g.works.join(', ')) || '—';
-      const sub = g.treatment && g.works.length ? `<div class="cell-sub kh">${g.works.map(escHTML).join(', ')}</div>` : '';
-      return `<tr data-id="${o.id}" data-act="opengroup" title="ចុចដើម្បីបន្ថែមជំហាន · Add Step">
-          <td class="kh">${escHTML(o.lab) || '—'}</td>
-          <td class="mono" style="white-space:nowrap;">${fmtYMD(g.firstSent || o.sent)}</td>
-          <td class="kh"><span class="lab-type-link">${work}</span>${sub}<div style="margin-top:4px;">${labStatusPillHTML(labGroupStatus(g))}</div></td>
-          <td class="mono">${escHTML(o.teeth) || '—'}</td>
-          <td style="text-align:right; color:var(--ink-dim);">›</td>
-        </tr>`;
-    }).join('');
-    document.getElementById('laboPatientDetailBody').innerHTML = `
-      <div class="kh" style="margin-bottom:10px; font-size:12.5px; color:var(--ink-soft);">${groups.length} ការងារ &nbsp;·&nbsp; ${totalTrips} ដងផ្ញើសរុប — ចុចលើប្រភេទធ្វើ ដើម្បីបន្ថែមជំហាន (Add Step)</div>
-      <div style="border:1px solid var(--border); border-radius:10px; overflow:hidden;">
-        <table class="lab-list-table">
-          <thead><tr><th>Lab</th><th>ថ្ងៃផ្ញើ</th><th>ប្រភេទធ្វើ</th><th>លេខធ្មេញ</th><th style="width:20px;"></th></tr></thead>
-          <tbody>${listRows || '<tr><td colspan="5" class="kh" style="text-align:center; color:var(--ink-dim); padding:18px;">មិនមានបញ្ជា Lab ទេ</td></tr>'}</tbody>
-        </table>
-      </div>`;
-    ov.classList.remove('hidden');
-    return;
-  }
-  groups = groups.filter(g => g.list.some(x => x.id === orderId));
-
-  const rows = groups.map(g => {
-    const o = g.latest;
-    const st = LAB_STATUS[o.status] ? o.status : 'sent';
-    const od = labOverdue(o);
-    const opts = Object.keys(LAB_STATUS).map(k => `<option value="${k}"${k === st ? ' selected' : ''}>${LAB_STATUS[k].en} · ${LAB_STATUS[k].kh}</option>`).join('');
-    const roundNum = labRoundCount(o);
-    // Timeline: the case's own steps from "Lab" on (Lab, លគ្រោង, Done...), else the order's Sent/Received dates.
-    const steps = labGroupTimeline(g);
-    const sub = [escHTML(o.teeth) ? `ធ្មេញ ${escHTML(o.teeth)}` : '', o.shade ? `Shade ${escHTML(o.shade)}` : '', escHTML(o.lab)].filter(Boolean).join(' · ');
-
-    // Root node: "LAB" circle + the lab work name (like the "TX" node of Procedure Steps)
-    const root = `
-      <div style="display:flex; gap:12px;">
-        <div style="display:flex; flex-direction:column; align-items:center; flex-shrink:0;">
-          <div style="width:28px; height:28px; border-radius:50%; background:var(--primary-dark); color:#fff; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:9.5px; letter-spacing:.02em;">LAB</div>
-          ${steps.length ? '<div style="width:2px; flex:1; min-height:14px; background:var(--border); margin:2px 0;"></div>' : ''}
-        </div>
-        <div style="flex:1; padding-bottom:${steps.length ? '12px' : '0'};">
-          <div class="kh" style="min-height:28px; display:flex; align-items:center; gap:6px; flex-wrap:wrap; font-weight:800; font-size:14.5px; color:var(--ink); font-style:italic;">
-            ${escHTML(g.treatment || g.works.join(', ')) || '—'}
-            ${g.treatment && g.works.length ? `<span class="kh" style="font-size:12px; font-weight:600; font-style:normal; color:var(--ink-soft);">· ${g.works.map(escHTML).join(', ')}</span>` : ''}
-            ${roundNum > 1 ? `<span class="badge-mini kh" style="background:var(--primary-soft);color:var(--primary-dark);font-style:normal;">ជុំទី ${roundNum}</span>` : ''}
-          </div>
-          ${sub ? `<div class="mono" style="font-size:11.5px; color:var(--ink-dim);">${sub}</div>` : ''}
-          <div style="margin-top:6px;">${labStatusPillHTML(labGroupStatus(g))}</div>
-        </div>
-      </div>`;
-
-    const stepHtml = steps.map((s, i) => {
-      const isLast = i === steps.length - 1;
-      const c = s.style || LAB_STEP_STYLE[s.key];
-      return `
-      <div style="display:flex; gap:12px;">
-        <div style="display:flex; flex-direction:column; align-items:center; flex-shrink:0;">
-          <div style="width:28px; height:28px; border-radius:50%; background:${s.pending ? '#fff' : c.solid}; color:${s.pending ? c.solid : '#fff'}; border:2px ${s.pending ? 'dashed' : 'solid'} ${c.solid}; box-sizing:border-box; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:12px;">${i+1}</div>
-          ${!isLast ? '<div style="width:2px; flex:1; min-height:14px; background:var(--border); margin:2px 0;"></div>' : ''}
-        </div>
-        <div class="kh" style="flex:1; padding-bottom:${isLast ? '0' : '12px'}; font-size:13px; min-height:28px; display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
-          <span style="font-weight:800; color:${c.fg}; background:${c.bg}; padding:2px 10px; border-radius:999px;">${escHTML(s.name)}</span>
-          <span style="color:var(--ink-dim);">-</span>
-          <span class="mono" style="color:var(--ink-soft);">${labDateText(s.date) || '—'}</span>
-          ${s.extra ? `<span class="badge-mini out kh">${s.extra}</span>` : ''}
-          ${s.note ? `<div style="flex-basis:100%; font-size:12px; color:var(--ink-soft); background:var(--surface-2); padding:4px 8px; border-radius:6px;">${escHTML(s.note)}</div>` : ''}
-        </div>
-      </div>`;
-    }).join('');
-
-    return `
-      <div class="lab-row lab-step-card${od ? ' is-overdue' : ''}" data-id="${o.id}" style="border:1px solid var(--border); border-radius:12px; padding:14px; margin-bottom:12px; display:block;">
-        ${root}
-        ${stepHtml || '<div class="kh" style="color:var(--ink-dim); padding:6px 0 0 40px;">មិនទាន់មានកាលបរិច្ឆេទ</div>'}
-        ${o.note ? `<div class="kh" style="font-size:12px; color:var(--ink-soft); margin:10px 0 0 40px; background:var(--surface-2); padding:5px 8px; border-radius:6px;">${escHTML(o.note)}</div>` : ''}
-        <div class="lab-addstep" style="margin-top:12px; padding:10px; border:1px dashed var(--border); border-radius:10px; background:var(--surface-2);">
-          <div class="kh" style="font-size:12px; font-weight:700; color:var(--ink-soft); margin-bottom:6px;">＋ បន្ថែមជំហានថ្មី · Add Step${g.rec ? '' : ' <span style="font-weight:400; color:var(--ink-dim);">(គ្មាន case ភ្ជាប់ → រក្សាទុកក្នុងបញ្ជា Lab)</span>'}</div>
-          <div style="display:flex; gap:6px; align-items:flex-end; flex-wrap:wrap;">
-            <div style="flex:2; min-width:130px;">
-              <select data-role="stepsel" class="kh" style="width:100%; height:36px;">${labAddStepOptionsHTML()}</select>
-              <input type="text" data-role="stepcustom" class="kh" placeholder="សរសេរជំហានផ្សេង..." style="display:none; width:100%; margin-top:6px; height:34px;">
-            </div>
-            <div style="width:175px;">
-              <label class="kh" style="display:block; font-size:10.5px; color:var(--ink-dim);">ថ្ងៃខែឆ្នាំ និង ម៉ោង</label>
-              <input type="datetime-local" data-role="stepdate" class="mono" value="${getLocalNowDateTime()}" style="width:100%; height:36px;">
-            </div>
-            <div style="flex:2; min-width:130px;">
-              <input type="text" data-role="stepnote" class="kh" placeholder="ចំណាំ (Note) — ស្រេចចិត្ត..." style="width:100%; height:36px;">
-            </div>
-            <button type="button" class="btn btn-primary btn-sm kh" data-act="addstep" style="height:36px;">＋ បន្ថែម</button>
-          </div>
-        </div>
-        <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-top:12px; padding-top:10px; border-top:1px dashed var(--border); flex-wrap:wrap;">
-          <select class="st-select st-${st}" data-act="status" aria-label="Status">${opts}</select>
-          <div class="row-actions">
-            ${st === 'received' ? `<button type="button" class="btn btn-outline btn-sm kh" data-act="sendagain" title="ផ្ញើទៅ Lab ម្តងទៀត">🔁 ផ្ញើម្តងទៀត</button>` : ''}
-            <button type="button" class="icon-btn" data-act="printlabform" title="Print Lab Form">🖨</button>
-            <button type="button" class="icon-btn" data-act="edit" title="កែប្រែ Edit">✎</button>
-            <button type="button" class="icon-btn danger" data-act="del" title="លុប Delete">✕</button>
-          </div>
-        </div>
+  // Next action (only the moves that make sense from where the work is now)
+  const outForm = (title, defStage) => `
+    <div class="lc-form" data-dir="out">
+      <div class="lc-act-title kh" style="color:#5B21B6;">📤 ${title}</div>
+      <div class="lc-act-grid">
+        <div><label class="kh">ដំណាក់កាល · Stage</label><select data-role="stage" class="kh">${labStageOptions(LAB_STAGES_OUT, defStage)}</select>
+          <input type="text" data-role="stagecustom" class="kh" placeholder="សរសេរដំណាក់កាល..." style="display:none; margin-top:6px;"></div>
+        <div><label class="kh">ថ្ងៃផ្ញើ · Date</label><input type="date" data-role="date" class="mono" value="${today}"></div>
+        <div><label class="kh">ថ្ងៃត្រូវយក · Due</label><input type="date" data-role="due" class="mono"></div>
       </div>
-    `;
-  }).join('');
+      <div class="lc-act-row lc-remake" style="display:${LAB_REMAKE_RE.test(defStage) ? 'flex' : 'none'};">
+        <label class="kh" style="display:flex; align-items:center; gap:6px; font-size:12px;"><input type="checkbox" data-role="charge"> Lab គិតថ្លៃ Remake → កត់ត្រាចំណាយ DL បន្ថែម</label>
+        <input type="number" data-role="chargeamt" class="mono" step="0.01" min="0" value="${num2(o.cost) > 0 ? num2(o.cost) : ''}" placeholder="$" style="width:100px; height:34px;">
+      </div>
+      <div class="lc-act-row">
+        <input type="text" data-role="note" class="kh" placeholder="កំណត់ចំណាំ (Note) — ស្រេចចិត្ត...">
+        <button type="button" class="btn btn-primary btn-sm kh" data-act="trip" style="height:36px; background:#7C3AED; border-color:#7C3AED;">📤 ផ្ញើទៅ Lab</button>
+      </div>
+    </div>`;
+  const inStageDefault = LAB_STAGES_IN[Math.min(ins, LAB_STAGES_IN.length - 1)];
+  const inForm = `
+    <div class="lc-form" data-dir="in">
+      <div class="lc-act-title kh" style="color:#0B5ED7;">📥 ទទួលពី Lab · Receive at clinic</div>
+      <div class="lc-act-grid">
+        <div><label class="kh">ដំណាក់កាល · Stage</label><select data-role="stage" class="kh">${labStageOptions(LAB_STAGES_IN, inStageDefault)}</select>
+          <input type="text" data-role="stagecustom" class="kh" placeholder="សរសេរដំណាក់កាល..." style="display:none; margin-top:6px;"></div>
+        <div><label class="kh">ថ្ងៃទទួល · Date</label><input type="date" data-role="date" class="mono" value="${today}"></div>
+        <div></div>
+      </div>
+      <div class="lc-act-row">
+        <input type="text" data-role="note" class="kh" placeholder="កំណត់ចំណាំ (Note) — ស្រេចចិត្ត...">
+        <button type="button" class="btn btn-primary btn-sm kh" data-act="trip" style="height:36px; background:#0B5ED7; border-color:#0B5ED7;">📥 ទទួល</button>
+      </div>
+    </div>`;
+  const deliverForm = `
+    <div class="lc-act-row" style="justify-content:space-between; background:#F0FDF4; border:1px solid #BBF7D0; border-radius:10px; padding:8px 10px;">
+      <span class="kh" style="font-weight:700; color:#166534;">✅ ដាក់ឱ្យអ្នកជំងឺ · Fit / Deliver</span>
+      <span style="display:flex; gap:6px;"><input type="date" data-role="dlvdate" class="mono" value="${today}" style="height:34px;">
+      <button type="button" class="btn btn-primary btn-sm kh" data-act="deliver" style="height:34px; background:#16A34A; border-color:#16A34A;">✅ ដាក់រួច</button></span>
+    </div>`;
+  let action;
+  if(atLab) action = inForm;
+  else if(loc.key === 'delivered') action = `
+    <div class="lc-act-row" style="justify-content:space-between;"><span class="kh" style="font-size:12.5px; color:var(--ink-soft);">Case បានបិទ។ បើត្រូវ Remake / កែ សូមផ្ញើទៅ Lab ម្តងទៀត ឬបើកវិញ។</span>
+    <button type="button" class="btn btn-outline btn-sm kh" data-act="undeliver">↩ បើក Case វិញ</button></div>
+    <div class="lc-or kh">— ឬ —</div>${outForm('Remake / Repair · ផ្ញើទៅ Lab ម្តងទៀត', LAB_STAGES_OUT[2])}`;
+  else action = `${loc.key === 'ready' ? deliverForm + '<div class="lc-or kh">— ឬ ផ្ញើត្រឡប់ទៅ Lab —</div>' : ''}
+    ${outForm('ផ្ញើទៅ Lab ម្តងទៀត · Send back to lab', LAB_STAGES_OUT[1])}
+    ${loc.key === 'tryin' ? '<div class="lc-or kh">— ឬ —</div>' + deliverForm : ''}`;
+
+  // Shipping log
+  const log = t.map((x, i) => {
+    const out = x.dir === 'out';
+    const c = out ? LAB_STEP_STYLE.sent : LAB_STEP_STYLE.received;
+    const isLast = i === t.length - 1 && !o.deliveredDate;
+    return `<div class="lc-trip">
+      <div class="n" style="background:${c.solid};">${i + 1}</div>
+      <div class="dir kh" style="color:${c.fg};">${out ? '🏥 → 🏭 ផ្ញើទៅ Lab' : '🏭 → 🏥 ទទួលពី Lab'}</div>
+      <div class="body"><div class="st kh">${escHTML(x.stage || '—')}</div>
+        <div class="meta">${fmtYMD(x.date) || '—'}${out && x.due ? ` · Due ${fmtYMD(x.due)}` : ''}${x.charged ? ` · Remake ${finMoney(x.charged)}` : ''}</div>
+        ${x.note ? `<div class="kh" style="font-size:11.5px; color:var(--ink-soft); margin-top:2px;">${escHTML(x.note)}</div>` : ''}</div>
+      <div>${isLast ? `<button type="button" class="fin-del" data-act="undotrip" data-trip="${x.id}" title="លុបការបញ្ជូននេះ (ត្រូវការ PIN)">✕</button>` : ''}</div>
+    </div>`;
+  }).join('') + (o.deliveredDate ? `<div class="lc-trip"><div class="n" style="background:#16A34A;">✓</div><div class="dir kh" style="color:#166534;">🏥 → 😁 ដាក់ឱ្យអ្នកជំងឺ</div><div class="body"><div class="st kh">Delivered · ដាក់រួច</div><div class="meta">${fmtYMD(o.deliveredDate)}</div></div><div></div></div>` : '');
 
   document.getElementById('laboPatientDetailBody').innerHTML = `
-    <button type="button" class="btn btn-outline btn-sm kh" data-act="backlist" style="margin-bottom:12px;">‹ ត្រឡប់ទៅបញ្ជី</button>
-    ${rows}
-  `;
+    <div data-id="${o.id}">
+      <div class="lc-facts">${facts}</div>
+      ${journey}
+      <div class="lc-act">${action}</div>
+      <div class="lc-log"><div class="lc-log-h kh">📜 ប្រវត្តិការបញ្ជូន · Shipping log (${t.length} ដង)</div>${log || '<div class="kh" style="padding:12px; color:var(--ink-dim);">មិនទាន់មានការបញ្ជូន</div>'}</div>
+      ${labDLPanelHTML(o)}
+      ${o.note ? `<div class="kh" style="font-size:12px; color:var(--ink-soft); background:var(--surface-2); padding:6px 10px; border-radius:8px; margin-bottom:12px;">📝 ${escHTML(o.note)}</div>` : ''}
+      <div style="display:flex; justify-content:flex-end; gap:8px; flex-wrap:wrap; padding-top:10px; border-top:1px dashed var(--border);">
+        <button type="button" class="btn btn-outline btn-sm kh" data-act="printlabform">🖨 Lab Form</button>
+        <button type="button" class="btn btn-outline btn-sm kh" data-act="edit">✎ កែ Case</button>
+        <button type="button" class="btn btn-danger btn-sm kh" data-act="del">🗑 លុប</button>
+      </div>
+    </div>`;
   document.getElementById('laboPatientDetailOverlay').classList.remove('hidden');
+}
+
+// Record a trip from the action form
+function labTripFromForm(o, form){
+  const dir = form.dataset.dir;
+  const sel = form.querySelector('[data-role="stage"]');
+  const stage = sel.value === 'custom' ? form.querySelector('[data-role="stagecustom"]').value.trim() : sel.value;
+  if(!stage){ alert('សូមបញ្ចូលដំណាក់កាល'); return; }
+  const date = form.querySelector('[data-role="date"]').value || getLocalTodayYMD();
+  const dueEl = form.querySelector('[data-role="due"]');
+  const due = dueEl ? dueEl.value : '';
+  if(due && due < date){ alert('ថ្ងៃត្រូវយក មិនអាចមុនថ្ងៃផ្ញើបានទេ'); return; }
+  const trip = { dir, stage, date, due, note: form.querySelector('[data-role="note"]').value.trim() };
+  const chk = form.querySelector('[data-role="charge"]');
+  const charge = chk && chk.checked && LAB_REMAKE_RE.test(stage) ? num2(form.querySelector('[data-role="chargeamt"]').value) : 0;
+  if(charge > 0) trip.charged = charge;
+  labAddTrip(o, trip);
+  if(charge > 0){
+    loadExpenses();
+    expensesList.push({ id: genCode(), date, type: 'DL', amount: charge,
+      desc: `${o.teeth || '—'} - ${o.work || '—'} - ${o.patient || '—'} (Remake)`, sourceOrderId: o.id, chargeKind: 'remake', tripId: (labTrips(o).slice(-1)[0] || {}).id || '' });
+    saveExpenses();
+  }
+  renderLab();
+  openLabCase(o.id);
 }
 
 function openLabForm(id){
@@ -7557,6 +7815,7 @@ function openLabForm(id){
   el('lab_cost').value = o && o.cost !== '' && o.cost != null ? o.cost : '';
   el('lab_status').value = o ? o.status : 'sent';
   el('lab_note').value = o ? (o.note || '') : '';
+  if(!o) updateLabCostAuto();          // new case: DL fee = Lab price x teeth straight away
   showFormError('labFormError', '');
   openOv('laboFormOverlay');
   el('lab_patient').focus();
@@ -7584,20 +7843,35 @@ function saveLabForm(){
 
   const data = {
     patient, work, lab: el('lab_lab').value.trim(), teeth: el('lab_teeth').value.trim(), shade: el('lab_shade').value.trim(),
-    sent, due, cost: costRaw === '' ? '' : num2(costRaw), status: el('lab_status').value, note: el('lab_note').value.trim()
+    cost: costRaw === '' ? '' : num2(costRaw), note: el('lab_note').value.trim()
   };
   let savedOrder = null;
   let isNewOrder = false;
   if(editingLabId){
     const o = labOrders.find(x => x.id === editingLabId);
-    if(o){ const prev = o.status; Object.assign(o, data); if(prev !== o.status) stampLabStatus(o); savedOrder = o; }
+    if(o){
+      const teethChanged = cleanStr(o.teeth) !== data.teeth;
+      Object.assign(o, data);
+      if(teethChanged) o.dlTeethCount = '';
+      const t = labTrips(o);
+      const firstOut = t.find(x => x.dir === 'out');
+      if(firstOut && sent) firstOut.date = sent;
+      const last = t[t.length - 1];
+      if(last && last.dir === 'out') last.due = due;
+      if(!t.length && sent) t.push({ id: genCode(), dir:'out', stage: LAB_STAGES_OUT[0], date: sent, due, note:'' });
+      labSyncFields(o);
+      savedOrder = o;
+    }
   } else {
-    const o = Object.assign({ id: genCode(), created: getLocalTodayYMD() }, data);
-    stampLabStatus(o);
+    const d0 = sent || getLocalTodayYMD();
+    const o = Object.assign({ id: genCode(), created: getLocalTodayYMD(), status:'sent', receivedDate:'', deliveredDate:'',
+      trips: [{ id: genCode(), dir:'out', stage: LAB_STAGES_OUT[0], date: d0, due, note:'' }] }, data);
+    labSyncFields(o);
     labOrders.push(o);
     savedOrder = o;
     isNewOrder = true;
   }
+  if(savedOrder && (savedOrder.cost === '' || savedOrder.cost == null)){ const c = labAutoCost(savedOrder); if(c !== '') savedOrder.cost = c; }
   saveLab();
   closeOv('laboFormOverlay');
   renderLab();
@@ -7606,10 +7880,12 @@ function saveLabForm(){
 }
 
 function exportLabCSV(){
-  const rows = labOrders.map(o => [o.patient, o.work, o.teeth, o.shade, o.lab, o.sent, o.due, o.receivedDate || '', o.deliveredDate || '',
-    o.cost === '' || o.cost == null ? '' : num2(o.cost).toFixed(2), LAB_STATUS[o.status] ? LAB_STATUS[o.status].en : o.status, o.note]);
+  const rows = labOrders.map(o => { const loc = labLocation(o); const t = labTrips(o);
+    return [labCaseNo(o), o.patient, o.work, o.teeth, labUnits(o), o.shade, o.lab, o.sent, o.due, o.deliveredDate || '',
+      t.length, t.map(x => `${x.dir === 'out' ? 'Clinic>Lab' : 'Lab>Clinic'} ${x.date} ${x.stage}`).join(' | '),
+      o.cost === '' || o.cost == null ? '' : num2(o.cost).toFixed(2), loc.en, o.note]; });
   downloadCSV(`Kep_Dental_Lab_${fileStamp()}.csv`,
-    ['Patient','Work','Teeth','Shade','Lab','Sent','Due','Received','Delivered','Cost ($)','Status','Note'], rows);
+    ['Case #','Patient','Work','Teeth','Units','Shade','Lab','First sent','Due','Delivered','Trips','Shipping log','DL fee ($)','Location','Note'], rows);
 }
 
 /* ---------------- INVENTORY ---------------- */
@@ -7886,68 +8162,92 @@ function updateOpsBadges(){
   el('laboFormOverlay').addEventListener('click', e => { if(e.target.id === 'laboFormOverlay') closeOv('laboFormOverlay'); });
 
   el('laboPatientDetailBody').addEventListener('click', e => {
-    if(e.target.closest('[data-act="backlist"]')){ if(laboDetailCtx) openLaboPatientDetail(laboDetailCtx.patient, null); return; }
-    const og = e.target.closest('tr[data-act="opengroup"]');
-    if(og){ if(laboDetailCtx) openLaboPatientDetail(laboDetailCtx.patient, og.dataset.id); return; }
-    if(e.target.closest('select')) return;
-    const row = e.target.closest('[data-id]'); if(!row) return;
-    const id = row.dataset.id;
     const actEl = e.target.closest('[data-act]');
-    if(!actEl) return;   // clicking the timeline itself does nothing; use the ✎ button to edit
+    if(!actEl) return;
+    const wrap = e.target.closest('[data-id]'); if(!wrap) return;
+    const id = wrap.dataset.id;
+    const o = labOrders.find(x => x.id === id); if(!o) return;
     const act = actEl.dataset.act;
-    if(act === 'addstep'){
-      addLabGroupStep(id, actEl.closest('.lab-addstep'));
-      return;
+    if(act === 'trip'){ labTripFromForm(o, actEl.closest('.lc-form')); return; }
+    if(act === 'deliver'){
+      const d = (wrap.querySelector('[data-role="dlvdate"]') || {}).value || getLocalTodayYMD();
+      o.deliveredDate = d; labSyncFields(o); saveLab(); pushToSheet('updateLabo', o);
+      upsertAutoLabExpense(o, false);
+      renderLab(); openLabCase(o.id); return;
     }
-    if(act === 'del'){
-      const o = labOrders.find(x => x.id === id); if(!o) return;
+    if(act === 'undeliver'){
+      o.deliveredDate = ''; labSyncFields(o); saveLab(); pushToSheet('updateLabo', o);
+      renderLab(); openLabCase(o.id); return;
+    }
+    if(act === 'undotrip'){
       requestClinicPin(() => {
-        // The lab cost this order booked as a "DL" expense goes with it, so the money isn't left counted as spent.
-        loadExpenses();
-        const linkedExp = expensesList.filter(e => e.sourceOrderId === id);
-        const linkedSum = linkedExp.reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
-        const extra = linkedExp.length ? `\nចំណាយ DL ដែលភ្ជាប់ (${linkedExp.length}) $${linkedSum.toFixed(2)} នឹងត្រូវលុបផង` : '';
-        showConfirm(`តើអ្នកពិតជាចង់លុបបញ្ជា Labo នេះមែនទេ?\n${o.patient} · ${o.work}${extra}`, () => {
-          const patientName = o.patient;
-          labOrders = labOrders.filter(x => x.id !== id); saveLab(); renderLab();
-          pushToSheet('deleteLabo', { id });
-          if(linkedExp.length){ loadExpenses(); expensesList = expensesList.filter(e => e.sourceOrderId !== id); saveExpenses(); }
-          const stillHasOrders = labOrders.some(x => cleanStr(x.patient).toLowerCase() === patientName.toLowerCase());
-          if(stillHasOrders) openLaboPatientDetail(patientName);
-          else document.getElementById('laboPatientDetailOverlay').classList.add('hidden');
+        const tid = actEl.dataset.trip;
+        showConfirm('លុបការបញ្ជូនចុងក្រោយនេះមែនទេ?', () => {
+          o.trips = labTrips(o).filter(x => x.id !== tid);
+          loadExpenses();
+          const before = expensesList.length;
+          expensesList = expensesList.filter(e => !(e.sourceOrderId === o.id && e.chargeKind && e.tripId === tid));
+          if(expensesList.length !== before) saveExpenses();
+          labSyncFields(o); saveLab(); pushToSheet('updateLabo', o);
+          renderLab(); openLabCase(o.id);
         });
       });
       return;
     }
-    if(act === 'sendagain'){
-      sendLabOrderAgain(id);
+    if(act === 'del'){
+      requestClinicPin(() => {
+        loadExpenses();
+        const linkedExp = expensesList.filter(e => e.sourceOrderId === id);
+        const linkedSum = linkedExp.reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
+        const extra = linkedExp.length ? `\nចំណាយ DL ដែលភ្ជាប់ (${linkedExp.length}) $${linkedSum.toFixed(2)} នឹងត្រូវលុបផង` : '';
+        showConfirm(`តើអ្នកពិតជាចង់លុប Case Lab នេះមែនទេ?\n${labCaseNo(o)} · ${o.patient} · ${o.work}${extra}`, () => {
+          labOrders = labOrders.filter(x => x.id !== id); saveLab();
+          pushToSheet('deleteLabo', { id });
+          if(linkedExp.length){ loadExpenses(); expensesList = expensesList.filter(e => e.sourceOrderId !== id); saveExpenses(); }
+          renderLab();
+          document.getElementById('laboPatientDetailOverlay').classList.add('hidden');
+        });
+      });
       return;
     }
     if(act === 'printlabform'){
-      const o = labOrders.find(x => x.id === id); if(!o) return;
       document.getElementById('laboPatientDetailOverlay').classList.add('hidden');
       printContext = { type: 'labform', order: o };
       document.getElementById('printSizeModalOverlay').classList.remove('hidden');
       return;
     }
-    requestClinicPin(() => {
-      document.getElementById('laboPatientDetailOverlay').classList.add('hidden');
-      openLabForm(id);
-    });
+    if(act === 'edit'){
+      requestClinicPin(() => {
+        document.getElementById('laboPatientDetailOverlay').classList.add('hidden');
+        openLabForm(id);
+      });
+    }
+  });
+  el('laboPatientDetailBody').addEventListener('input', e => {
+    const inp = e.target.closest('[data-role="dlteeth"], [data-role="dlprice"]');
+    if(inp) labDLRecalc(inp.closest('.lab-dl'));
   });
   el('laboPatientDetailBody').addEventListener('change', e => {
-    const stepSel = e.target.closest('select[data-role="stepsel"]');
-    if(stepSel){
-      const custom = stepSel.parentElement.querySelector('[data-role="stepcustom"]');
-      if(custom){ custom.style.display = stepSel.value === 'custom' ? 'block' : 'none'; if(stepSel.value === 'custom') custom.focus(); }
+    const wrap = e.target.closest('[data-id]'); if(!wrap) return;
+    const dl = e.target.closest('.lab-dl');
+    if(dl){
+      const dlWork = e.target.closest('select[data-role="dlwork"]');
+      if(dlWork){
+        const price = dlWork.selectedOptions[0] ? dlWork.selectedOptions[0].dataset.price : '';
+        if(price) dl.querySelector('[data-role="dlprice"]').value = price;
+      }
+      saveLabDLCost(wrap.dataset.id, dl);       // fee + DL expense update automatically
       return;
     }
-    const sel = e.target.closest('select[data-act="status"]'); if(!sel) return;
-    const id = sel.closest('[data-id]').dataset.id;
-    const o = labOrders.find(x => x.id === id); if(!o) return;
-    o.status = sel.value; stampLabStatus(o); saveLab(); renderLab();
-    pushToSheet('updateLabo', o);
-    openLaboPatientDetail(o.patient);
+    const stageSel = e.target.closest('select[data-role="stage"]');
+    if(stageSel){
+      const form = stageSel.closest('.lc-form');
+      const custom = form.querySelector('[data-role="stagecustom"]');
+      custom.style.display = stageSel.value === 'custom' ? 'block' : 'none';
+      if(stageSel.value === 'custom') custom.focus();
+      const rm = form.querySelector('.lc-remake');
+      if(rm) rm.style.display = LAB_REMAKE_RE.test(stageSel.value) ? 'flex' : 'none';
+    }
   });
   el('closeLaboPatientDetail').addEventListener('click', () => {
     document.getElementById('laboPatientDetailOverlay').classList.add('hidden');
