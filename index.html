@@ -1057,6 +1057,58 @@
   @media (max-width:1300px){ .dash-kpis{ grid-template-columns:repeat(3, minmax(0,1fr)); } }
   @media (max-width:1100px){ .dash-grid{ grid-template-columns:1fr; } }
   @media (max-width:760px){ .dash-kpis{ grid-template-columns:repeat(2, minmax(0,1fr)); } .dash-split{ grid-template-columns:1fr; gap:0; } .dash-greet{ font-size:17px; } .dq{ padding:7px 10px; font-size:12px; } }
+
+  /* ===== Dashboard · phone fit ===== */
+  @media (max-width:1100px){
+    .dash-grid{ display:flex; flex-direction:column; gap:0; align-items:stretch; }
+    .dash-grid > * , .dash-main > *, .dash-side > *{ width:100%; min-width:0; box-sizing:border-box; }
+    .dash-main, .dash-side{ display:contents; }
+    .dash-o1{ order:1; } .dash-o2{ order:2; } .dash-o3{ order:3; } .dash-o4{ order:4; } .dash-o5{ order:5; } .dash-o6{ order:6; } .dash-o7{ order:7; }
+  }
+  @media (max-width:600px){
+    #view-dashboard{ overflow-x:hidden; }
+    .dash-hero{ padding:12px 14px; border-radius:14px; margin-bottom:12px; gap:10px; }
+    .dash-greet{ font-size:15px; line-height:1.4; }
+    .dash-date{ font-size:11.5px; }
+    .dash-quick{ flex-wrap:nowrap; overflow-x:auto; width:100%; gap:6px; padding-bottom:2px; scrollbar-width:none; -webkit-overflow-scrolling:touch; }
+    .dash-quick::-webkit-scrollbar{ display:none; }
+    .dq{ flex:0 0 auto; padding:7px 10px; font-size:11.5px; white-space:nowrap; }
+
+    .dash-kpis{ grid-template-columns:repeat(3, minmax(0,1fr)); gap:8px; margin-bottom:12px; }
+    .dash-kpis .fin-kpi{ padding:9px 9px 8px 11px; border-radius:12px; }
+    .dash-kpis .fin-kpi::before{ width:3px; }
+    .dash-kpis .k-label{ font-size:10.5px; line-height:1.35; gap:4px; align-items:flex-start; min-height:28px; }
+    .dash-kpis .k-label .k-ico{ display:none; }
+    .dash-kpis .k-val{ font-size:17px; margin-top:4px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .dash-kpis .k-en{ display:none; }
+    .dash-kpis .k-foot{ margin-top:5px; padding-top:5px; font-size:10px; gap:3px; line-height:1.3; }
+    .dash-kpis .k-foot{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; display:block; }
+    .dash-kpis .k-foot > .fin-delta + span{ display:none; }
+    .dash-kpis .fin-delta{ font-size:10px; padding:0 5px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:100%; }
+
+    #view-dashboard .fin-card{ margin-bottom:12px; border-radius:12px; }
+    #view-dashboard .fin-card-head{ padding:10px 12px; }
+    #view-dashboard .fin-title{ font-size:13.5px; }
+    #view-dashboard .fin-sub{ font-size:10px; }
+    .dash-split{ grid-template-columns:1fr; gap:0; }
+    .dash-list{ padding:4px 8px 8px; max-height:340px; }
+    .dash-list .empty-state{ padding:10px !important; font-size:11.5px !important; margin:4px 0; }
+    .dash-list .appt-row{ gap:8px; padding:9px 8px; }
+    .dash-list .appt-row .appt-time{ min-width:62px !important; }
+    .dash-list .appt-main{ min-width:0; }
+    .dash-list .appt-name, .dash-list .appt-meta{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .dash-list .appt-row > .kh:last-child{ font-size:10px !important; padding:3px 7px !important; }
+    .dash-legend{ font-size:10.5px; gap:8px; }
+    #dashTrend{ padding:8px 6px 4px !important; }
+    .dash-alert{ padding:9px 12px; gap:8px; }
+    .dash-alert .ai{ width:28px; height:28px; font-size:13px; }
+    .dash-alert .at b{ font-size:12px; }
+    #dashFinance, #dashTopTx, #dashDemo{ padding:10px 12px !important; }
+    .dash-mix .mv{ font-size:16px; }
+  }
+  @media (max-width:360px){
+    .dash-kpis{ grid-template-columns:repeat(2, minmax(0,1fr)); }
+  }
 </style>
 <style id="dynamicPageStyle">@page{ size: A4 portrait; margin: 15mm; }</style>
 </head>
@@ -1190,7 +1242,7 @@
 
         <div class="dash-grid">
           <div class="dash-main">
-            <div class="fin-card">
+            <div class="fin-card dash-o1">
               <div class="fin-card-head">
                 <div><div class="fin-title kh">🩺 អ្នកជំងឺថ្ងៃនេះ <span class="fin-count mono" id="queueTodayCount" style="background:var(--primary-softer); color:var(--primary-dark);">0</span></div>
                 <div class="fin-sub">Today's patient queue · procedures</div></div>
@@ -1198,7 +1250,7 @@
               <div class="dash-list" id="queueTodayBody"></div>
             </div>
 
-            <div class="dash-split">
+            <div class="dash-split dash-o3">
               <div class="fin-card">
                 <div class="fin-card-head">
                   <div><div class="fin-title kh">📅 ការណាត់ថ្ងៃនេះ <span class="fin-count mono" id="apptTodayCount" style="background:#FEF3C7; color:#92400E;">0</span></div>
@@ -1215,10 +1267,10 @@
               </div>
             </div>
 
-            <div class="fin-card">
+            <div class="fin-card dash-o5">
               <div class="fin-card-head">
-                <div><div class="fin-title kh">📈 និន្នាការ ១៤ ថ្ងៃចុងក្រោយ</div>
-                <div class="fin-sub">Patient visits &amp; revenue · last 14 days</div></div>
+                <div><div class="fin-title kh">📈 និន្នាការ <span id="dashTrendDays">១៤</span> ថ្ងៃចុងក្រោយ</div>
+                <div class="fin-sub">Patient visits &amp; revenue · last <span id="dashTrendDaysEn">14</span> days</div></div>
                 <div class="dash-legend kh"><span><i style="background:var(--primary)"></i>អ្នកជំងឺ</span><span><i style="background:#0E9F6E; height:3px;"></i>ចំណូល ($)</span></div>
               </div>
               <div id="dashTrend" style="padding:12px 14px 6px;"></div>
@@ -1226,19 +1278,19 @@
           </div>
 
           <div class="dash-side">
-            <div class="fin-card">
+            <div class="fin-card dash-o2">
               <div class="fin-card-head"><div><div class="fin-title kh">🔔 ការងារត្រូវយកចិត្តទុកដាក់</div><div class="fin-sub">Action items · alerts</div></div></div>
               <div id="dashAlerts"></div>
             </div>
-            <div class="fin-card">
+            <div class="fin-card dash-o4">
               <div class="fin-card-head"><div><div class="fin-title kh">💰 ហិរញ្ញវត្ថុខែនេះ</div><div class="fin-sub">Finance · month to date</div></div></div>
               <div id="dashFinance" style="padding:14px 16px;"></div>
             </div>
-            <div class="fin-card">
+            <div class="fin-card dash-o6">
               <div class="fin-card-head"><div><div class="fin-title kh">🦷 ការព្យាបាលច្រើនជាងគេ</div><div class="fin-sub">Top procedures · this month</div></div></div>
               <div id="dashTopTx" style="padding:12px 16px;"></div>
             </div>
-            <div class="fin-card">
+            <div class="fin-card dash-o7">
               <div class="fin-card-head"><div><div class="fin-title kh">👥 អ្នកជំងឺខែនេះ</div><div class="fin-sub">Patient mix · this month</div></div></div>
               <div id="dashDemo" style="padding:12px 16px;"></div>
             </div>
@@ -3117,6 +3169,11 @@ function pushToSheet(action, data){
   let stamp = Date.now();
   if(stamp <= (pushToSheet._last || 0)) stamp = pushToSheet._last + 1;
   pushToSheet._last = stamp;
+  if((action === 'addLabo' || action === 'updateLabo') && data && typeof data === 'object'){
+    data.updatedAt = stamp;                 // local edit time: protects this edit from being overwritten by an older Sheet copy
+    try{ saveLab(); }catch(e){}
+    data = labSheetCopy(data);
+  }
   const payload = { action, data, timestamp: stamp };
   const n = enqueueSync(payload);
   console.log('[SYNC] queued:', action, '| queue length now:', n);
@@ -3252,10 +3309,7 @@ async function fetchFromSheet(isSilent = false){
       renderAll();
 
       if(Array.isArray(json.labo)){
-        labOrders = json.labo.map(o => ({
-          ...o,
-          cost: (o.cost === '' || o.cost == null) ? '' : num2(o.cost)
-        }));
+        labOrders = mergeLabFromSheet(json.labo);
         saveLab();
       }
       if(Array.isArray(json.inventory)){
@@ -3843,9 +3897,13 @@ function renderDashOverview(){
   // ---- 14-day trend (bars = patients, line = revenue)
   const trEl = document.getElementById('dashTrend');
   if(trEl){
+    const small = window.innerWidth <= 600;          // phone: 7 days, narrower canvas -> readable labels
+    const N = small ? 7 : 14;
+    const dk = document.getElementById('dashTrendDays'); if(dk) dk.textContent = small ? '៧' : '១៤';
+    const de = document.getElementById('dashTrendDaysEn'); if(de) de.textContent = N;
     const days = [];
-    for(let i = 13; i >= 0; i--){ const d = new Date(startOfToday); d.setDate(d.getDate() - i); const st = computeDayStats(d); days.push({ d, p: st.patientsTodayCount, inc: st.income }); }
-    const W = 680, H = 200, padL = 28, padR = 40, padT = 18, padB = 30;
+    for(let i = N - 1; i >= 0; i--){ const d = new Date(startOfToday); d.setDate(d.getDate() - i); const st = computeDayStats(d); days.push({ d, p: st.patientsTodayCount, inc: st.income }); }
+    const W = small ? 360 : 680, H = small ? 190 : 200, padL = 24, padR = 36, padT = 18, padB = 30;
     const cw = (W - padL - padR) / days.length, bw = Math.min(26, cw * 0.55);
     const maxP = Math.max(1, ...days.map(x => x.p)), maxI = Math.max(1, ...days.map(x => x.inc));
     const yP = v => padT + (H - padT - padB) * (1 - v / maxP), yI = v => padT + (H - padT - padB) * (1 - v / maxI);
@@ -3865,12 +3923,23 @@ function renderDashOverview(){
     trEl.innerHTML = `<svg viewBox="0 0 ${W} ${H}" style="width:100%; height:auto; display:block;">${grid}${bars}
       <polyline points="${pts}" fill="none" stroke="#0E9F6E" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>${dots}</svg>
       <div class="kh" style="display:flex; gap:16px; flex-wrap:wrap; font-size:12px; color:var(--ink-soft); padding:4px 2px 6px;">
-        <span>សរុប ១៤ ថ្ងៃ៖ <b class="mono">${totP}</b> ការមកពិនិត្យ</span><span>មធ្យម <b class="mono">${(totP / 14).toFixed(1)}</b> នាក់/ថ្ងៃ</span><span>ចំណូល <b class="mono" style="color:#0E9F6E;">${finMoney(totI)}</b></span>
+        <span>សរុប ${small ? '៧' : '១៤'} ថ្ងៃ៖ <b class="mono">${totP}</b> ការមកពិនិត្យ</span><span>មធ្យម <b class="mono">${(totP / N).toFixed(1)}</b> នាក់/ថ្ងៃ</span><span>ចំណូល <b class="mono" style="color:#0E9F6E;">${finMoney(totI)}</b></span>
       </div>`;
   }
 }
 
 document.querySelectorAll('#view-dashboard [data-dq]').forEach(b => b.addEventListener('click', () => dashGo(b.dataset.dq)));
+// Re-draw the dashboard when the screen crosses the phone breakpoint (rotate / resize)
+(function(){
+  let wasSmall = window.innerWidth <= 600, t = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(t);
+    t = setTimeout(() => {
+      const nowSmall = window.innerWidth <= 600;
+      if(nowSmall !== wasSmall){ wasSmall = nowSmall; try{ renderDashOverview(); }catch(e){} }
+    }, 200);
+  });
+})();
 
 function renderTreatmentStats(){
   const counts = {};
@@ -7611,6 +7680,76 @@ function labTrailHTML(steps){
   return `<div class="lab-trail">${hidden ? `<span class="lt-more">+${hidden}</span><span class="lt-line"></span>` : ''}${parts.join('<span class="lt-line"></span>')}</div>`;
 }
 
+/* ---------- Dental Lab <-> Google Sheet ---------- */
+const LAB_LAST_PULL_KEY = 'kep_lab_last_pull_v1';
+// Fields the Sheet may not have columns for; never let an empty Sheet cell wipe them.
+const LAB_LOCAL_FIELDS = ['tripsJSON','trips','dlTeethCount','dlPerTooth','dlAuto','deliveredDate','receivedDate','due','shade','lab','teeth','note','sourceRecordId','created'];
+
+// One cell = one plain value: arrays/objects become JSON text, the trips array travels as tripsJSON.
+function labSheetCopy(o){
+  const c = {};
+  Object.keys(o).forEach(k => {
+    const v = o[k];
+    if(k === 'trips') return;
+    if(v !== null && typeof v === 'object') c[k] = JSON.stringify(v);
+    else c[k] = v;
+  });
+  if(Array.isArray(o.trips)) c.tripsJSON = JSON.stringify(o.trips);
+  return c;
+}
+// Sheets turns "2026-10-05" into a Date and returns "2026-10-04T17:00:00.000Z" — bring it back to local YYYY-MM-DD.
+function labNormYMD(v){
+  if(v === null || v === undefined || v === '') return '';
+  const s = String(v).trim();
+  if(isYMD(s)) return s;
+  let d = /^\d{4}-\d{2}-\d{2}T/.test(s) ? new Date(s) : parseAnyDate(s);
+  if(!d || isNaN(d)) return s;
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+function labNormFromSheet(o){
+  const n = Object.assign({}, o);
+  ['created','sent','due','receivedDate','deliveredDate'].forEach(k => { if(k in n) n[k] = labNormYMD(n[k]); });
+  n.cost = (n.cost === '' || n.cost == null) ? '' : num2(n.cost);
+  ['rounds','labSteps'].forEach(k => { if(typeof n[k] === 'string'){ try{ n[k] = JSON.parse(n[k]); }catch(e){ n[k] = []; } } });
+  if(typeof n.trips === 'string'){ try{ const a = JSON.parse(n.trips); n.trips = Array.isArray(a) ? a : undefined; }catch(e){ n.trips = undefined; } }
+  if(!Array.isArray(n.trips)) delete n.trips;
+  if(n.tripsJSON && typeof n.tripsJSON !== 'string') n.tripsJSON = JSON.stringify(n.tripsJSON);
+  if(n.trips === undefined && n.tripsJSON){ try{ const a = JSON.parse(n.tripsJSON); if(Array.isArray(a)) n.trips = a; }catch(e){} }
+  if(n.dlAuto === 'TRUE' || n.dlAuto === 'true') n.dlAuto = true;
+  if(n.dlAuto === 'FALSE' || n.dlAuto === 'false' || n.dlAuto === '') delete n.dlAuto;
+  n.updatedAt = Number(n.updatedAt) || 0;
+  return n;
+}
+// Merge the Sheet's copy with this device's copy. An order edited here after the Sheet's version wins;
+// otherwise the Sheet wins, but empty Sheet cells never erase data the Sheet has no column for.
+function mergeLabFromSheet(serverList){
+  const lastPull = Number(localStorage.getItem(LAB_LAST_PULL_KEY)) || 0;
+  const local = new Map((labOrders || []).map(o => [o.id, o]));
+  const sheetHasStamp = serverList.some(o => o && o.updatedAt !== undefined && o.updatedAt !== '');
+  const seen = new Set();
+  const out = serverList.filter(o => o && o.id).map(raw => {
+    const s = labNormFromSheet(raw);
+    const l = local.get(s.id);
+    seen.add(s.id);
+    if(!l) return s;
+    const lt = Number(l.updatedAt) || 0;
+    // local is newer (Sheet has not stored this edit yet, or has no updatedAt column to tell)
+    if(lt && (lt > s.updatedAt) && (sheetHasStamp || lt > lastPull)) return l;
+    if(lt && !sheetHasStamp) return l;
+    const m = Object.assign({}, l, s);
+    LAB_LOCAL_FIELDS.forEach(k => {
+      const sv = s[k];
+      if((sv === undefined || sv === '' || sv === null) && l[k] !== undefined && l[k] !== '') m[k] = l[k];
+    });
+    if(!Array.isArray(s.trips) && Array.isArray(l.trips)) m.trips = l.trips;
+    return m;
+  });
+  // orders made on this device that the Sheet doesn't have yet
+  (labOrders || []).forEach(l => { if(!seen.has(l.id) && (Number(l.updatedAt) || 0) > lastPull) out.push(l); });
+  try{ localStorage.setItem(LAB_LAST_PULL_KEY, String(Date.now())); }catch(e){}
+  return out;
+}
+
 let laboDetailCtx = null;   // { patient, orderId } — which case the Dental Lab popup is showing
 
 /* =====================================================================
@@ -8109,7 +8248,16 @@ function saveLabForm(){
     savedOrder = o;
     isNewOrder = true;
   }
-  if(savedOrder && (savedOrder.cost === '' || savedOrder.cost == null)){ const c = labAutoCost(savedOrder); if(c !== '') savedOrder.cost = c; }
+  if(savedOrder){
+    const units = countTeeth(savedOrder.teeth) || parseInt(savedOrder.dlTeethCount, 10) || 1;
+    if(savedOrder.cost === '' || savedOrder.cost == null){
+      const pr = findLabPrice(savedOrder.work);
+      if(pr && parseFloat(pr.price) > 0) savedOrder.cost = num2(parseFloat(pr.price) * units);
+    }
+    // the DL panel (price/tooth x teeth) must match the fee saved here
+    savedOrder.dlTeethCount = units;
+    savedOrder.dlPerTooth = num2(savedOrder.cost) > 0 ? num2(num2(savedOrder.cost) / units) : '';
+  }
   saveLab();
   closeOv('laboFormOverlay');
   renderLab();
