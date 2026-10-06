@@ -3582,7 +3582,44 @@ function getUpcomingAppointments(){
     .sort((a,b) => (a.d ? a.d.getTime() : Infinity) - (b.d ? b.d.getTime() : Infinity));
 }
 
-function apptRowHTML({p, rec, d}, showDay){
+// Today's appointments for every patient (also those who already came and got a new record today).
+// arrived = the patient has a record or a treatment step dated today, other than the appointment itself.
+function getTodayAppointments(){
+  const t0 = new Date(); t0.setHours(0,0,0,0);
+  const t1 = new Date(t0); t1.setDate(t1.getDate() + 1);
+  const isToday = d => d && d >= t0 && d < t1;
+  const out = [];
+  buildPatientGroups(null).forEach(p => {
+    let appt = null;                                   // earliest appointment today
+    p.list.forEach(r => {
+      const tl = r.timeLast ? parseAnyDate(r.timeLast) : null;
+      if(isToday(tl) && (!appt || tl < appt.d)) appt = { d: tl, rec: r, step: null };
+      (r.procedureSteps || []).forEach(st => {
+        const hl = stepHighlightFor(st && st.step);
+        if(!hl || hl.id !== 'appt') return;
+        const sd = parseAnyDate(st.date);
+        if(isToday(sd) && (!appt || sd < appt.d)) appt = { d: sd, rec: r, step: st };
+      });
+    });
+    if(!appt) return;
+    let arrived = false;
+    p.list.forEach(r => {
+      if(arrived) return;
+      const rd = parseAnyDate(r.timestamp);
+      if(r !== appt.rec && isToday(rd)) arrived = true;                       // a new record made today
+      (r.procedureSteps || []).forEach(st => {
+        if(arrived || st === appt.step) return;
+        const hl = stepHighlightFor(st && st.step);
+        if(hl && hl.id === 'appt') return;                                    // another appointment is not a visit
+        if(isToday(parseAnyDate(st.date))) arrived = true;                    // a treatment step added today
+      });
+    });
+    out.push({ p, rec: appt.rec, d: appt.d, arrived });
+  });
+  return out.sort((a,b) => a.d - b.d);
+}
+
+function apptRowHTML({p, rec, d, arrived}, showDay){
   let dayLbl = '', timeStr = '—', dateStr = '';
   if(d){
     const today = new Date(); today.setHours(0,0,0,0);
@@ -3606,8 +3643,11 @@ function apptRowHTML({p, rec, d}, showDay){
         <div class="appt-meta">${formatPhoneDisplay(p.latest.phone)||'គ្មានលេខ'} · <span class="kh">${escHTML(plan)}${rec.teeth ? ' · ធ្មេញ ' + escHTML(rec.teeth) : ''}</span></div>
       </div>
       <div class="kh" style="font-size:11px; font-weight:700; white-space:nowrap; padding:4px 10px; border-radius:999px; ${
-        showDay ? 'background:#FEF3C7;color:#92400E;' : passed ? 'background:var(--surface-2);color:var(--ink-dim);' : 'background:#D97706;color:#fff;'}">${
-        showDay ? dayLbl : passed ? 'ហួសម៉ោង' : 'រង់ចាំ'}</div>
+        showDay ? 'background:#FEF3C7;color:#92400E;'
+        : arrived ? 'background:#DCFCE7;color:#166534;'
+        : passed ? 'background:#FFF7ED;color:#C2410C;border:1px solid #FED7AA;'
+        : 'background:#D97706;color:#fff;'}">${
+        showDay ? dayLbl : arrived ? '✓ មករួច' : passed ? 'មិនទាន់មក' : 'រង់ចាំ'}</div>
     </div>`;
 }
 
@@ -3619,11 +3659,14 @@ function renderUpcomingAppointments(){
   const t0 = new Date(); t0.setHours(0,0,0,0);
   const t1 = new Date(t0); t1.setDate(t1.getDate() + 1);          // tomorrow 00:00
   const t3 = new Date(t0); t3.setDate(t3.getDate() + 3);          // end of the day after tomorrow
-  const todayItems = items.filter(x => x.d && x.d >= t0 && x.d < t1);
+  const todayItems = getTodayAppointments();
   const nextItems  = items.filter(x => x.d && x.d >= t1 && x.d < t3);
-  if(!todayBody || !nextBody) return todayItems.length + nextItems.length;
+  const waiting = todayItems.filter(x => !x.arrived).length;
+  if(!todayBody || !nextBody) return waiting + nextItems.length;
 
-  document.getElementById('apptTodayCount').textContent = todayItems.length;
+  const arrivedN = todayItems.length - waiting;
+  document.getElementById('apptTodayCount').textContent = arrivedN ? `${arrivedN}/${todayItems.length}` : todayItems.length;
+  document.getElementById('apptTodayCount').title = `មករួច ${arrivedN} · នៅសល់ ${waiting}`;
   document.getElementById('apptUpcomingCount').textContent = nextItems.length;
   const empty = (kh, en) => `<div class="empty-state kh" style="padding:20px;font-size:12px;">${kh}<br><span style="opacity:.7">${en}</span></div>`;
   todayBody.innerHTML = todayItems.length ? todayItems.map(x => apptRowHTML(x, false)).join('') : empty('មិនមានការណាត់ថ្ងៃនេះទេ', 'No appointments today');
@@ -3632,7 +3675,7 @@ function renderUpcomingAppointments(){
   [todayBody, nextBody].forEach(b => b.querySelectorAll('.appt-upcoming').forEach(el => {
     el.addEventListener('click', () => openPatientRecord(decodeURIComponent(el.dataset.name)));
   }));
-  return todayItems.length + nextItems.length;
+  return waiting + nextItems.length;
 }
 
 function renderAppointments(){
