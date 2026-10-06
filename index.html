@@ -1018,6 +1018,45 @@
     .lc-act-grid{ grid-template-columns:1fr 1fr; } .lc-act-grid > div:first-child{ grid-column:1 / -1; }
     .lc-trip{ grid-template-columns:28px 1fr auto; } .lc-trip .dir{ grid-column:2; } .lc-trip .body{ grid-column:2 / -1; }
   }
+
+  /* ===== Dashboard (EMR overview) ===== */
+  .dash-hero{ display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap; padding:18px 20px; margin-bottom:16px; border-radius:16px;
+    background:linear-gradient(120deg, #20B2AA 0%, #2BC4B8 45%, #3A8FD9 100%); color:#fff; box-shadow:var(--shadow); }
+  .dash-greet{ font-size:20px; font-weight:700; }
+  .dash-date{ font-size:12.5px; opacity:.9; margin-top:3px; }
+  .dash-quick{ display:flex; gap:8px; flex-wrap:wrap; }
+  .dq{ border:1px solid rgba(255,255,255,.45); background:rgba(255,255,255,.15); color:#fff; font-size:12.5px; font-weight:600; padding:8px 12px; border-radius:10px; cursor:pointer; transition:background .15s, transform .15s; }
+  .dq:hover{ background:rgba(255,255,255,.28); transform:translateY(-1px); }
+  .dq.dq-primary{ background:#fff; color:var(--primary-dark); border-color:#fff; font-weight:700; }
+  .dash-kpis{ grid-template-columns:repeat(6, minmax(0,1fr)); }
+  .dash-grid{ display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:16px; align-items:start; }
+  .dash-split{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .dash-list{ padding:6px 10px 10px; max-height:420px; overflow-y:auto; }
+  .dash-list .appt-row{ border-radius:10px; }
+  .dash-legend{ display:flex; gap:12px; font-size:11.5px; color:var(--ink-soft); }
+  .dash-legend i{ display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:5px; vertical-align:middle; }
+  .dash-alert{ display:flex; align-items:center; gap:10px; padding:10px 16px; border-bottom:1px solid var(--border-soft); cursor:pointer; transition:background .12s; }
+  .dash-alert:last-child{ border-bottom:0; }
+  .dash-alert:hover{ background:var(--surface-2); }
+  .dash-alert .ai{ width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; font-size:15px; flex-shrink:0; }
+  .dash-alert .at{ flex:1; min-width:0; } .dash-alert .at b{ display:block; font-size:12.5px; color:var(--ink); } .dash-alert .at span{ font-size:11px; color:var(--ink-dim); }
+  .dash-alert .an{ font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:14px; padding:2px 10px; border-radius:999px; }
+  .dash-alert .chev{ color:var(--ink-dim); font-size:14px; }
+  .dash-fin-row{ display:flex; justify-content:space-between; align-items:baseline; font-size:12.5px; margin-bottom:6px; }
+  .dash-fin-row b{ font-family:'IBM Plex Mono',monospace; font-size:14px; }
+  .dash-meter{ height:8px; border-radius:99px; background:var(--surface-2); overflow:hidden; margin:4px 0 12px; }
+  .dash-meter > i{ display:block; height:100%; border-radius:99px; }
+  .dash-bar-row{ margin-bottom:9px; }
+  .dash-bar-row .bl{ display:flex; justify-content:space-between; font-size:12px; margin-bottom:3px; gap:8px; }
+  .dash-bar-row .bl span:first-child{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .dash-bar-row .bl b{ font-family:'IBM Plex Mono',monospace; }
+  .dash-mix{ display:grid; grid-template-columns:repeat(2,1fr); gap:8px; }
+  .dash-mix > div{ border:1px solid var(--border-soft); border-radius:10px; padding:8px 10px; }
+  .dash-mix .ml{ font-size:11px; color:var(--ink-dim); } .dash-mix .mv{ font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:18px; margin-top:2px; }
+  .dash-empty{ text-align:center; font-size:12px; color:var(--ink-dim); padding:14px; }
+  @media (max-width:1300px){ .dash-kpis{ grid-template-columns:repeat(3, minmax(0,1fr)); } }
+  @media (max-width:1100px){ .dash-grid{ grid-template-columns:1fr; } }
+  @media (max-width:760px){ .dash-kpis{ grid-template-columns:repeat(2, minmax(0,1fr)); } .dash-split{ grid-template-columns:1fr; gap:0; } .dash-greet{ font-size:17px; } .dq{ padding:7px 10px; font-size:12px; } }
 </style>
 <style id="dynamicPageStyle">@page{ size: A4 portrait; margin: 15mm; }</style>
 </head>
@@ -1130,36 +1169,79 @@
     <main class="wrap">
 
       <!-- Dashboard -->
-      <section class="view active" id="view-dashboard">
-        <div class="section-title">
-          <h2 class="kh">ផ្ទាំងសរុប · Dashboard</h2>
-          <span class="kh" id="dashDate" style="font-size:12px;color:var(--ink-dim)"></span>
+      <section class="view active fin dash" id="view-dashboard">
+        <!-- Welcome / quick actions -->
+        <div class="dash-hero">
+          <div>
+            <div class="dash-greet kh" id="dashGreet">សួស្តី 👋</div>
+            <div class="dash-date kh"><span id="dashDate"></span> · <span class="mono" id="dashClock" style="color:#fff !important; font-weight:600;"></span></div>
+          </div>
+          <div class="dash-quick">
+            <button type="button" class="dq dq-primary kh" data-dq="new">＋ កត់ត្រាអ្នកជំងឺ</button>
+            <button type="button" class="dq kh" data-dq="appointments">📅 ការណាត់</button>
+            <button type="button" class="dq kh" data-dq="labo">🧪 Dental Lab</button>
+            <button type="button" class="dq kh" data-dq="income-expense">💰 ហិរញ្ញវត្ថុ</button>
+            <button type="button" class="dq kh" data-dq="reports">📊 របាយការណ៍</button>
+          </div>
         </div>
 
-        <div id="dashSummaryStrip" style="display:flex; flex-wrap:wrap; gap:0; border:1px solid var(--border); border-radius:12px; background:var(--surface); margin-bottom:20px; overflow:hidden;"></div>
+        <!-- Today KPIs (vs yesterday) -->
+        <div class="fin-kpis dash-kpis" id="dashSummaryStrip"></div>
 
-        <div class="appt-panel" style="width:100%;">
-          <div class="appt-panel-head">
-            <h3 class="kh">🗓️ Today's Patient procedures</h3>
-            <span class="count-pill" id="queueTodayCount">0</span>
-          </div>
-          <div id="queueTodayBody"></div>
-        </div>
+        <div class="dash-grid">
+          <div class="dash-main">
+            <div class="fin-card">
+              <div class="fin-card-head">
+                <div><div class="fin-title kh">🩺 អ្នកជំងឺថ្ងៃនេះ <span class="fin-count mono" id="queueTodayCount" style="background:var(--primary-softer); color:var(--primary-dark);">0</span></div>
+                <div class="fin-sub">Today's patient queue · procedures</div></div>
+              </div>
+              <div class="dash-list" id="queueTodayBody"></div>
+            </div>
 
-        <div class="appt-split">
-          <div class="appt-panel">
-            <div class="appt-panel-head">
-              <h3 class="kh">📅 ការណាត់ថ្ងៃនេះ · Today</h3>
-              <span class="count-pill" id="apptTodayCount">0</span>
+            <div class="dash-split">
+              <div class="fin-card">
+                <div class="fin-card-head">
+                  <div><div class="fin-title kh">📅 ការណាត់ថ្ងៃនេះ <span class="fin-count mono" id="apptTodayCount" style="background:#FEF3C7; color:#92400E;">0</span></div>
+                  <div class="fin-sub">Today's appointments</div></div>
+                </div>
+                <div class="dash-list" id="apptTodayBody"></div>
+              </div>
+              <div class="fin-card">
+                <div class="fin-card-head">
+                  <div><div class="fin-title kh">⏭️ ការណាត់ ២ ថ្ងៃខាងមុខ <span class="fin-count mono" id="apptUpcomingCount" style="background:#E1EFFF; color:#0B5ED7;">0</span></div>
+                  <div class="fin-sub">Upcoming · next 2 days</div></div>
+                </div>
+                <div class="dash-list" id="apptUpcomingBody"></div>
+              </div>
             </div>
-            <div id="apptTodayBody"></div>
+
+            <div class="fin-card">
+              <div class="fin-card-head">
+                <div><div class="fin-title kh">📈 និន្នាការ ១៤ ថ្ងៃចុងក្រោយ</div>
+                <div class="fin-sub">Patient visits &amp; revenue · last 14 days</div></div>
+                <div class="dash-legend kh"><span><i style="background:var(--primary)"></i>អ្នកជំងឺ</span><span><i style="background:#0E9F6E; height:3px;"></i>ចំណូល ($)</span></div>
+              </div>
+              <div id="dashTrend" style="padding:12px 14px 6px;"></div>
+            </div>
           </div>
-          <div class="appt-panel">
-            <div class="appt-panel-head">
-              <h3 class="kh">⏭️ ការណាត់ខាងមុខ · Next 2 days</h3>
-              <span class="count-pill" id="apptUpcomingCount">0</span>
+
+          <div class="dash-side">
+            <div class="fin-card">
+              <div class="fin-card-head"><div><div class="fin-title kh">🔔 ការងារត្រូវយកចិត្តទុកដាក់</div><div class="fin-sub">Action items · alerts</div></div></div>
+              <div id="dashAlerts"></div>
             </div>
-            <div id="apptUpcomingBody"></div>
+            <div class="fin-card">
+              <div class="fin-card-head"><div><div class="fin-title kh">💰 ហិរញ្ញវត្ថុខែនេះ</div><div class="fin-sub">Finance · month to date</div></div></div>
+              <div id="dashFinance" style="padding:14px 16px;"></div>
+            </div>
+            <div class="fin-card">
+              <div class="fin-card-head"><div><div class="fin-title kh">🦷 ការព្យាបាលច្រើនជាងគេ</div><div class="fin-sub">Top procedures · this month</div></div></div>
+              <div id="dashTopTx" style="padding:12px 16px;"></div>
+            </div>
+            <div class="fin-card">
+              <div class="fin-card-head"><div><div class="fin-title kh">👥 អ្នកជំងឺខែនេះ</div><div class="fin-sub">Patient mix · this month</div></div></div>
+              <div id="dashDemo" style="padding:12px 16px;"></div>
+            </div>
           </div>
         </div>
       </section>
@@ -3614,26 +3696,181 @@ const DASH_SUMMARY_METRICS = [
 function renderDashboardDayStats(){
   const today = new Date();
   const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
-  const todayStats = computeDayStats(today);
-  const yestStats = computeDayStats(yesterday);
-
+  const T = computeDayStats(today), Y = computeDayStats(yesterday);
   const stripEl = document.getElementById('dashSummaryStrip');
   if(stripEl){
-    stripEl.innerHTML = DASH_SUMMARY_METRICS.map(m => {
-      const tv = todayStats[m.key], yv = yestStats[m.key];
-      const diff = tv - yv;
-      const deltaCls = diff > 0 ? 'up' : (diff < 0 ? 'down' : 'flat');
-      const deltaSign = diff > 0 ? '▲' : (diff < 0 ? '▼' : '—');
-      const deltaAbs = m.key === 'income' || m.key === 'expense' ? Math.abs(diff).toFixed(0) : Math.abs(diff);
-      return `
-        <div class="dash-pill">
-          <div class="dp-label kh">${m.kh}</div>
-          <div><span class="dp-value">${m.fmt(tv)}</span><span class="dp-delta ${deltaCls}">${deltaSign}${diff !== 0 ? deltaAbs : ''}</span></div>
-        </div>
-      `;
+    const delta = (tv, yv, money) => {
+      const d = tv - yv;
+      if(!d) return `<span class="fin-delta flat">— ម្សិលមិញ ${money ? '$' + yv.toFixed(0) : yv}</span>`;
+      return `<span class="fin-delta ${d > 0 ? 'up' : 'down'}">${d > 0 ? '▲' : '▼'} ${money ? '$' + Math.abs(d).toFixed(0) : Math.abs(d)}</span><span>ធៀបម្សិលមិញ</span>`;
+    };
+    let ar = { count: 0, amount: 0 };
+    try{ ar = unpaidInvoiceSummary(); }catch(e){}
+    let labActive = 0, labAlert = 0;
+    try{ (labOrders || []).forEach(o => { const k = labLocation(o).key; if(k !== 'delivered') labActive++; if(k === 'overdue' || k === 'ready') labAlert++; }); }catch(e){}
+    const kpi = o => `<div class="fin-kpi" style="--k:${o.c}; --kb:${o.cb};">
+      <div class="k-label kh"><span class="k-ico">${o.i}</span>${o.kh}</div>
+      <div class="k-val" style="${o.vc ? 'color:' + o.vc : ''}">${o.v}</div>
+      <div class="k-en">${o.en}</div><div class="k-foot kh">${o.f}</div></div>`;
+    stripEl.innerHTML = [
+      kpi({ i:'🧑‍⚕️', kh:'អ្នកជំងឺថ្ងៃនេះ', en:'Patients today', v: T.patientsTodayCount, c:'var(--primary-dark)', cb:'var(--primary-softer)', f: delta(T.patientsTodayCount, Y.patientsTodayCount) }),
+      kpi({ i:'✨', kh:'អ្នកជំងឺថ្មី', en:'New patients', v: T.newPatientsCount, c:'#7C3AED', cb:'#EDE9FE', f: delta(T.newPatientsCount, Y.newPatientsCount) }),
+      kpi({ i:'📅', kh:'ការណាត់ថ្ងៃនេះ', en:'Appointments', v: T.apptCount, c:'#D97706', cb:'#FEF3C7', f: delta(T.apptCount, Y.apptCount) }),
+      kpi({ i:'💰', kh:'ចំណូលថ្ងៃនេះ', en:'Revenue today', v: finMoney(T.income), c:'#0E9F6E', cb:'#DEF7EC', f: delta(T.income, Y.income, true) }),
+      kpi({ i:'⏳', kh:'ប្រាក់ជំពាក់', en:'Accounts receivable', v: finMoney(ar.amount), vc: ar.amount ? 'var(--coral-dark)' : '', c:'var(--coral)', cb:'var(--coral-soft)', f: `${ar.count} នាក់មិនទាន់បង់អស់` }),
+      kpi({ i:'🧪', kh:'Lab កំពុងដំណើរការ', en:'Active lab cases', v: labActive, c:'#0B5ED7', cb:'#E1EFFF', f: labAlert ? `<span style="color:var(--coral-dark); font-weight:700;">⚠ ${labAlert} ត្រូវតាមដាន</span>` : 'គ្មានបន្ទាន់' })
+    ].join('');
+  }
+  try{ renderDashOverview(); }catch(e){ console.warn('Dashboard overview error:', e); }
+}
+
+/* ---------- Dashboard overview panels ---------- */
+function dashGo(view, after){
+  if(view === 'new'){ const b = document.getElementById('fabAdd'); if(b) b.click(); return; }
+  const go = () => { showView(view); if(after) after(); };
+  if(view === 'income-expense') requestClinicPin(go); else go();
+}
+function dashTick(){
+  const now = new Date(), h = now.getHours();
+  const g = h < 12 ? 'អរុណសួស្តី' : h < 17 ? 'ទិវាសួស្តី' : 'សាយណ្ហសួស្តី';
+  const ge = document.getElementById('dashGreet'); if(ge) ge.textContent = `${g} 👋 · សូមស្វាគមន៍មកកាន់គ្លីនិក`;
+  const ce = document.getElementById('dashClock');
+  if(ce){ let hr = h % 12 || 12; ce.textContent = `${String(hr).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')} ${h >= 12 ? 'PM' : 'AM'}`; }
+}
+setInterval(dashTick, 30000);
+
+function renderDashOverview(){
+  dashTick();
+  const now = new Date();
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+  const ym = getLocalTodayYMD().slice(0, 7);
+
+  // ---- Alerts / action items
+  const alertsEl = document.getElementById('dashAlerts');
+  if(alertsEl){
+    let missed = 0, tomorrow = 0;
+    try{ missed = buildPatientGroups(null).filter(p => patientState(p, startOfToday) === 'missing').length; }catch(e){}
+    try{
+      const t1 = new Date(startOfToday); t1.setDate(t1.getDate() + 1);
+      const t2 = new Date(startOfToday); t2.setDate(t2.getDate() + 2);
+      tomorrow = getUpcomingAppointments().filter(x => x.d && x.d >= t1 && x.d < t2).length;
+    }catch(e){}
+    const lab = { overdue:0, ready:0, tryin:0 };
+    try{ (labOrders || []).forEach(o => { const k = labLocation(o).key; if(k in lab) lab[k]++; }); }catch(e){}
+    let invBad = 0, invWarn = 0;
+    try{ (invItems || []).forEach(it => { const f = invFlags(it); if(f.includes('out') || f.includes('expired')) invBad++; else if(f.length) invWarn++; }); }catch(e){}
+    let ar = { count:0, amount:0 }; try{ ar = unpaidInvoiceSummary(); }catch(e){}
+    const RED = ['#FEE2E2','#991B1B'], AMB = ['#FEF3C7','#92400E'], BLU = ['#E1EFFF','#0B5ED7'], GRN = ['#DCFCE7','#166534'];
+    const items = [
+      { n: missed, ico:'🚫', c: RED, kh:'ខកខានការណាត់', en:'Missed appointments', go: () => dashGo('patients', () => setPatientFilter('missing')) },
+      { n: lab.overdue, ico:'⚠', c: RED, kh:'Lab យឺតពេល', en:'Overdue lab cases', go: () => dashGo('labo', () => { labFilter = 'overdue'; renderLab(); }) },
+      { n: invBad, ico:'📦', c: RED, kh:'បរិក្ខាអស់ / ផុតកំណត់', en:'Out of stock / expired', go: () => dashGo('inventory') },
+      { n: ar.count, ico:'💳', c: AMB, kh:'អ្នកជំងឺមិនទាន់បង់អស់', en:`Outstanding ${finMoney(ar.amount)}`, go: () => dashGo('income-expense') },
+      { n: lab.ready, ico:'📦', c: BLU, kh:'ធ្មេញរួចរាល់ រង់ចាំដាក់', en:'Lab work ready to fit', go: () => dashGo('labo', () => { labFilter = 'received'; renderLab(); }) },
+      { n: lab.tryin, ico:'🏥', c: AMB, kh:'Lab រង់ចាំសាកល្បង', en:'Try-in at clinic', go: () => dashGo('labo', () => { labFilter = 'received'; renderLab(); }) },
+      { n: invWarn, ico:'📉', c: AMB, kh:'បរិក្ខាជិតអស់ / ជិតផុត', en:'Low stock / expiring soon', go: () => dashGo('inventory') },
+      { n: tomorrow, ico:'📞', c: GRN, kh:'ការណាត់ថ្ងៃស្អែក (រំលឹក)', en:'Remind tomorrow\'s patients', go: () => dashGo('appointments') }
+    ].filter(x => x.n > 0);
+    alertsEl.innerHTML = items.length ? items.map((x, i) => `
+      <div class="dash-alert" data-i="${i}">
+        <div class="ai" style="background:${x.c[0]}; color:${x.c[1]};">${x.ico}</div>
+        <div class="at"><b class="kh">${x.kh}</b><span>${x.en}</span></div>
+        <div class="an" style="background:${x.c[0]}; color:${x.c[1]};">${x.n}</div><div class="chev">›</div>
+      </div>`).join('')
+      : `<div class="dash-empty kh">✅ គ្មានការងារបន្ទាន់ទេ<br><span style="opacity:.7">All clear</span></div>`;
+    alertsEl.querySelectorAll('.dash-alert').forEach(row => row.addEventListener('click', () => items[+row.dataset.i].go()));
+  }
+
+  // ---- Finance MTD
+  const finEl = document.getElementById('dashFinance');
+  if(finEl){
+    try{ loadExpenses(); }catch(e){}
+    const st = getIncomeExpenseStats();
+    const net = st.incomeMonth - st.expenseMonth;
+    const expPct = st.incomeMonth > 0 ? Math.min(100, Math.round(st.expenseMonth / st.incomeMonth * 100)) : (st.expenseMonth > 0 ? 100 : 0);
+    const vsLast = st.incomeLastMonth > 0 ? Math.round((st.incomeMonth - st.incomeLastMonth) / st.incomeLastMonth * 100) : null;
+    finEl.innerHTML = `
+      <div class="dash-fin-row kh"><span>ចំណូល · Revenue</span><b style="color:#0E9F6E;">${finMoney(st.incomeMonth)}</b></div>
+      <div class="dash-fin-row kh"><span>ចំណាយ · Expenses</span><b style="color:var(--coral-dark);">${finMoney(st.expenseMonth)}</b></div>
+      <div class="dash-meter" title="ចំណាយ ${expPct}% នៃចំណូល"><i style="width:${expPct}%; background:linear-gradient(90deg,#F59E0B,#E4574C);"></i></div>
+      <div class="dash-fin-row kh" style="border-top:1px dashed var(--border); padding-top:8px;"><span><b style="font-family:inherit; font-size:13px;">ចំណេញសុទ្ធ · Net</b></span>
+        <b style="font-size:17px; color:${net >= 0 ? 'var(--primary-dark)' : 'var(--coral-dark)'};">${net < 0 ? '-' : ''}${finMoney(Math.abs(net))}</b></div>
+      <div class="kh" style="font-size:11.5px; color:var(--ink-dim); display:flex; gap:10px; flex-wrap:wrap;">
+        <span>DL ${finMoney(st.dlExpenseMonth)}</span><span>DM ${finMoney(st.dmExpenseMonth)}</span>
+        ${vsLast !== null ? `<span class="fin-delta ${vsLast >= 0 ? 'up' : 'down'}">${vsLast >= 0 ? '▲' : '▼'} ${Math.abs(vsLast)}% ចំណូលធៀបខែមុន</span>` : ''}
+      </div>`;
+  }
+
+  // ---- Records this month (procedures + patient mix)
+  const monthRecs = allRecords.filter(r => { const d = parseAnyDate(r.timestamp); return d && d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth(); });
+  const txEl = document.getElementById('dashTopTx');
+  if(txEl){
+    const cnt = {};
+    monthRecs.forEach(r => { const t = cleanStr(r.treatment); if(t && t !== '—') cnt[t] = (cnt[t] || 0) + 1; });
+    const top = Object.entries(cnt).sort((a,b) => b[1] - a[1]).slice(0, 6);
+    const max = top.length ? top[0][1] : 1;
+    const colors = ['#20B2AA','#3A8FD9','#7C3AED','#D97706','#0E9F6E','#E4574C'];
+    txEl.innerHTML = top.length ? top.map(([name, n], i) => `
+      <div class="dash-bar-row"><div class="bl kh"><span title="${escHTML(name)}">${escHTML(name)}</span><b>${n}</b></div>
+      <div class="dash-meter" style="margin:0; height:7px;"><i style="width:${Math.round(n / max * 100)}%; background:${colors[i]};"></i></div></div>`).join('')
+      : `<div class="dash-empty kh">មិនទាន់មានការព្យាបាលខែនេះ</div>`;
+  }
+  const demoEl = document.getElementById('dashDemo');
+  if(demoEl){
+    const seen = new Map();
+    monthRecs.forEach(r => { if(cleanStr(r.name)) seen.set(patientKey(r), r); });
+    const firstSeen = new Map();
+    allRecords.forEach(r => { if(!cleanStr(r.name)) return; const d = parseAnyDate(r.timestamp); const k = patientKey(r); if(d && (!firstSeen.has(k) || d < firstSeen.get(k))) firstSeen.set(k, d); });
+    let male = 0, female = 0, kids = 0, newP = 0;
+    seen.forEach((r, k) => {
+      const sx = String(r.sex || '').toUpperCase();
+      if(sx === 'M' || sx.includes('ប្រុស')) male++; else if(sx === 'F' || sx.includes('ស្រី')) female++;
+      const a = parseInt(r.age, 10); if(!isNaN(a) && a <= 15) kids++;
+      const f = firstSeen.get(k); if(f && f.getFullYear() === now.getFullYear() && f.getMonth() === now.getMonth()) newP++;
+    });
+    const total = seen.size, fPct = total ? Math.round(female / total * 100) : 0, mPct = total ? Math.round(male / total * 100) : 0;
+    demoEl.innerHTML = `
+      <div class="dash-mix">
+        <div><div class="ml kh">សរុប · Unique</div><div class="mv">${total}</div></div>
+        <div><div class="ml kh">ថ្មី · New</div><div class="mv" style="color:#7C3AED;">${newP}</div></div>
+        <div><div class="ml kh">ចាស់ · Returning</div><div class="mv" style="color:var(--primary-dark);">${Math.max(0, total - newP)}</div></div>
+        <div><div class="ml kh">កុមារ ≤15</div><div class="mv" style="color:#D97706;">${kids}</div></div>
+      </div>
+      <div class="kh" style="display:flex; justify-content:space-between; font-size:11.5px; margin:12px 0 4px;"><span style="color:#3A8FD9;">♂ ប្រុស ${male} (${mPct}%)</span><span style="color:#E4574C;">♀ ស្រី ${female} (${fPct}%)</span></div>
+      <div class="dash-meter" style="display:flex; margin:0;"><i style="width:${mPct}%; background:#3A8FD9; border-radius:0;"></i><i style="width:${fPct}%; background:#E4574C; border-radius:0;"></i></div>`;
+  }
+
+  // ---- 14-day trend (bars = patients, line = revenue)
+  const trEl = document.getElementById('dashTrend');
+  if(trEl){
+    const days = [];
+    for(let i = 13; i >= 0; i--){ const d = new Date(startOfToday); d.setDate(d.getDate() - i); const st = computeDayStats(d); days.push({ d, p: st.patientsTodayCount, inc: st.income }); }
+    const W = 680, H = 200, padL = 28, padR = 40, padT = 18, padB = 30;
+    const cw = (W - padL - padR) / days.length, bw = Math.min(26, cw * 0.55);
+    const maxP = Math.max(1, ...days.map(x => x.p)), maxI = Math.max(1, ...days.map(x => x.inc));
+    const yP = v => padT + (H - padT - padB) * (1 - v / maxP), yI = v => padT + (H - padT - padB) * (1 - v / maxI);
+    const bars = days.map((x, i) => {
+      const cx = padL + cw * i + cw / 2, y = yP(x.p), isToday = i === days.length - 1;
+      return `<rect x="${cx - bw/2}" y="${y}" width="${bw}" height="${H - padB - y}" rx="4" fill="${isToday ? 'var(--primary-dark)' : 'var(--primary)'}" opacity="${isToday ? 1 : .75}"><title>${x.d.getDate()}/${x.d.getMonth()+1}: ${x.p} នាក់ · $${x.inc.toFixed(2)}</title></rect>
+        ${x.p ? `<text x="${cx}" y="${y - 4}" text-anchor="middle" font-size="10" font-weight="700" fill="var(--ink-soft)" font-family="IBM Plex Mono, monospace">${x.p}</text>` : ''}
+        <text x="${cx}" y="${H - 12}" text-anchor="middle" font-size="10" fill="${isToday ? 'var(--primary-dark)' : 'var(--ink-dim)'}" font-weight="${isToday ? 700 : 400}" font-family="IBM Plex Mono, monospace">${x.d.getDate()}/${x.d.getMonth()+1}</text>`;
     }).join('');
+    const pts = days.map((x, i) => `${padL + cw * i + cw / 2},${yI(x.inc)}`).join(' ');
+    const dots = days.map((x, i) => x.inc ? `<circle cx="${padL + cw * i + cw / 2}" cy="${yI(x.inc)}" r="3" fill="#0E9F6E"><title>$${x.inc.toFixed(2)}</title></circle>` : '').join('');
+    const grid = [0, .5, 1].map(f => { const y = padT + (H - padT - padB) * (1 - f);
+      return `<line x1="${padL}" x2="${W - padR}" y1="${y}" y2="${y}" stroke="var(--border-soft)" stroke-dasharray="3 4"/>
+        <text x="${padL - 6}" y="${y + 3}" text-anchor="end" font-size="9.5" fill="var(--ink-dim)" font-family="IBM Plex Mono, monospace">${Math.round(maxP * f)}</text>
+        <text x="${W - padR + 6}" y="${y + 3}" font-size="9.5" fill="#0E9F6E" font-family="IBM Plex Mono, monospace">$${Math.round(maxI * f)}</text>`; }).join('');
+    const totP = days.reduce((s, x) => s + x.p, 0), totI = days.reduce((s, x) => s + x.inc, 0);
+    trEl.innerHTML = `<svg viewBox="0 0 ${W} ${H}" style="width:100%; height:auto; display:block;">${grid}${bars}
+      <polyline points="${pts}" fill="none" stroke="#0E9F6E" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>${dots}</svg>
+      <div class="kh" style="display:flex; gap:16px; flex-wrap:wrap; font-size:12px; color:var(--ink-soft); padding:4px 2px 6px;">
+        <span>សរុប ១៤ ថ្ងៃ៖ <b class="mono">${totP}</b> ការមកពិនិត្យ</span><span>មធ្យម <b class="mono">${(totP / 14).toFixed(1)}</b> នាក់/ថ្ងៃ</span><span>ចំណូល <b class="mono" style="color:#0E9F6E;">${finMoney(totI)}</b></span>
+      </div>`;
   }
 }
+
+document.querySelectorAll('#view-dashboard [data-dq]').forEach(b => b.addEventListener('click', () => dashGo(b.dataset.dq)));
 
 function renderTreatmentStats(){
   const counts = {};
@@ -7024,6 +7261,7 @@ function showView(key){
   if(key === 'appointments'){ view = 'patients'; setPatientFilter('appt', true); }
   else if(key === 'patients'){ setPatientFilter('all', true); }
   currentView = view;
+  if(view === 'dashboard'){ try{ renderDashboardDayStats(); }catch(e){} }
   if(view === 'labo') renderLab();
   if(view === 'inventory') renderInventory();
   if(view === 'income-expense') renderIncomeExpensePage();
