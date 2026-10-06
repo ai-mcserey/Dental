@@ -1123,6 +1123,44 @@
     .lab-range-q .chip{ flex:0 0 auto; }
     .lab-range select{ width:100%; }
   }
+
+  /* ===== CPD tracker ===== */
+  #cpdOverlay{ z-index:95; }
+  .cpd-bar{ display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
+  .cpd-tabs{ display:flex; gap:6px; flex-wrap:wrap; }
+  .cpd-tab{ border:1px solid var(--border); background:var(--surface); color:var(--ink-soft); font-size:12px; font-weight:600; padding:6px 12px; border-radius:999px; cursor:pointer; }
+  .cpd-tab[aria-pressed="true"]{ background:#7C3AED; border-color:#7C3AED; color:#fff; }
+  .cpd-tab .n{ font-family:'IBM Plex Mono',monospace; opacity:.8; margin-left:4px; }
+  .cpd-actions{ display:flex; gap:6px; }
+  .cpd-status{ font-size:12px; color:var(--ink-dim); margin-bottom:10px; min-height:16px; }
+  .cpd-hero{ display:grid; grid-template-columns:150px 1fr; gap:18px; align-items:center; padding:16px; border-radius:14px; background:linear-gradient(120deg,#F5F3FF,#EEF2FF); border:1px solid #DDD6FE; margin-bottom:14px; }
+  .cpd-ring{ position:relative; width:150px; height:150px; }
+  .cpd-ring .c{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .cpd-ring .c b{ font-family:'IBM Plex Mono',monospace; font-size:30px; color:#4C1D95; line-height:1; }
+  .cpd-ring .c span{ font-size:12px; color:#6D28D9; margin-top:4px; }
+  .cpd-facts{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; }
+  .cpd-facts > div{ background:#fff; border:1px solid #E9E5FF; border-radius:10px; padding:8px 10px; }
+  .cpd-facts .l{ font-size:11px; color:var(--ink-dim); } .cpd-facts .v{ font-family:'IBM Plex Mono',monospace; font-weight:700; font-size:18px; margin-top:2px; }
+  .cpd-target{ display:flex; align-items:center; gap:8px; margin-top:10px; font-size:12.5px; flex-wrap:wrap; }
+  .cpd-target input{ width:80px; height:32px; text-align:center; font-weight:700; }
+  .cpd-msg{ margin-top:10px; font-size:13px; font-weight:700; padding:8px 12px; border-radius:10px; }
+  .cpd-list{ border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+  .cpd-item{ display:grid; grid-template-columns:34px 1fr auto auto; gap:10px; align-items:center; padding:10px 12px; border-bottom:1px solid var(--border-soft); }
+  .cpd-item:last-child{ border-bottom:0; }
+  .cpd-item .i{ width:30px; height:30px; border-radius:8px; background:#EDE9FE; color:#6D28D9; display:flex; align-items:center; justify-content:center; font-size:14px; }
+  .cpd-item .t{ font-size:13px; font-weight:600; color:var(--ink); line-height:1.35; }
+  .cpd-item .m{ font-size:11.5px; color:var(--ink-dim); margin-top:2px; }
+  .cpd-item .p{ font-family:'IBM Plex Mono',monospace; font-weight:800; font-size:14px; color:#6D28D9; background:#F5F3FF; border:1px solid #DDD6FE; padding:3px 10px; border-radius:999px; white-space:nowrap; }
+  .cpd-item .p.zero{ color:#B45309; background:#FFFBEB; border-color:#FDE68A; }
+  .cpd-item a{ font-size:16px; text-decoration:none; }
+  .cpd-cfg{ margin-top:14px; font-size:12px; color:var(--ink-soft); }
+  .cpd-cfg summary{ cursor:pointer; }
+  @media (max-width:600px){
+    .cpd-hero{ grid-template-columns:1fr; justify-items:center; text-align:center; padding:12px; }
+    .cpd-facts{ width:100%; } .cpd-facts .v{ font-size:15px; }
+    .cpd-item{ grid-template-columns:28px 1fr auto; } .cpd-item a{ grid-column:3; grid-row:1; }
+    .cpd-item .p{ grid-column:2; justify-self:start; }
+  }
 </style>
 <style id="dynamicPageStyle">@page{ size: A4 portrait; margin: 15mm; }</style>
 </head>
@@ -2001,6 +2039,9 @@
         <button type="button" class="btn btn-outline btn-block kh" id="openClinicalConfigBtn" style="border-color: var(--primary); color: var(--primary-dark); font-weight: 700; font-size: 12.5px;">
           ⚙️ កំណត់ Treatment, Diagnosis & Procedures
         </button>
+        <button type="button" class="btn btn-outline btn-block kh" id="openCpdBtn" style="border-color:#7C3AED; color:#6D28D9; font-weight:700; font-size:12.5px; margin-top:8px;">
+          🎓 CPD · វិញ្ញាបនបត្របណ្តុះបណ្តាល (Google Drive)
+        </button>
       </div>
 
       <hr style="border:none;border-top:1px solid var(--border-soft);margin:4px 0 16px;">
@@ -2009,6 +2050,34 @@
         <input type="text" id="s_webappurl">
       </div>
       <button class="btn btn-primary btn-block" id="saveSettingsBtn">រក្សាទុក Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- CPD tracker (certificates from Google Drive) -->
+<div class="overlay hidden" id="cpdOverlay">
+  <div class="modal" style="max-width:820px;">
+    <div class="modal-head">
+      <h2 class="kh">🎓 CPD · Continuing Professional Development</h2>
+      <button class="x" id="closeCpd">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="cpd-bar">
+        <div class="cpd-tabs" id="cpdTabs"></div>
+        <div class="cpd-actions">
+          <a class="btn btn-outline btn-sm kh" id="cpdDriveLink" target="_blank" rel="noopener">📂 Drive</a>
+          <button type="button" class="btn btn-primary btn-sm kh" id="cpdRefreshBtn" style="background:#7C3AED; border-color:#7C3AED;">🔄 ទាញទិន្នន័យ</button>
+        </div>
+      </div>
+      <div id="cpdStatus" class="kh cpd-status"></div>
+      <div id="cpdBody"></div>
+      <details class="cpd-cfg">
+        <summary class="kh">⚙ កំណត់ Folder Drive</summary>
+        <div style="display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;">
+          <input type="text" id="cpdFolderInput" class="mono" style="flex:1; min-width:220px; height:36px;" placeholder="Folder ID ឬ Link Google Drive">
+          <button type="button" class="btn btn-outline btn-sm kh" id="cpdFolderSave" style="height:36px;">រក្សាទុក</button>
+        </div>
+      </details>
     </div>
   </div>
 </div>
@@ -5877,6 +5946,182 @@ document.querySelectorAll('.cfg-tab-btn').forEach(btn => {
     btn.classList.add('active');
     document.getElementById(btn.dataset.tab).classList.add('active');
   });
+});
+
+/* =====================================================================
+   🎓 CPD tracker — certificates in a Google Drive folder (read by CPD.gs in Apps Script)
+   ===================================================================== */
+const CPD_DEFAULT_FOLDER = '1W-KK_yBfqqugU_N-s6bawseoQaDXS-3c';
+const CPD_KEYS = { folder:'kep_cpd_folder_v1', cache:'kep_cpd_cache_v1', targets:'kep_cpd_targets_v1', tab:'kep_cpd_tab_v1' };
+let cpdData = null, cpdTab = '', cpdBusy = false;
+function cpdGet(k, d){ try{ const v = localStorage.getItem(k); return v === null ? d : v; }catch(e){ return d; } }
+function cpdSet(k, v){ try{ localStorage.setItem(k, v); }catch(e){} }
+function cpdFolderId(){ return cpdGet(CPD_KEYS.folder, CPD_DEFAULT_FOLDER); }
+function cpdTargets(){ try{ return JSON.parse(cpdGet(CPD_KEYS.targets, '{}')) || {}; }catch(e){ return {}; } }
+function cpdTargetFor(name){ const t = cpdTargets()[name]; return t > 0 ? t : 60; }
+function cpdParseDate(s){
+  if(!s) return null;
+  const m = String(s).match(/(\d{1,2})(?:st|nd|rd|th)?(?:\s*[-–]\s*\d{1,2}(?:st|nd|rd|th)?)?\s+([A-Za-z]+)\s*,?\s*(\d{4})/) ;
+  if(m){ const d = new Date(`${m[2]} ${m[1]}, ${m[3]}`); if(!isNaN(d)) return d; }
+  const d = new Date(s); return isNaN(d) ? null : d;
+}
+
+function cpdLink(url){
+  if(!url) return '#';
+  const email = (cpdData && cpdData.ownerEmail) || '';
+  if(!email) return url;
+  return url + (url.includes('?') ? '&' : '?') + 'authuser=' + encodeURIComponent(email);
+}
+function openCpd(){
+  document.getElementById('cpdFolderInput').value = cpdFolderId();
+  document.getElementById('cpdDriveLink').href = 'https://drive.google.com/drive/folders/' + cpdFolderId();
+  try{ cpdData = JSON.parse(cpdGet(CPD_KEYS.cache, 'null')); }catch(e){ cpdData = null; }
+  cpdTab = cpdGet(CPD_KEYS.tab, '');
+  renderCpd();
+  document.getElementById('cpdOverlay').classList.remove('hidden');
+  loadCpd(false);
+}
+
+async function loadCpd(force){
+  const st = document.getElementById('cpdStatus');
+  if(!webAppUrl){ st.innerHTML = '⚠ មិនទាន់មាន Google Sheet Sync URL (Apps Script) ក្នុង Settings'; return; }
+  if(cpdBusy) return;
+  cpdBusy = true;
+  const btn = document.getElementById('cpdRefreshBtn');
+  btn.disabled = true;
+  try{
+    for(let round = 0; round < 6; round++){
+      st.innerHTML = round === 0 ? '⏳ កំពុងទាញទិន្នន័យពី Google Drive...' : `⏳ កំពុងអាន PDF ថ្មី... (នៅសល់ ${cpdData && cpdData.pending || 0})`;
+      const url = webAppUrl + (webAppUrl.includes('?') ? '&' : '?') + 'action=cpd&folder=' + encodeURIComponent(cpdFolderId()) + (force && round === 0 ? '&refresh=1' : '') + '&_=' + Date.now();
+      const res = await fetch(url);
+      const raw = await res.text();
+      let json = null;
+      try{ json = JSON.parse(raw); }
+      catch(parseErr){
+        // Apps Script answered with an HTML page (script error / permission page), not data.
+        const tmp = document.createElement('div'); tmp.innerHTML = raw.replace(/<(script|style)[\s\S]*?<\/\1>/gi, '');
+        const txt = (tmp.textContent || '').replace(/\s+/g, ' ').trim();
+        const m = txt.match(/((?:Reference|Syntax|Type)Error|Exception|Error)[^.]{0,220}/);
+        const why = /authori[sz]|permission|អនុញ្ញាត|sign in|ចូល/i.test(txt) ? 'Apps Script ត្រូវការការអនុញ្ញាត (Authorization) ម្តងទៀត'
+                  : /already been declared|ប្រកាសរួចហើយ/i.test(txt) ? 'មានកូដ CPD ស្ទួន (ដាក់ CPD.gs ២ ដង)'
+                  : /not defined|is not a function/i.test(txt) ? 'រកមិនឃើញមុខងារ (ឯកសារ CPD.gs បាត់ ឬមិនទាន់ Save)'
+                  : 'Apps Script មានកំហុស';
+        const e2 = new Error(why);
+        e2.detail = m ? m[0] : txt.slice(0, 220);
+        e2.html = true;
+        throw e2;
+      }
+      if(!json || !json.cpd){
+        if(json && json.status === 'error') throw new Error(json.message || 'error');
+        st.innerHTML = '⚠ Apps Script មិនទាន់មានមុខងារ CPD។ សូមបន្ថែម <b>CPD.gs</b> ហើយ Deploy “New version” (សូមមើលការណែនាំក្នុង CPD.gs)';
+        return;
+      }
+      cpdData = json.cpd;
+      cpdSet(CPD_KEYS.cache, JSON.stringify(cpdData));
+      renderCpd();
+      if(!(cpdData.pending > 0)) break;
+    }
+    if(!(Number(cpdData && cpdData.version) >= 4)){
+      const tail = webAppUrl.replace(/\/exec.*$/, '').slice(-8);
+      st.innerHTML = `<div style="padding:10px 12px; border-radius:10px; background:#FEF3C7; color:#92400E; font-weight:600;">
+        ⚠ Apps Script នៅតែដំណើរការ <b>CPD.gs ជំនាន់ចាស់</b> — កូដថ្មីមិនទាន់ Deploy ទៅ URL ដែល App កំពុងប្រើទេ។<br>
+        <span style="font-weight:400;">URL ក្នុង App បញ្ចប់ដោយ <b class="mono">…${escHTML(tail)}/exec</b>។ សូមបង្កើត <b>New deployment</b> រួចដាក់ URL ថ្មីក្នុង Settings។</span></div>`;
+      return;
+    }
+    const t = cpdData && cpdData.scannedAt ? new Date(cpdData.scannedAt) : new Date();
+    st.innerHTML = `✓ ធ្វើបច្ចុប្បន្នភាព ${fmtYMD(getLocalTodayYMD())} ${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}${cpdData.pending ? ` · នៅសល់ ${cpdData.pending} ឯកសារមិនទាន់អាន (ចុច 🔄 ម្តងទៀត)` : ''}`;
+  }catch(e){
+    const testUrl = webAppUrl + (webAppUrl.includes('?') ? '&' : '?') + 'action=cpd';
+    st.innerHTML = '⚠ ទាញទិន្នន័យមិនបាន៖ <b>' + escHTML(String(e.message || e)) + '</b>'
+      + (e.detail ? `<div class="mono" style="font-size:11px; margin-top:4px; padding:6px 8px; background:#FEF2F2; color:#991B1B; border-radius:6px; word-break:break-word;">${escHTML(e.detail)}</div>` : '')
+      + (e.html ? `<div style="margin-top:6px;"><a href="${escHTML(testUrl)}" target="_blank" rel="noopener" class="btn btn-outline btn-sm kh">🔗 បើក Apps Script មើលកំហុស</a></div>` : '')
+      + (cpdData ? '<div style="margin-top:4px;">បង្ហាញទិន្នន័យចុងក្រោយ</div>' : '');
+  }finally{
+    cpdBusy = false; btn.disabled = false;
+  }
+}
+
+function renderCpd(){
+  const body = document.getElementById('cpdBody'), tabs = document.getElementById('cpdTabs');
+  if(!cpdData || !Array.isArray(cpdData.folders) || !cpdData.folders.length){
+    tabs.innerHTML = '';
+    body.innerHTML = '<div class="empty-state kh" style="padding:24px;">មិនទាន់មានទិន្នន័យ CPD<br><span style="opacity:.7">No CPD data yet</span></div>';
+    return;
+  }
+  const folders = cpdData.folders;
+  if(!folders.some(f => f.name === cpdTab)){
+    const avail = folders.find(f => /available/i.test(f.name));
+    cpdTab = (avail || folders.slice().sort((a,b) => b.files.length - a.files.length)[0]).name;
+  }
+  tabs.innerHTML = folders.map(f => `<button type="button" class="cpd-tab kh" data-name="${escHTML(f.name)}" aria-pressed="${f.name === cpdTab}">📁 ${escHTML(f.name)}<span class="n">${num2(f.total)}</span></button>`).join('');
+  tabs.querySelectorAll('.cpd-tab').forEach(b => b.addEventListener('click', () => { cpdTab = b.dataset.name; cpdSet(CPD_KEYS.tab, cpdTab); renderCpd(); }));
+
+  const f = folders.find(x => x.name === cpdTab);
+  const target = cpdTargetFor(f.name);
+  const total = num2(f.files.reduce((s, x) => s + (parseFloat(x.cpd) || 0), 0));
+  const pct = Math.min(100, Math.round(total / target * 100));
+  const remain = num2(Math.max(0, target - total));
+  const R = 62, C = 2 * Math.PI * R;
+  const color = pct >= 100 ? '#16A34A' : pct >= 50 ? '#7C3AED' : '#D97706';
+  const files = f.files.slice().sort((a, b) => ((cpdParseDate(b.date) || new Date(b.modified)) - (cpdParseDate(a.date) || new Date(a.modified))));
+  const zero = files.filter(x => !(parseFloat(x.cpd) > 0)).length;
+  document.getElementById('cpdDriveLink').href = cpdLink(f.url || ('https://drive.google.com/drive/folders/' + cpdFolderId()));
+
+  body.innerHTML = `
+    <div class="cpd-hero">
+      <div class="cpd-ring">
+        <svg viewBox="0 0 150 150" width="150" height="150">
+          <circle cx="75" cy="75" r="${R}" fill="none" stroke="#E9E5FF" stroke-width="14"/>
+          <circle cx="75" cy="75" r="${R}" fill="none" stroke="${color}" stroke-width="14" stroke-linecap="round"
+            stroke-dasharray="${(C * pct / 100).toFixed(1)} ${C.toFixed(1)}" transform="rotate(-90 75 75)"/>
+        </svg>
+        <div class="c"><b>${total}</b><span class="kh">/ ${target} CPD · ${pct}%</span></div>
+      </div>
+      <div style="width:100%;">
+        <div class="cpd-facts">
+          <div><div class="l kh">CPD សរុប</div><div class="v" style="color:#6D28D9;">${total}</div></div>
+          <div><div class="l kh">វិញ្ញាបនបត្រ</div><div class="v">${files.length}</div></div>
+          <div><div class="l kh">នៅខ្វះ</div><div class="v" style="color:${remain ? '#B45309' : '#16A34A'};">${remain}</div></div>
+        </div>
+        <div class="cpd-target kh">🎯 គោលដៅ CPD សម្រាប់ “${escHTML(f.name)}”៖
+          <input type="number" id="cpdTargetInput" class="mono" min="1" step="1" value="${target}"></div>
+        <div class="cpd-msg kh" style="${remain ? 'background:#FFFBEB; color:#92400E;' : 'background:#DCFCE7; color:#166534;'}">
+          ${remain ? `នៅខ្វះ ${remain} CPD ទៀត ទើបគ្រប់ ${target}` : `✅ គ្រប់ចំនួន CPD ហើយ (${total} / ${target})`}</div>
+      </div>
+    </div>
+    <div class="kh" style="font-size:11.5px; color:var(--ink-dim); margin-bottom:8px;">🔐 ឯកសារបើកបានតែពេល Browser ចូល Google Account ${cpdData && cpdData.ownerEmail ? '<b>' + escHTML(cpdData.ownerEmail) + '</b>' : 'ម្ចាស់ Folder'} ប៉ុណ្ណោះ</div>
+    ${zero ? `<div class="kh" style="font-size:12px; color:#B45309; margin-bottom:8px;">⚠ ${zero} ឯកសាររកមិនឃើញលេខ CPD — អាចកែក្នុង Tab “CPD” របស់ Google Sheet (Column manual)</div>` : ''}
+    <div class="cpd-list">
+      ${files.length ? files.map(x => `
+        <div class="cpd-item">
+          <div class="i">📜</div>
+          <div><div class="t">${escHTML(x.topic || x.name.replace(/\.pdf$/i, ''))}</div>
+            <div class="m">${[x.date, x.org, x.topic ? x.name : ''].filter(Boolean).map(escHTML).join(' · ')}${x.manual ? ' · ✎ manual' : ''}${x.waiting ? ' · ⏳ មិនទាន់អាន' : ''}</div>
+            ${x.debug && !(parseFloat(x.cpd) > 0) ? `<div class="mono" style="font-size:10.5px; color:#B91C1C; background:#FEF2F2; border-radius:6px; padding:3px 6px; margin-top:4px; word-break:break-word;">${escHTML(String(x.debug).slice(0, 260))}</div>` : ''}</div>
+          <div class="p${parseFloat(x.cpd) > 0 ? '' : ' zero'}">${parseFloat(x.cpd) > 0 ? num2(x.cpd) : '?'} CPD</div>
+          <a href="${escHTML(cpdLink(x.url))}" target="_blank" rel="noopener" title="បើកក្នុង Drive${cpdData && cpdData.ownerEmail ? ' (' + escHTML(cpdData.ownerEmail) + ')' : ''}">🔗</a>
+        </div>`).join('') : '<div class="empty-state kh" style="padding:18px;">Folder នេះមិនមានវិញ្ញាបនបត្រទេ</div>'}
+    </div>`;
+  document.getElementById('cpdTargetInput').addEventListener('change', e => {
+    const v = parseFloat(e.target.value);
+    const t = cpdTargets(); if(v > 0) t[f.name] = v; else delete t[f.name];
+    cpdSet(CPD_KEYS.targets, JSON.stringify(t));
+    renderCpd();
+  });
+}
+
+document.getElementById('openCpdBtn').addEventListener('click', openCpd);
+document.getElementById('closeCpd').addEventListener('click', () => document.getElementById('cpdOverlay').classList.add('hidden'));
+document.getElementById('cpdOverlay').addEventListener('click', e => { if(e.target.id === 'cpdOverlay') e.target.classList.add('hidden'); });
+document.getElementById('cpdRefreshBtn').addEventListener('click', () => loadCpd(false));
+document.getElementById('cpdFolderSave').addEventListener('click', () => {
+  const raw = document.getElementById('cpdFolderInput').value.trim();
+  const m = raw.match(/folders\/([A-Za-z0-9_-]{10,})/) || raw.match(/^([A-Za-z0-9_-]{10,})$/);
+  if(!m){ alert('Folder ID ឬ Link មិនត្រឹមត្រូវ'); return; }
+  cpdSet(CPD_KEYS.folder, m[1]);
+  cpdData = null; cpdSet(CPD_KEYS.cache, 'null');
+  document.getElementById('cpdFolderInput').value = m[1];
+  renderCpd(); loadCpd(false);
 });
 
 document.getElementById('openClinicalConfigBtn').addEventListener('click', () => {
