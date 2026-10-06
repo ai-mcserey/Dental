@@ -1125,7 +1125,7 @@
   }
 
   /* ===== CPD tracker ===== */
-  #cpdOverlay{ z-index:95; }
+  #cpdOverlay{ z-index:105 !important; background:rgba(11,42,39,0.65) !important; }   /* above Settings (102) */
   .cpd-bar{ display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
   .cpd-tabs{ display:flex; gap:6px; flex-wrap:wrap; }
   .cpd-tab{ border:1px solid var(--border); background:var(--surface); color:var(--ink-soft); font-size:12px; font-weight:600; padding:6px 12px; border-radius:999px; cursor:pointer; }
@@ -2479,7 +2479,7 @@ let allRecords = [];
 let clinicInfo = {name:'KEP Dental Clinic', address:'Kep, Cambodia', phone:''};
 let printContext = { type: null, record: null }; 
 
-const DEFAULT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbztTTq5JA_XdhgWNyEbZNTXfAPVFARZVslWT0tV4p_PTo0XbHEALditA2abzZCZKhmx9Q/exec';
+const DEFAULT_WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbzSTb4KJph95685Whp3TF-Sq77DbyzUmQAkTSsbaUBmngdkC1PO-x3LoY-5Oa1BMUANOw/exec';
 let webAppUrl = DEFAULT_WEB_APP_URL;
 
 localStorage.setItem('kep_dental_webapp_url', webAppUrl);
