@@ -1109,6 +1109,20 @@
   @media (max-width:360px){
     .dash-kpis{ grid-template-columns:repeat(2, minmax(0,1fr)); }
   }
+
+  /* ===== Dental Lab · date range ===== */
+  .lab-range{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; padding:10px 16px; border-bottom:1px solid var(--border-soft); background:var(--surface-2); }
+  .lab-range .lr-l{ font-size:12px; font-weight:600; color:var(--ink-soft); }
+  .lab-range input[type=date], .lab-range select{ height:32px; padding:0 8px; font-size:12.5px; border:1px solid var(--border); border-radius:8px; background:var(--surface); }
+  .lab-range-q{ display:flex; gap:5px; flex-wrap:wrap; }
+  .lab-range-q .chip{ padding:4px 10px; font-size:11.5px; }
+  @media (max-width:600px){
+    .lab-range{ padding:8px 10px; gap:6px; }
+    .lab-range input[type=date]{ flex:1; min-width:0; }
+    .lab-range-q{ width:100%; flex-wrap:nowrap; overflow-x:auto; }
+    .lab-range-q .chip{ flex:0 0 auto; }
+    .lab-range select{ width:100%; }
+  }
 </style>
 <style id="dynamicPageStyle">@page{ size: A4 portrait; margin: 15mm; }</style>
 </head>
@@ -1352,8 +1366,26 @@
             <div class="fin-head-actions">
               <input type="text" class="tb-search kh" id="laboSearch" placeholder="🔍 ស្វែងរក ឈ្មោះ, ការងារ, Lab, Case #...">
               <button type="button" class="btn btn-outline btn-sm kh" id="laboExportBtn">⬇ CSV</button>
+              <button type="button" class="btn btn-sm kh" id="laboPdfBtn" style="background:#DC2626; border-color:#DC2626; color:#fff;" title="ទាញយករបាយការណ៍ Lab ជា PDF តាមថ្ងៃដែលបានជ្រើស">📄 PDF-LAB</button>
               <button type="button" class="btn btn-primary btn-sm kh" id="laboAddBtn">＋ Case Lab ថ្មី</button>
             </div>
+          </div>
+          <div class="lab-range">
+            <span class="kh lr-l">📅 ពីថ្ងៃ</span>
+            <input type="date" id="laboDateFrom" class="mono">
+            <span class="kh lr-l">ដល់</span>
+            <input type="date" id="laboDateTo" class="mono">
+            <div class="lab-range-q">
+              <button type="button" class="chip" data-range="today"><span class="kh">ថ្ងៃនេះ</span></button>
+              <button type="button" class="chip" data-range="7"><span class="kh">៧ ថ្ងៃ</span></button>
+              <button type="button" class="chip" data-range="month"><span class="kh">ខែនេះ</span></button>
+              <button type="button" class="chip" data-range="30"><span class="kh">៣០ ថ្ងៃ</span></button>
+              <button type="button" class="chip" data-range="all"><span class="kh">ទាំងអស់</span></button>
+            </div>
+            <select id="laboDateBasis" class="kh" title="ត្រងតាមថ្ងៃអ្វី">
+              <option value="opened">តាមថ្ងៃបើក Case</option>
+              <option value="activity">តាមថ្ងៃផ្ញើ/ទទួល/ដាក់</option>
+            </select>
           </div>
           <div class="filter-chips lab-chips" id="laboFilters" role="group" aria-label="Filter lab cases">
             <button type="button" class="chip" data-filter="all" aria-pressed="true"><span class="kh">ទាំងអស់</span><span class="chip-n">0</span></button>
@@ -5883,7 +5915,7 @@ document.getElementById('closePrintBtn').addEventListener('click', ()=>document.
 document.getElementById('printBtn').addEventListener('click', ()=>window.print());
 ['closePrint','closePrintBtn'].forEach(id => document.getElementById(id).addEventListener('click', () => {
   const ps = document.getElementById('dynamicPageStyle');
-  if(ps && /6mm 8mm/.test(ps.textContent)) ps.textContent = '@page{ size: A4 portrait; margin: 15mm; }';
+  if(ps && /6mm 8mm|landscape/.test(ps.textContent)) ps.textContent = '@page{ size: A4 portrait; margin: 15mm; }';
 }));
 
 // ភ្ជាប់ Event Listener លើប៊ូតុង Setting ⚙ ឱ្យឆ្លងកាត់ការសួរ PIN
@@ -7464,6 +7496,7 @@ const LAB_STATUS = {
 const LAB_WORKS = ['Crown PFM','Crown Zirconia','Crown Metal','Crown E.max','Bridge','Veneer','Inlay / Onlay','Post & Core',
   'Complete Denture','Partial Denture (Acrylic)','Partial Denture (Metal)','Flexible Denture','Retainer','Night Guard','Ortho Appliance'];
 let labOrders = [], labFilter = 'all', labSearchTerm = '', editingLabId = null;
+let labDateFrom = '', labDateTo = '', labDateBasis = 'opened';   // '' = no limit
 
 function loadLab(){ try{ const a = JSON.parse(localStorage.getItem(LAB_KEY) || '[]'); labOrders = Array.isArray(a) ? a : []; }catch(e){ labOrders = []; } }
 function saveLab(){ try{ localStorage.setItem(LAB_KEY, JSON.stringify(labOrders)); }catch(e){} }
@@ -7863,11 +7896,154 @@ function labKpi(o){
     <div class="k-foot kh">${o.f}</div></div>`;
 }
 
+/* ---------- Dental Lab · date range filter ---------- */
+let labLastRows = [];
+function labYMDAdd(ymd, days){ const d = new Date(ymd + 'T00:00:00'); d.setDate(d.getDate() + days); return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+function labOpenedYMD(o){ const t = labTrips(o); return cleanStr(o.created) || (t[0] && t[0].date) || cleanStr(o.sent) || ''; }
+function labInDateRange(o, from, to, basis){
+  const inR = d => !!d && (!from || d >= from) && (!to || d <= to);
+  if(basis === 'activity'){
+    if(inR(labOpenedYMD(o)) || inR(o.deliveredDate)) return true;
+    return labTrips(o).some(t => inR(t.date));
+  }
+  return inR(labOpenedYMD(o));
+}
+function labSetRange(key){
+  const today = getLocalTodayYMD();
+  if(key === 'today'){ labDateFrom = today; labDateTo = today; }
+  else if(key === '7'){ labDateFrom = labYMDAdd(today, -6); labDateTo = today; }
+  else if(key === '30'){ labDateFrom = labYMDAdd(today, -29); labDateTo = today; }
+  else if(key === 'month'){ labDateFrom = today.slice(0, 8) + '01'; labDateTo = today; }
+  else { labDateFrom = ''; labDateTo = ''; }
+  renderLab();
+}
+function labSyncRangeUI(){
+  const f = document.getElementById('laboDateFrom'), t = document.getElementById('laboDateTo');
+  if(!f) return;
+  if(f.value !== labDateFrom) f.value = labDateFrom;
+  if(t.value !== labDateTo) t.value = labDateTo;
+  const today = getLocalTodayYMD();
+  const active = !labDateFrom && !labDateTo ? 'all'
+    : labDateTo !== today ? ''
+    : labDateFrom === today ? 'today'
+    : labDateFrom === labYMDAdd(today, -6) ? '7'
+    : labDateFrom === labYMDAdd(today, -29) ? '30'
+    : labDateFrom === today.slice(0, 8) + '01' ? 'month' : '';
+  document.querySelectorAll('.lab-range-q .chip').forEach(c => c.setAttribute('aria-pressed', c.dataset.range === active ? 'true' : 'false'));
+}
+
+/* ---------- PDF-LAB report (A4 landscape) ---------- */
+function printLabReport(){
+  renderLab();                                  // make sure the rows match the current filters
+  const rows = labLastRows.slice();
+  if(!rows.length){ alert('មិនមាន Case Lab ក្នុងលក្ខខណ្ឌនេះទេ / No lab cases to export'); return; }
+  const today = getLocalTodayYMD();
+  const from = labDateFrom || rows.map(labOpenedYMD).filter(Boolean).sort()[0] || today;
+  const to = labDateTo || today;
+  const basisTxt = labDateBasis === 'activity' ? 'តាមថ្ងៃផ្ញើ/ទទួល/ដាក់' : 'តាមថ្ងៃបើក Case';
+  const chip = document.querySelector(`#laboFilters .chip[data-filter="${labFilter}"] .kh`);
+  const statusTxt = labFilter === 'all' ? 'គ្រប់ស្ថានភាព' : (chip ? chip.textContent : labFilter);
+  const fm = v => '$' + (Number(v) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+  let totUnits = 0, totTrips = 0, totFee = 0, totExtra = 0;
+  const cnt = { atlab: 0, overdue: 0, tryin: 0, ready: 0, delivered: 0 };
+  const byLab = {};
+  const body = rows.map((o, i) => {
+    const loc = labLocation(o);
+    const t = labTrips(o), last = t[t.length - 1];
+    const units = labUnits(o);
+    const fee = num2(o.cost) || 0;
+    const extra = labExtraExpenses(o).reduce((s, e) => s + (parseFloat(e.amount) || 0), 0);
+    totUnits += units; totTrips += t.length; totFee += fee; totExtra += extra;
+    cnt[loc.key] = (cnt[loc.key] || 0) + 1;
+    const ln = cleanStr(o.lab) || '— មិនបញ្ជាក់ —';
+    if(!byLab[ln]) byLab[ln] = { n: 0, u: 0, fee: 0 };
+    byLab[ln].n++; byLab[ln].u += units; byLab[ln].fee += fee + extra;
+    const dateCol = loc.key === 'delivered' ? `ដាក់ ${fmtYMD(o.deliveredDate)}` : (o.due && (loc.key === 'atlab' || loc.key === 'overdue') ? `Due ${fmtYMD(o.due)}` : '—');
+    return `<tr${loc.key === 'overdue' ? ' class="od"' : ''}>
+      <td class="c">${i + 1}</td>
+      <td class="mono">${labCaseNo(o)}</td>
+      <td class="mono">${fmtYMD(labOpenedYMD(o)) || '—'}</td>
+      <td><b>${escHTML(o.patient) || '—'}</b></td>
+      <td>${escHTML(o.work) || '—'}</td>
+      <td class="mono">${escHTML(o.teeth) || '—'}</td>
+      <td class="c">${units}</td>
+      <td class="c">${escHTML(o.shade) || '—'}</td>
+      <td>${escHTML(o.lab) || '—'}</td>
+      <td class="c">${t.length}<div class="sm">${escHTML(last ? last.stage : '')}</div></td>
+      <td>${loc.ico} ${loc.kh}</td>
+      <td class="mono sm2">${dateCol}</td>
+      <td class="r mono">${fee ? fm(fee) : '—'}${extra ? `<div class="sm">+Remake ${fm(extra)}</div>` : ''}</td>
+    </tr>`;
+  }).join('');
+  const labRows = Object.entries(byLab).sort((a, b) => b[1].fee - a[1].fee).map(([n, v]) =>
+    `<tr><td>${escHTML(n)}</td><td class="c">${v.n}</td><td class="c">${v.u}</td><td class="r mono">${fm(v.fee)}</td></tr>`).join('');
+  const box = (l, v, c) => `<div class="bx"><div class="bl">${l}</div><div class="bv" style="${c ? 'color:' + c : ''}">${v}</div></div>`;
+  const now = new Date();
+  const printedAt = `${fmtYMD(today)} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+  document.getElementById('dynamicPageStyle').textContent = '@page{ size: A4 landscape; margin: 8mm 10mm; }';
+  document.getElementById('printOverlayTitle').textContent = 'PDF-LAB · របាយការណ៍ Dental Lab';
+  document.getElementById('printArea').innerHTML = `
+  <style>
+    .plab{ font-family:'Noto Sans Khmer','Khmer OS Siemreap','Inter',sans-serif; color:#111; background:#fff; font-size:10.5px; }
+    .plab .mono{ font-family:'IBM Plex Mono',monospace; }
+    .plab-h{ display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid #0F766E; padding-bottom:8px; margin-bottom:10px; }
+    .plab-h .cn{ font-size:16px; font-weight:800; color:#0F766E; } .plab-h .cs{ font-size:10px; color:#555; margin-top:2px; }
+    .plab-h .tt{ text-align:right; } .plab-h .tt b{ font-size:15px; display:block; } .plab-h .tt span{ font-size:10.5px; color:#333; }
+    .plab-bx{ display:grid; grid-template-columns:repeat(8,1fr); gap:6px; margin-bottom:10px; }
+    .plab .bx{ border:1px solid #CBD5E1; border-radius:6px; padding:5px 7px; } .plab .bl{ font-size:9px; color:#555; } .plab .bv{ font-size:13px; font-weight:800; font-family:'IBM Plex Mono',monospace; }
+    .plab table{ width:100%; border-collapse:collapse; }
+    .plab th{ background:#0F766E; color:#fff; font-size:9.5px; padding:5px 4px; text-align:left; border:1px solid #0F766E; }
+    .plab td{ padding:4px; border:1px solid #CBD5E1; vertical-align:top; font-size:10px; }
+    .plab tr:nth-child(even) td{ background:#F8FAFC; } .plab tr.od td{ background:#FEF2F2; }
+    .plab .c{ text-align:center; } .plab .r{ text-align:right; } .plab .sm{ font-size:8.5px; color:#666; } .plab .sm2{ font-size:9px; }
+    .plab tfoot td{ font-weight:800; background:#E2E8F0 !important; }
+    .plab-bottom{ display:grid; grid-template-columns:1.2fr 1fr; gap:16px; margin-top:12px; page-break-inside:avoid; }
+    .plab-sign{ display:grid; grid-template-columns:1fr 1fr; gap:10px; text-align:center; font-size:10.5px; align-self:end; }
+    .plab-sign .ln{ margin-top:46px; border-top:1px dotted #555; padding-top:3px; }
+    .plab thead{ display:table-header-group; } .plab tr{ page-break-inside:avoid; }
+  </style>
+  <div class="plab">
+    <div class="plab-h">
+      <div><div class="cn">${escHTML(clinicInfo.name || 'KEP Dental Clinic')}</div>
+        <div class="cs">${escHTML(clinicInfo.address || '')}${clinicInfo.phone ? ' · ' + escHTML(clinicInfo.phone) : ''}</div></div>
+      <div class="tt"><b>របាយការណ៍ការងារ Dental Lab · PDF-LAB</b>
+        <span>ពីថ្ងៃ <b style="display:inline; font-size:11px;" class="mono">${fmtYMD(from)}</b> ដល់ <b style="display:inline; font-size:11px;" class="mono">${fmtYMD(to)}</b> · ${basisTxt} · ${escHTML(statusTxt)}${labSearchTerm ? ` · ស្វែងរក “${escHTML(labSearchTerm)}”` : ''}</span></div>
+    </div>
+    <div class="plab-bx">
+      ${box('Case សរុប', rows.length)}${box('ធ្មេញ / Units', totUnits)}${box('ការបញ្ជូន / Trips', totTrips)}
+      ${box('🏭 នៅ Lab', cnt.atlab + cnt.overdue, '#6D28D9')}${box('⚠ យឺត', cnt.overdue, '#B91C1C')}
+      ${box('🏥 នៅគ្លីនិក', cnt.tryin + cnt.ready, '#B45309')}${box('✅ ដាក់រួច', cnt.delivered, '#15803D')}
+      ${box('💵 ចំណាយ DL', fm(totFee + totExtra), '#B91C1C')}
+    </div>
+    <table>
+      <thead><tr><th class="c">#</th><th>Case #</th><th>ថ្ងៃបើក</th><th>អ្នកជំងឺ</th><th>ការងារ</th><th>លេខធ្មេញ</th><th class="c">Units</th><th class="c">Shade</th><th>Lab</th><th class="c">ការបញ្ជូន</th><th>ស្ថានភាព</th><th>Due / ដាក់</th><th class="r">ចំណាយ DL</th></tr></thead>
+      <tbody>${body}</tbody>
+      <tfoot><tr><td colspan="6">សរុប · Total (${rows.length} case)</td><td class="c">${totUnits}</td><td></td><td></td><td class="c">${totTrips}</td><td></td><td></td><td class="r mono">${fm(totFee + totExtra)}</td></tr></tfoot>
+    </table>
+    <div class="plab-bottom">
+      <div>
+        <div style="font-weight:800; margin-bottom:4px;">សរុបតាម Lab · Summary by lab</div>
+        <table><thead><tr><th>Lab</th><th class="c">Case</th><th class="c">Units</th><th class="r">ចំណាយ DL</th></tr></thead><tbody>${labRows}</tbody></table>
+        <div class="sm" style="margin-top:4px;">បោះពុម្ព ${printedAt}</div>
+      </div>
+      <div class="plab-sign">
+        <div>រៀបចំដោយ<div class="ln">ហត្ថលេខា និងឈ្មោះ</div></div>
+        <div>ពិនិត្យ និងឯកភាពដោយ<div class="ln">ហត្ថលេខា និងឈ្មោះ</div></div>
+      </div>
+    </div>
+  </div>`;
+  document.getElementById('printOverlay').classList.remove('hidden');
+}
+
 function renderLab(){
   const today = getLocalTodayYMD();
   labOrders.forEach(o => { labSyncFields(o); labEnsureAutoFee(o); });
   const q = labSearchTerm.trim().toLowerCase();
-  const base = q ? labOrders.filter(o => [labCaseNo(o), o.patient, o.work, o.teeth, o.shade, o.lab, o.note].join(' ').toLowerCase().includes(q)) : labOrders.slice();
+  let base = q ? labOrders.filter(o => [labCaseNo(o), o.patient, o.work, o.teeth, o.shade, o.lab, o.note].join(' ').toLowerCase().includes(q)) : labOrders.slice();
+  if(labDateFrom || labDateTo) base = base.filter(o => labInDateRange(o, labDateFrom, labDateTo, labDateBasis));
+  labSyncRangeUI();
   const locOf = new Map(base.map(o => [o.id, labLocation(o)]));
   const inFilter = (o, f) => {
     const k = locOf.get(o.id).key;
@@ -7909,6 +8085,7 @@ function renderLab(){
     return ((lb[lb.length-1] || {}).date || b.sent || '').localeCompare((la[la.length-1] || {}).date || a.sent || '');
   });
   el('laboCaseCount').textContent = rows.length ? rows.length + ' case' : '';
+  labLastRows = rows;
 
   el('laboCardGrid').innerHTML = rows.map(o => {
     const loc = locOf.get(o.id);
@@ -8525,6 +8702,20 @@ function updateOpsBadges(){
   el('laboAddBtn').addEventListener('click', () => openLabForm());
   el('laboExportBtn').addEventListener('click', exportLabCSV);
   el('laboSearch').addEventListener('input', e => { labSearchTerm = e.target.value; renderLab(); });
+  el('laboPdfBtn').addEventListener('click', printLabReport);
+  el('laboDateFrom').addEventListener('change', e => {
+    labDateFrom = e.target.value;
+    if(labDateFrom && !labDateTo) labDateTo = getLocalTodayYMD();
+    if(labDateFrom && labDateTo && labDateFrom > labDateTo) labDateTo = labDateFrom;
+    renderLab();
+  });
+  el('laboDateTo').addEventListener('change', e => {
+    labDateTo = e.target.value;
+    if(labDateFrom && labDateTo && labDateTo < labDateFrom) labDateFrom = labDateTo;
+    renderLab();
+  });
+  el('laboDateBasis').addEventListener('change', e => { labDateBasis = e.target.value; renderLab(); });
+  document.querySelectorAll('.lab-range-q .chip').forEach(c => c.addEventListener('click', () => labSetRange(c.dataset.range)));
   document.querySelectorAll('#laboFilters .chip').forEach(ch => ch.addEventListener('click', () => { labFilter = ch.dataset.filter; renderLab(); }));
   el('labFormSave').addEventListener('click', saveLabForm);
   el('labFormPrint').addEventListener('click', () => {
