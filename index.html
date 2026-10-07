@@ -1161,6 +1161,21 @@
     .cpd-item{ grid-template-columns:28px 1fr auto; } .cpd-item a{ grid-column:3; grid-row:1; }
     .cpd-item .p{ grid-column:2; justify-self:start; }
   }
+
+  /* ===== CPD · Professional Dental License ===== */
+  .cpd-tab.passed{ border-color:#86EFAC; background:#F0FDF4; color:#166534; }
+  .cpd-tab.passed[aria-pressed="true"]{ background:#16A34A; border-color:#16A34A; color:#fff; }
+  .cpd-lic{ display:grid; grid-template-columns:240px 1fr; gap:16px; padding:14px; margin-bottom:14px; border-radius:14px;
+    background:linear-gradient(120deg,#F0FDF4,#ECFEFF); border:1.5px solid #86EFAC; box-shadow:0 4px 14px rgba(22,163,74,.12); }
+  .cpd-lic-img{ display:block; position:relative; border-radius:10px; overflow:hidden; background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='60'%3E%3Ctext x='40' y='40' font-size='34' text-anchor='middle'%3E%F0%9F%AA%AA%3C/text%3E%3C/svg%3E") center/80px no-repeat; border:1px solid #BBF7D0; aspect-ratio:4/3; }
+  .cpd-lic-img img{ width:100%; height:100%; object-fit:contain; display:block; }
+  .cpd-lic-badge{ display:inline-block; background:#16A34A; color:#fff; font-weight:800; font-size:12.5px; padding:4px 12px; border-radius:999px; }
+  .cpd-lic-t{ font-size:16px; font-weight:800; color:#14532D; margin-top:8px; }
+  .cpd-lic-s{ font-size:11.5px; color:#166534; opacity:.85; }
+  .cpd-lic-grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; margin-top:10px; }
+  .cpd-lic-grid > div{ background:#fff; border:1px solid #BBF7D0; border-radius:10px; padding:6px 10px; }
+  .cpd-lic-grid span{ display:block; font-size:10.5px; color:var(--ink-dim); } .cpd-lic-grid b{ font-size:13px; color:#14532D; }
+  @media (max-width:600px){ .cpd-lic{ grid-template-columns:1fr; } .cpd-lic-grid{ grid-template-columns:1fr; } }
 </style>
 <style id="dynamicPageStyle">@page{ size: A4 portrait; margin: 15mm; }</style>
 </head>
@@ -6021,7 +6036,7 @@ async function loadCpd(force){
       renderCpd();
       if(!(cpdData.pending > 0)) break;
     }
-    if(!(Number(cpdData && cpdData.version) >= 4)){
+    if(!(Number(cpdData && cpdData.version) >= 5)){
       const tail = webAppUrl.replace(/\/exec.*$/, '').slice(-8);
       st.innerHTML = `<div style="padding:10px 12px; border-radius:10px; background:#FEF3C7; color:#92400E; font-weight:600;">
         ⚠ Apps Script នៅតែដំណើរការ <b>CPD.gs ជំនាន់ចាស់</b> — កូដថ្មីមិនទាន់ Deploy ទៅ URL ដែល App កំពុងប្រើទេ។<br>
@@ -6053,12 +6068,14 @@ function renderCpd(){
     const avail = folders.find(f => /available/i.test(f.name));
     cpdTab = (avail || folders.slice().sort((a,b) => b.files.length - a.files.length)[0]).name;
   }
-  tabs.innerHTML = folders.map(f => `<button type="button" class="cpd-tab kh" data-name="${escHTML(f.name)}" aria-pressed="${f.name === cpdTab}">📁 ${escHTML(f.name)}<span class="n">${num2(f.total)}</span></button>`).join('');
+  tabs.innerHTML = folders.map(f => `<button type="button" class="cpd-tab kh${f.license ? ' passed' : ''}" data-name="${escHTML(f.name)}" aria-pressed="${f.name === cpdTab}">${f.license ? '🪪' : '📁'} ${escHTML(f.name)}<span class="n">${f.license ? '✓ PASS' : num2(f.total)}</span></button>`).join('');
   tabs.querySelectorAll('.cpd-tab').forEach(b => b.addEventListener('click', () => { cpdTab = b.dataset.name; cpdSet(CPD_KEYS.tab, cpdTab); renderCpd(); }));
 
   const f = folders.find(x => x.name === cpdTab);
   const target = cpdTargetFor(f.name);
-  const total = num2(f.files.reduce((s, x) => s + (parseFloat(x.cpd) || 0), 0));
+  const lic = f.license || null;                         // Professional Dental License in this folder = period passed
+  const certTotal = num2(f.files.reduce((s, x) => s + (parseFloat(x.cpd) || 0), 0));
+  const total = lic ? Math.max(target, certTotal) : certTotal;
   const pct = Math.min(100, Math.round(total / target * 100));
   const remain = num2(Math.max(0, target - total));
   const R = 62, C = 2 * Math.PI * R;
@@ -6067,7 +6084,27 @@ function renderCpd(){
   const zero = files.filter(x => !(parseFloat(x.cpd) > 0)).length;
   document.getElementById('cpdDriveLink').href = cpdLink(f.url || ('https://drive.google.com/drive/folders/' + cpdFolderId()));
 
+  const licCard = lic ? `
+    <div class="cpd-lic">
+      <a class="cpd-lic-img" href="${escHTML(cpdLink(lic.url))}" target="_blank" rel="noopener" title="បើកអាជ្ញាបណ្ណក្នុង Drive">
+        <img src="${escHTML(cpdLink(lic.thumb))}" alt="Professional Dental License" loading="lazy"
+             onerror="if(this.dataset.f!=='1'){this.dataset.f='1'; ${lic.thumbData ? `this.src='${lic.thumbData}'` : `this.style.display='none'`};}">
+      </a>
+      <div class="cpd-lic-info">
+        <div class="cpd-lic-badge kh">✅ PASS · គ្រប់ ${target} CPD</div>
+        <div class="cpd-lic-t kh">🪪 អាជ្ញាបណ្ណវិជ្ជាជីវៈទន្តសាស្ត្រ</div>
+        <div class="cpd-lic-s">Professional Dental License · Dental Council of Cambodia</div>
+        <div class="cpd-lic-grid">
+          ${lic.licenseNo ? `<div><span class="kh">លេខអាជ្ញាបណ្ណ</span><b class="mono">${escHTML(lic.licenseNo)}</b></div>` : ''}
+          ${lic.valid ? `<div><span class="kh">សុពលភាព · Valid</span><b class="mono">${escHTML(lic.valid)}</b></div>` : ''}
+        </div>
+        <div class="kh" style="font-size:12px; color:#166534; margin-top:8px;">អាជ្ញាបណ្ណត្រូវបានចេញ = CPD ក្នុងរយៈពេល “${escHTML(f.name)}” ត្រូវបានទទួលស្គាល់គ្រប់ ${target} ពិន្ទុ</div>
+        <a class="btn btn-outline btn-sm kh" href="${escHTML(cpdLink(lic.url))}" target="_blank" rel="noopener" style="margin-top:8px;">🔗 បើកអាជ្ញាបណ្ណ</a>
+      </div>
+    </div>` : '';
+
   body.innerHTML = `
+    ${licCard}
     <div class="cpd-hero">
       <div class="cpd-ring">
         <svg viewBox="0 0 150 150" width="150" height="150">
@@ -6080,13 +6117,14 @@ function renderCpd(){
       <div style="width:100%;">
         <div class="cpd-facts">
           <div><div class="l kh">CPD សរុប</div><div class="v" style="color:#6D28D9;">${total}</div></div>
-          <div><div class="l kh">វិញ្ញាបនបត្រ</div><div class="v">${files.length}</div></div>
+          <div><div class="l kh">វិញ្ញាបនបត្រ</div><div class="v">${files.length}${lic ? ' <span style="font-size:12px;">+🪪</span>' : ''}</div></div>
           <div><div class="l kh">នៅខ្វះ</div><div class="v" style="color:${remain ? '#B45309' : '#16A34A'};">${remain}</div></div>
         </div>
         <div class="cpd-target kh">🎯 គោលដៅ CPD សម្រាប់ “${escHTML(f.name)}”៖
           <input type="number" id="cpdTargetInput" class="mono" min="1" step="1" value="${target}"></div>
         <div class="cpd-msg kh" style="${remain ? 'background:#FFFBEB; color:#92400E;' : 'background:#DCFCE7; color:#166534;'}">
-          ${remain ? `នៅខ្វះ ${remain} CPD ទៀត ទើបគ្រប់ ${target}` : `✅ គ្រប់ចំនួន CPD ហើយ (${total} / ${target})`}</div>
+          ${lic ? `🪪 មានអាជ្ញាបណ្ណ → PASS ${target} / ${target} CPD${certTotal ? ` (វិញ្ញាបនបត្រក្នុង Folder ${certTotal} CPD)` : ''}`
+               : remain ? `នៅខ្វះ ${remain} CPD ទៀត ទើបគ្រប់ ${target}` : `✅ គ្រប់ចំនួន CPD ហើយ (${total} / ${target})`}</div>
       </div>
     </div>
     <div class="kh" style="font-size:11.5px; color:var(--ink-dim); margin-bottom:8px;">🔐 ឯកសារបើកបានតែពេល Browser ចូល Google Account ${cpdData && cpdData.ownerEmail ? '<b>' + escHTML(cpdData.ownerEmail) + '</b>' : 'ម្ចាស់ Folder'} ប៉ុណ្ណោះ</div>
@@ -6100,7 +6138,7 @@ function renderCpd(){
             ${x.debug && !(parseFloat(x.cpd) > 0) ? `<div class="mono" style="font-size:10.5px; color:#B91C1C; background:#FEF2F2; border-radius:6px; padding:3px 6px; margin-top:4px; word-break:break-word;">${escHTML(String(x.debug).slice(0, 260))}</div>` : ''}</div>
           <div class="p${parseFloat(x.cpd) > 0 ? '' : ' zero'}">${parseFloat(x.cpd) > 0 ? num2(x.cpd) : '?'} CPD</div>
           <a href="${escHTML(cpdLink(x.url))}" target="_blank" rel="noopener" title="បើកក្នុង Drive${cpdData && cpdData.ownerEmail ? ' (' + escHTML(cpdData.ownerEmail) + ')' : ''}">🔗</a>
-        </div>`).join('') : '<div class="empty-state kh" style="padding:18px;">Folder នេះមិនមានវិញ្ញាបនបត្រទេ</div>'}
+        </div>`).join('') : `<div class="empty-state kh" style="padding:18px;">${lic ? 'Folder នេះមានតែអាជ្ញាបណ្ណ (មិនមានវិញ្ញាបនបត្រ CPD ផ្សេង)' : 'Folder នេះមិនមានវិញ្ញាបនបត្រទេ'}</div>`}
     </div>`;
   document.getElementById('cpdTargetInput').addEventListener('change', e => {
     const v = parseFloat(e.target.value);
