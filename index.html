@@ -7571,21 +7571,39 @@ let patientFilter = 'all';
 
 /* One place that decides which status bucket a patient belongs to
    (used for card colours, filter chips and sidebar counts). */
+// Did the patient come (new record or a treatment step) on/after the appointment day?
+function patientCameSince(p, apptDate){
+  const d0 = new Date(apptDate.getFullYear(), apptDate.getMonth(), apptDate.getDate());
+  const sameAppt = r => { const t = r.timeLast ? parseAnyDate(r.timeLast) : null; return t && Math.abs(t - apptDate) < 60000; };
+  return (p.list || []).some(r => {
+    const ts = parseAnyDate(r.timestamp);
+    if(ts && ts >= d0 && !(sameAppt(r) && ts < apptDate)) return true;              // a new visit record (not the one that booked it)
+    return (r.procedureSteps || []).some(st => {
+      const hl = stepHighlightFor(st && st.step);
+      if(hl && (hl.id === 'appt' || hl.id === 'miss')) return false;               // booking / miss marks are not visits
+      const sd = parseAnyDate(st && st.date);
+      return !!(sd && sd >= d0);
+    });
+  });
+}
+
+// Patient status bucket. Red ("missing") ONLY when:
+//  • the status was set to Missing, or
+//  • the latest status is an appointment, its date has passed, and the patient has not come since.
 function patientState(p, startOfToday){
-  let isMissed = false;
-  if(p.latest.timeLast){
-    const ad = parseAnyDate(p.latest.timeLast);
-    if(ad && ad < startOfToday) isMissed = true;
-  }
-  // Status may be a step name ("Appointment", "Done", "Lab"...): map it to the status buckets.
   const hl = stepHighlightFor(p.latest.status);
   const mapped = hl ? ({ appt:'Appt', done:'Done', miss:'Missing', lab:'Labo' })[hl.id] : null;
-  const st = p.latest.status === 'Doing' ? 'Appt' : (mapped || p.latest.status || 'Missing');
-  // an Appointment step whose date has passed with nothing after it = missed
-  if(mapped === 'Appt' && !p.hasActiveAppt && !p.latest.timeLast) isMissed = true;
-  if(isMissed && p.hasActiveAppt) isMissed = false;
-  if(isMissed || st === 'Missing') return 'missing';
-  if(p.hasActiveAppt || st === 'Appt') return 'appt';
+  const raw = cleanStr(p.latest.status);
+  const st = raw === 'Doing' ? 'Appt' : (mapped || raw);
+
+  if(st === 'Missing') return 'missing';
+  if(p.hasActiveAppt) return 'appt';                         // a future appointment is booked
+  if(st === 'Appt' || !st){
+    const ad = p.latest.timeLast ? parseAnyDate(p.latest.timeLast) : null;
+    if(ad && ad < startOfToday) return patientCameSince(p, ad) ? 'done' : 'missing';
+    if(st === 'Appt') return 'appt';
+    return 'done';                                           // no status and no appointment = nothing pending
+  }
   if(st === 'Planning') return 'planning';
   if(st === 'Labo') return 'labo';
   return 'done';
