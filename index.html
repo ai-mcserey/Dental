@@ -1594,6 +1594,57 @@
   .lib-bkgrid{ gap:16px 12px; }
   .lib-rowscroll{ padding-bottom:10px; }
   @media (max-width:600px){ .lib-bkgrid{ gap:12px 8px; } }
+
+  /* ===== Library · shelves fit the screen width (no sideways scrolling) ===== */
+  .lib-bkgrid{ grid-template-columns:repeat(auto-fill, minmax(92px, 1fr)); gap:16px 12px; }
+  #view-library, #libBody{ max-width:100%; overflow-x:hidden; }
+  @media (max-width:600px){ .lib-bkgrid{ grid-template-columns:repeat(4, minmax(0,1fr)); gap:12px 8px; } }
+
+  /* ===== Dental Lab table · fits the screen width (no sideways scrolling) ===== */
+  #view-labo .fin-table-wrap{ overflow-x:hidden; }
+  #view-labo .lab-table{ table-layout:fixed; width:100%; }
+  #view-labo .lab-table th, #view-labo .lab-table td{ padding:9px 8px; overflow-wrap:anywhere; }
+  #view-labo .lab-table .lab-ck-th, #view-labo .lab-table .lab-ck-td{ width:36px; }
+  #view-labo .lab-table .lab-c-case{ width:13%; }
+  #view-labo .lab-table .lab-c-pt{ width:15%; }
+  #view-labo .lab-table .lab-c-work{ width:20%; }
+  #view-labo .lab-table .lab-c-loc{ width:21%; }
+  #view-labo .lab-table .lab-c-due{ width:11%; }
+  #view-labo .lab-table .lab-c-fee{ width:10%; }
+  #view-labo .lab-table .lab-c-pay{ width:10%; }
+  #view-labo .lab-caseno{ font-size:11px; white-space:normal; }
+  .lab-labname{ font-weight:500; color:var(--ink-soft); font-size:11.5px; }
+  .lab-loc-sub{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:4px; }
+  .lab-loc-sub .lab-trips .tp{ width:18px; height:18px; font-size:10px; }
+  #view-labo .lab-loc{ white-space:normal; font-size:11px; padding:2px 8px; }
+  #view-labo .lab-pay{ white-space:normal; padding:3px 6px; font-size:10.5px; max-width:100%; }
+  @media (max-width:1100px){
+    #view-labo .lab-table .lab-c-due{ display:none; }
+    #view-labo .lab-table .lab-c-case{ width:14%; } #view-labo .lab-table .lab-c-work{ width:23%; } #view-labo .lab-table .lab-c-loc{ width:23%; }
+  }
+  /* phone: each case becomes a card */
+  @media (max-width:760px){
+    #view-labo .lab-table thead{ display:none; }
+    #view-labo .lab-table, #view-labo .lab-table tbody{ display:block; }
+    #view-labo .lab-table tbody tr{ display:grid; grid-template-columns:26px minmax(0,1fr) auto;
+      grid-template-areas:"ck pt pay" "ck case fee" "ck work work" "ck loc loc";
+      gap:4px 10px; padding:12px 12px; border-bottom:1px solid var(--border-soft); }
+    #view-labo .lab-table tbody td{ display:block; width:auto !important; padding:0 !important; border:0 !important; background:none !important; }
+    #view-labo .lab-table .lab-ck-td{ grid-area:ck; padding-top:2px !important; }
+    #view-labo .lab-table .lab-c-pt{ grid-area:pt; } #view-labo .lab-table .lab-c-pt .fin-pt-name{ font-size:13.5px; }
+    #view-labo .lab-table .lab-c-case{ grid-area:case; display:flex !important; gap:8px; align-items:baseline; }
+    #view-labo .lab-table .lab-c-work{ grid-area:work; }
+    #view-labo .lab-table .lab-c-loc{ grid-area:loc; }
+    #view-labo .lab-table .lab-c-fee{ grid-area:fee; text-align:right; }
+    #view-labo .lab-table .lab-c-pay{ grid-area:pay; text-align:right; }
+    #view-labo .lab-table .lab-c-due{ display:none !important; }
+    #view-labo .lab-table tr.is-overdue{ box-shadow:inset 3px 0 0 var(--coral); }
+    #view-labo .lab-table tr.is-overdue td:first-child{ box-shadow:none; }
+    #view-labo .lab-bulk{ padding:9px 12px; }
+  }
+
+  #view-labo .lab-chips{ flex-wrap:wrap; overflow-x:visible; }
+  @media (max-width:760px){ #view-labo .lab-chips .chip{ padding:5px 10px; font-size:12px; } }
 </style>
 <style id="dynamicPageStyle">@page{ size: A4 portrait; margin: 15mm; }</style>
 </head>
@@ -1897,15 +1948,13 @@
             <table class="fin-table lab-table">
               <thead><tr>
                 <th class="c lab-ck-th"><input type="checkbox" id="laboSelAll" class="lab-ck" title="ជ្រើសទាំងអស់"></th>
-                <th>Case #<br><span>ថ្ងៃបើក</span></th>
-                <th>អ្នកជំងឺ · Patient</th>
-                <th>ការងារ · Work<br><span>Teeth · Units · Shade</span></th>
-                <th>Lab</th>
-                <th>ទីតាំង / ដំណាក់កាល<br><span>Location · Stage</span></th>
-                <th>ការបញ្ជូន<br><span>Trips</span></th>
-                <th>ថ្ងៃត្រូវយក<br><span>Due</span></th>
-                <th class="r">ចំណាយ DL<br><span>Lab fee</span></th>
-                <th class="c">បង់ Lab<br><span>Paid to lab</span></th>
+                <th class="lab-c-case">Case #<br><span>ថ្ងៃបើក</span></th>
+                <th class="lab-c-pt">អ្នកជំងឺ · Patient</th>
+                <th class="lab-c-work">ការងារ · Lab<br><span>Teeth · Units · Shade</span></th>
+                <th class="lab-c-loc">ទីតាំង · ការបញ្ជូន<br><span>Location · Trips</span></th>
+                <th class="lab-c-due">ថ្ងៃត្រូវយក<br><span>Due</span></th>
+                <th class="r lab-c-fee">ចំណាយ DL<br><span>Lab fee</span></th>
+                <th class="c lab-c-pay">បង់ Lab<br><span>Paid</span></th>
               </tr></thead>
               <tbody id="laboCardGrid"></tbody>
             </table>
@@ -6896,17 +6945,26 @@ function libBookHTML(it){
     </div>`;
 }
 const LIB_ROW_MAX = 18;
+const LIB_ROW_LINES = 2;            // shelves on the overview show this many full lines, sized to the screen
+// how many covers fit across the library width (same numbers as the .lib-bkgrid CSS)
+function libCols(){
+  const body = document.getElementById('libBody');
+  const w = (body && body.clientWidth) || window.innerWidth;
+  if(window.innerWidth <= 600) return 4;
+  const min = 92, gap = 12;
+  return Math.max(3, Math.floor((w - 8 + gap) / (min + gap)));
+}
 function libSectionHTML(title, items, shelf, mode){
   const n = items.length;
-  const shown = mode === 'row' ? items.slice(0, LIB_ROW_MAX) : items;
+  const shown = mode === 'row' ? items.slice(0, libCols() * LIB_ROW_LINES) : items;
   const tools = shelf ? `<div class="lib-sec-tools">
       <button type="button" class="lib-sec-btn" data-shelf-edit="${escHTML(shelf.id)}">✎ ប្តូរឈ្មោះ</button>
       ${n ? '' : `<button type="button" class="lib-sec-btn" data-shelf-del="${escHTML(shelf.id)}">🗑 លុប</button>`}</div>` : '';
-  const more = mode === 'row' && shelf && n > 0 ? `<button type="button" class="lib-seeall kh" data-shelf="${escHTML(shelf.id)}">មើលទាំងអស់ <span>${n}</span> →</button>` : '';
+  const more = mode === 'row' && shelf && n > shown.length ? `<button type="button" class="lib-seeall kh" data-shelf="${escHTML(shelf.id)}">មើលទាំងអស់ <span>${n}</span> →</button>` : '';
   const empty = `<div class="lib-sec-empty kh">${libManage ? '⬇ អូសសៀវភៅមកដាក់ធ្នើនេះ' : 'ធ្នើនេះមិនទាន់មានសៀវភៅ'}</div>`;
   return `<section class="lib-sec"${shelf ? ` data-drop="${escHTML(shelf.id)}"` : ''}>
       <div class="lib-sec-h"><div class="lib-sec-tt"><h3 class="kh">${escHTML(title)}</h3><span class="lib-sec-n">${n} ក្បាល</span></div>${tools}${more}</div>
-      ${n ? `<div class="${mode === 'row' ? 'lib-rowscroll' : 'lib-bkgrid'}">${shown.map(libBookHTML).join('')}</div>` : empty}
+      ${n ? `<div class="lib-bkgrid${mode === 'row' ? ' lib-fitrow' : ''}">${shown.map(libBookHTML).join('')}</div>` : empty}
     </section>`;
 }
 function libContinueHTML(items){
@@ -7292,6 +7350,14 @@ function libEditDelete(){
   }));
 }
 
+let libFitW = 0, libFitT = null;
+window.addEventListener('resize', () => {
+  clearTimeout(libFitT);
+  libFitT = setTimeout(() => {
+    if(currentView !== 'library') return;
+    const c = libCols(); if(c !== libFitW){ libFitW = c; renderLibrary(); }
+  }, 200);
+});
 (function initLibrary(){
   const v = document.getElementById('view-library');
   if(!v) return;
@@ -9744,16 +9810,14 @@ function renderLab(){
     return `
       <tr class="${loc.key === 'overdue' ? 'is-overdue' : ''}${labSelected.has(o.id) ? ' sel' : ''}" data-id="${o.id}">
         <td class="c lab-ck-td"><input type="checkbox" class="lab-ck" data-ck="${o.id}"${labSelected.has(o.id) ? ' checked' : ''} aria-label="ជ្រើស ${labCaseNo(o)}"></td>
-        <td><div class="lab-caseno">${labCaseNo(o)}</div><div class="lab-sub mono">${fmtYMD(o.created || o.sent) || '—'}</div></td>
-        <td class="kh"><div class="fin-pt-name">${escHTML(o.patient) || '—'}</div></td>
-        <td class="kh"><div style="font-weight:700;">${escHTML(o.work) || '—'}</div>
+        <td class="lab-c-case"><div class="lab-caseno">${labCaseNo(o)}</div><div class="lab-sub mono">${fmtYMD(o.created || o.sent) || '—'}</div></td>
+        <td class="kh lab-c-pt"><div class="fin-pt-name">${escHTML(o.patient) || '—'}</div></td>
+        <td class="kh lab-c-work"><div style="font-weight:700;">${escHTML(o.work) || '—'}${o.lab ? ` <span class="lab-labname">· ${escHTML(o.lab)}</span>` : ''}</div>
           <div class="lab-sub">🦷 <span class="mono">${escHTML(o.teeth) || '—'}</span> · ${units} unit${units > 1 ? 's' : ''}${o.shade ? ` · Shade <b>${escHTML(o.shade)}</b>` : ''}</div></td>
-        <td class="kh">${escHTML(o.lab) || '<span class="lab-sub">—</span>'}</td>
-        <td>${labLocPill(loc)}<div class="lab-sub kh">${escHTML(last ? last.stage : '') || ''}</div></td>
-        <td>${labTripsMini(o)}</td>
-        <td>${dueTxt}</td>
-        <td class="num">${fee}${extra ? `<div class="lab-sub kh">+ Remake ${finMoney(extra)}</div>` : ''}${booked}</td>
-        <td class="c">${labPayBadgeHTML(o)}</td>
+        <td class="lab-c-loc">${labLocPill(loc)}<div class="lab-loc-sub">${labTripsMini(o)}<span class="lab-sub kh">${escHTML(last ? last.stage : '') || ''}</span></div></td>
+        <td class="lab-c-due">${dueTxt}</td>
+        <td class="num lab-c-fee">${fee}${extra ? `<div class="lab-sub kh">+ Remake ${finMoney(extra)}</div>` : ''}${booked}</td>
+        <td class="c lab-c-pay">${labPayBadgeHTML(o)}</td>
       </tr>`;
   }).join('');
   document.querySelectorAll('#laboCardGrid tr[data-id]').forEach(row => row.addEventListener('click', e => {
