@@ -1400,6 +1400,169 @@
   body.guest-cpd #cpdOverlay{ z-index:1001 !important; }
   body.guest-cpd #cpdOverlay .cpd-cfg{ display:none; }
   @media (max-width:600px){ body.guest .guest-bar{ left:8px; right:8px; justify-content:space-between; top:6px; } body.guest .guest-bar > span{ display:none; } }
+
+  /* ===== 📖 e-book reader ===== */
+  .lib-eb{ position:absolute; inset:0; display:flex; flex-direction:column; background:#fbf6ea; }
+  .lib-eb-stage{ flex:1; min-height:0; position:relative; }
+  .lib-eb-nav{ position:absolute; top:50%; transform:translateY(-50%); z-index:3; width:42px; height:64px; border:0; border-radius:12px; cursor:pointer;
+    background:rgba(59,36,18,.12); color:#3b2412; font-size:30px; line-height:1; transition:background .15s; }
+  .lib-eb-nav:hover{ background:rgba(59,36,18,.25); }
+  .lib-eb-nav.prev{ left:8px; } .lib-eb-nav.next{ right:8px; }
+  .lib-eb-bar{ display:flex; align-items:center; gap:10px; padding:8px 14px; background:#f1e6cc; border-top:1px solid #e0cfa6; font-size:12px; color:#5a3a1f; }
+  .lib-eb-bar button{ border:1px solid #c9a24a; background:#fffaf0; color:#3b2412; border-radius:8px; padding:2px 9px; font-weight:800; cursor:pointer; font-size:12px; }
+  .lib-eb-ch{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .lib-eb-prog{ width:160px; height:6px; border-radius:99px; background:#e0cfa6; overflow:hidden; } .lib-eb-prog i{ display:block; height:100%; width:0; background:#a8822e; transition:width .3s; }
+  .lib-eb-load{ z-index:4; background:linear-gradient(180deg,#3b2412,#2a1709); }
+  .lib-eb-lbar{ width:220px; height:6px; border-radius:99px; background:rgba(255,255,255,.15); overflow:hidden; } .lib-eb-lbar i{ display:block; height:100%; width:4%; background:#f1d98c; transition:width .4s; }
+  @media (max-width:600px){ .lib-eb-nav{ width:30px; height:52px; font-size:24px; } .lib-eb-prog{ width:70px; } }
+
+  /* =====================================================================
+     📚 Library v3 · modern look (overrides the wooden theme)
+     ===================================================================== */
+  #view-library{ --lb-ink:#0F172A; --lb-soft:#475569; --lb-dim:#94A3B8; --lb-line:#E2E8F0; --lb-card:#FFFFFF; --lb-acc:#0D9488; --lb-acc2:#4F46E5; }
+  #view-library .lib-hero{ position:relative; overflow:hidden; border:0; border-radius:22px; padding:26px 28px; margin-bottom:18px; color:#fff;
+    background:
+      radial-gradient(420px 220px at 92% -20%, rgba(255,255,255,.22), transparent 60%),
+      radial-gradient(380px 260px at -5% 120%, rgba(45,212,191,.45), transparent 60%),
+      linear-gradient(120deg, #0F766E 0%, #0E7490 45%, #4338CA 100%);
+    box-shadow:0 20px 40px -24px rgba(67,56,202,.55); }
+  #view-library .lib-hero::after{ content:""; position:absolute; right:-40px; bottom:-60px; width:260px; height:260px; border-radius:50%;
+    background:radial-gradient(circle, rgba(255,255,255,.14), transparent 65%); pointer-events:none; }
+  .lib-hero-eyebrow{ font-family:'Sora','Inter',sans-serif; font-size:10.5px; font-weight:700; letter-spacing:.22em; opacity:.75; }
+  #view-library .lib-hero-t{ color:#fff; text-shadow:none; font-size:28px; line-height:1.55; }
+  #view-library .lib-hero-s{ opacity:.9; font-size:12.5px; }
+  #view-library .lib-hero-a{ position:relative; z-index:1; gap:8px; flex-wrap:nowrap; }
+  .lib-search{ display:flex; align-items:center; gap:8px; height:44px; min-width:320px; padding:0 16px; border-radius:999px; background:#fff; box-shadow:0 10px 24px -12px rgba(15,23,42,.45); }
+  .lib-search svg{ width:18px; height:18px; fill:none; stroke:#64748B; stroke-width:2; stroke-linecap:round; flex-shrink:0; }
+  .lib-search input{ border:0; outline:0; background:transparent; flex:1; min-width:0; font-size:14px; color:var(--lb-ink); height:100%; padding:0; box-shadow:none; }
+  .lib-icbtn{ width:44px; height:44px; flex-shrink:0; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; font-size:17px; cursor:pointer; text-decoration:none;
+    background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.35); color:#fff; backdrop-filter:blur(6px); transition:background .15s, transform .15s; }
+  .lib-icbtn:hover{ background:rgba(255,255,255,.28); transform:translateY(-1px); }
+  .lib-icbtn:disabled{ opacity:.5; }
+
+  #view-library .lib-kinds{ display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; margin-bottom:14px; scrollbar-width:none; }
+  #view-library .lib-kinds::-webkit-scrollbar{ display:none; }
+  #view-library .lib-kind{ flex:0 0 auto; flex-direction:row; gap:8px; padding:9px 16px 9px 12px; border-radius:999px; background:var(--lb-card); border:1px solid var(--lb-line);
+    box-shadow:none; color:var(--lb-soft); position:static; }
+  #view-library .lib-kind:hover{ transform:none; border-color:#CBD5E1; color:var(--lb-ink); box-shadow:0 4px 12px -8px rgba(15,23,42,.3); }
+  #view-library .lib-kind .i{ font-size:17px; }
+  #view-library .lib-kind .t{ font-size:13.5px; font-weight:700; }
+  #view-library .lib-kind .n{ position:static; font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:700; color:var(--lb-dim); background:#F1F5F9; padding:1px 8px; border-radius:999px; }
+  #view-library .lib-kind[aria-selected="true"]{ background:var(--lb-ink); border-color:var(--lb-ink); color:#fff; box-shadow:0 8px 18px -10px rgba(15,23,42,.6); }
+  #view-library .lib-kind[aria-selected="true"] .n{ background:rgba(255,255,255,.18); color:#fff; }
+
+  #view-library .lib-shelfnav .chip{ background:var(--lb-card); border:1px solid var(--lb-line); color:var(--lb-soft); border-radius:999px; }
+  #view-library .lib-shelfnav .chip[aria-pressed="true"]{ background:#CCFBF1; border-color:#5EEAD4; color:#115E59; }
+  #view-library .lib-shelfnav .chip.drop-over{ background:#99F6E4; border-color:var(--lb-acc); color:#134E4A; }
+  #view-library .lib-btn-wood{ background:var(--lb-card) !important; color:var(--lb-ink) !important; border:1px solid var(--lb-line) !important; border-radius:999px; font-weight:700; }
+  #view-library .lib-btn-wood[aria-pressed="true"]{ background:var(--lb-acc) !important; color:#fff !important; border-color:var(--lb-acc) !important; }
+  #view-library .lib-bulk{ background:rgba(255,255,255,.92); backdrop-filter:blur(10px); border:1px solid var(--lb-line); border-radius:16px; box-shadow:0 14px 30px -16px rgba(15,23,42,.45); }
+  #view-library .lib-btn-gold{ background:var(--lb-acc) !important; color:#fff !important; border-color:var(--lb-acc) !important; border-radius:999px; }
+  #view-library .lib-status{ font-size:11.5px; color:var(--lb-dim); }
+
+  /* sections */
+  .lib-sec{ position:relative; margin-bottom:26px; padding:4px 0; border-radius:18px; transition:background .15s, box-shadow .15s; }
+  .lib-sec.drop-over{ background:#F0FDFA; box-shadow:0 0 0 2px #5EEAD4; }
+  .lib-sec-h{ display:flex; align-items:flex-end; justify-content:space-between; gap:10px; margin-bottom:12px; padding:0 2px; flex-wrap:wrap; }
+  .lib-sec-tt{ display:flex; align-items:baseline; gap:10px; min-width:0; }
+  .lib-sec-tt h3{ margin:0; font-size:19px; font-weight:800; color:var(--lb-ink); letter-spacing:-.01em; font-family:'Sora','Noto Sans Khmer',sans-serif; }
+  .lib-sec-n{ font-size:12px; color:var(--lb-dim); white-space:nowrap; }
+  .lib-seeall{ border:0; background:none; color:var(--lb-acc); font-weight:700; font-size:13px; cursor:pointer; padding:4px 2px; font-family:inherit; }
+  .lib-seeall span{ font-family:'IBM Plex Mono',monospace; font-size:11px; background:#CCFBF1; color:#115E59; border-radius:999px; padding:1px 7px; margin:0 2px; }
+  .lib-seeall:hover{ text-decoration:underline; }
+  .lib-sec-tools{ display:none; gap:6px; margin-left:auto; }
+  #view-library.managing .lib-sec-tools{ display:flex; }
+  .lib-sec-btn{ border:1px solid var(--lb-line); background:var(--lb-card); color:var(--lb-soft); border-radius:999px; padding:4px 12px; font-size:12px; font-weight:700; cursor:pointer; font-family:inherit; }
+  .lib-sec-btn:hover{ border-color:#94A3B8; color:var(--lb-ink); }
+  .lib-sec-empty{ border:2px dashed var(--lb-line); border-radius:16px; padding:26px 12px; text-align:center; color:var(--lb-dim); font-size:13px; }
+  .lib-back{ border:0; background:none; color:var(--lb-soft); font-weight:700; font-size:13px; cursor:pointer; padding:2px 0 10px; font-family:inherit; }
+  .lib-back:hover{ color:var(--lb-acc); }
+  .lib-empty-big{ text-align:center; color:var(--lb-dim); padding:60px 12px; font-size:14px; }
+  .lib-empty-big > div:first-child{ font-size:42px; margin-bottom:8px; }
+  .lib-spin{ width:34px; height:34px; margin:0 auto 12px; border-radius:50%; border:3px solid #E2E8F0; border-top-color:var(--lb-acc); animation:libspin 0.9s linear infinite; }
+  @keyframes libspin{ to{ transform:rotate(360deg); } }
+
+  /* book tile */
+  .lib-rowscroll{ display:grid; grid-auto-flow:column; grid-auto-columns:132px; gap:18px; overflow-x:auto; padding:6px 4px 14px; scroll-snap-type:x proximity; scrollbar-width:thin; }
+  .lib-rowscroll > .lib-bk{ scroll-snap-align:start; }
+  .lib-bkgrid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(124px, 1fr)); gap:22px 18px; padding:6px 4px; }
+  .lib-bk{ position:relative; cursor:pointer; outline:none; min-width:0; }
+  .lib-bk-cover{ position:relative; aspect-ratio:2/3; border-radius:10px; overflow:hidden; background:linear-gradient(150deg, var(--g1), var(--g2)); color:var(--gi);
+    box-shadow:0 1px 2px rgba(15,23,42,.08), 0 10px 22px -12px rgba(15,23,42,.45); transition:transform .22s cubic-bezier(.2,.8,.2,1), box-shadow .22s; }
+  .lib-bk-cover::after{ content:""; position:absolute; inset:0; z-index:2; pointer-events:none; border-radius:inherit;
+    background:linear-gradient(90deg, rgba(0,0,0,.14) 0, rgba(255,255,255,.18) 2px, transparent 7px), linear-gradient(180deg, rgba(255,255,255,.12), transparent 30%);
+    box-shadow:inset 0 0 0 1px rgba(15,23,42,.08); }
+  .lib-bk:hover .lib-bk-cover, .lib-bk:focus-visible .lib-bk-cover{ transform:translateY(-6px); box-shadow:0 2px 4px rgba(15,23,42,.08), 0 22px 34px -16px rgba(15,23,42,.55); }
+  .lib-bk-cover img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:top; background:#fff; opacity:0; transition:opacity .35s; z-index:1; }
+  .lib-bk-cover img.ok{ opacity:1; }
+  .lib-bk-fb{ position:absolute; inset:0; display:flex; flex-direction:column; justify-content:space-between; padding:12px 11px 12px; text-align:left; }
+  .lib-bk-fb .x{ align-self:flex-start; font-family:'IBM Plex Mono',monospace; font-size:9px; font-weight:700; letter-spacing:.08em; padding:2px 6px; border-radius:6px; background:rgba(255,255,255,.22); }
+  .lib-bk-fb .t{ font-family:'Sora','Noto Sans Khmer',sans-serif; font-size:13px; font-weight:800; line-height:1.28; display:-webkit-box; -webkit-line-clamp:6; -webkit-box-orient:vertical; overflow:hidden; word-break:break-word; }
+  .lib-bk-fb .l{ width:28px; height:3px; border-radius:3px; background:currentColor; opacity:.55; }
+  .lib-bk-t{ margin-top:9px; font-size:12.5px; font-weight:700; color:var(--lb-ink); line-height:1.35; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .lib-bk-m{ margin-top:2px; font-size:10.5px; color:var(--lb-dim); font-family:'IBM Plex Mono',monospace; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .lib-bk-m b{ color:var(--lb-acc); }
+  .lib-bk-pct{ position:relative; height:3px; border-radius:3px; background:#E2E8F0; margin-top:7px; overflow:hidden; }
+  .lib-bk-pct i{ position:absolute; left:0; top:0; bottom:0; background:var(--lb-acc); border-radius:3px; }
+  #view-library .lib-bk .lib-ck{ top:8px; right:8px; border-color:#fff; background:rgba(15,23,42,.35); color:#fff; }
+  #view-library .lib-bk.is-sel .lib-ck{ background:var(--lb-acc); border-color:var(--lb-acc); }
+  #view-library .lib-bk.is-sel .lib-bk-cover{ box-shadow:0 0 0 3px var(--lb-acc), 0 10px 22px -12px rgba(15,23,42,.45); }
+  #view-library .lib-bk .lib-edit{ bottom:8px; right:8px; background:#fff; color:var(--lb-ink); }
+  .lib-bk-solo{ width:110px; cursor:default; }
+  .lib-bk-solo .lib-ck, .lib-bk-solo .lib-edit{ display:none !important; }
+
+  /* continue reading */
+  .lib-cont-row{ display:grid; grid-auto-flow:column; grid-auto-columns:minmax(290px, 340px); gap:14px; overflow-x:auto; padding:4px 2px 12px; scrollbar-width:thin; }
+  .lib-cont{ display:flex; gap:14px; align-items:center; padding:12px; border-radius:18px; background:var(--lb-card); border:1px solid var(--lb-line); cursor:pointer;
+    box-shadow:0 6px 18px -14px rgba(15,23,42,.4); transition:transform .18s, box-shadow .18s; }
+  .lib-cont:hover{ transform:translateY(-2px); box-shadow:0 14px 26px -16px rgba(15,23,42,.45); }
+  .lib-cont .lib-bk{ width:74px; flex-shrink:0; }
+  .lib-cont .lib-bk-fb .t{ font-size:9px; -webkit-line-clamp:5; } .lib-cont .lib-bk-fb{ padding:7px; } .lib-cont .lib-bk-fb .x{ font-size:7px; }
+  .lib-cont .lib-ck, .lib-cont .lib-edit{ display:none !important; }
+  .lib-cont-b{ min-width:0; flex:1; }
+  .lib-cont-t{ font-size:13.5px; font-weight:800; color:var(--lb-ink); line-height:1.35; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+  .lib-cont-m{ font-size:11.5px; color:var(--lb-dim); margin-top:3px; } .lib-cont-m b{ color:var(--lb-acc); }
+  .lib-cont-p{ height:5px; border-radius:99px; background:#E2E8F0; overflow:hidden; margin-top:9px; } .lib-cont-p i{ display:block; height:100%; background:linear-gradient(90deg,#14B8A6,#4F46E5); border-radius:99px; }
+
+  /* media cards / rows */
+  #view-library .lib-card, #view-library .lib-row{ border-color:var(--lb-line); border-radius:16px; box-shadow:0 6px 18px -14px rgba(15,23,42,.35); }
+  #view-library .lib-row .ic{ border-radius:12px; }
+
+  /* reader chrome */
+  #libReaderOverlay{ background:rgba(15,23,42,.72) !important; backdrop-filter:blur(4px); }
+  .lib-reader-body{ background:#0F172A !important; }
+  .lib-eb{ background:#FCFBF7 !important; }
+  .lib-eb-bar{ background:#fff !important; border-top:1px solid #E2E8F0 !important; color:#475569 !important; }
+  .lib-eb-bar button{ border-color:#E2E8F0 !important; background:#F8FAFC !important; color:#0F172A !important; border-radius:999px !important; }
+  .lib-eb-prog{ background:#E2E8F0 !important; } .lib-eb-prog i{ background:linear-gradient(90deg,#14B8A6,#4F46E5) !important; }
+  .lib-eb-nav{ background:rgba(15,23,42,.06) !important; color:#0F172A !important; border-radius:999px !important; width:44px !important; height:44px !important; }
+  .lib-eb-nav:hover{ background:rgba(15,23,42,.14) !important; }
+  .lib-eb-load{ background:linear-gradient(135deg,#0F766E,#4338CA) !important; }
+  .lib-eb-lbar i{ background:#fff !important; }
+  .lib-reader-note .lib-btn-gold{ background:#fff !important; color:#0F172A !important; border-color:#fff !important; border-radius:999px; }
+  .lib-reader-note .lib-btn-ghost{ background:rgba(255,255,255,.12) !important; color:#fff !important; border-color:rgba(255,255,255,.4) !important; border-radius:999px; }
+
+  /* guest bar + lock button in the new palette */
+  body.guest .guest-bar{ background:rgba(15,23,42,.9); }
+  body.guest .guest-bar button{ background:#fff; border-color:#fff; color:#0F172A; }
+  .lock-gbtn.lib{ background:linear-gradient(135deg,#0F766E,#4338CA); color:#fff; border-color:#3730A3; box-shadow:0 8px 18px -10px rgba(67,56,202,.8); }
+
+  @media (max-width:760px){
+    #view-library .lib-hero{ padding:20px 18px; border-radius:18px; }
+    #view-library .lib-hero-a{ width:100%; }
+    .lib-search{ min-width:0; flex:1; height:42px; }
+    .lib-icbtn{ width:42px; height:42px; }
+  }
+  @media (max-width:600px){
+    #view-library .lib-hero-t{ font-size:23px; }
+    .lib-rowscroll{ grid-auto-columns:104px; gap:12px; }
+    .lib-bkgrid{ grid-template-columns:repeat(3, minmax(0,1fr)); gap:16px 10px; }
+    .lib-bk-fb{ padding:8px 7px; } .lib-bk-fb .t{ font-size:10.5px; -webkit-line-clamp:5; }
+    .lib-bk-t{ font-size:11.5px; } .lib-bk-m{ font-size:9.5px; }
+    .lib-sec-tt h3{ font-size:16.5px; }
+    .lib-cont-row{ grid-auto-columns:82%; }
+    #view-library .lib-kind{ padding:8px 13px 8px 10px; } #view-library .lib-kind .t{ font-size:12.5px; }
+  }
 </style>
 <style id="dynamicPageStyle">@page{ size: A4 portrait; margin: 15mm; }</style>
 </head>
@@ -1869,13 +2032,15 @@
       <section class="view" id="view-library">
         <div class="lib-hero">
           <div class="lib-hero-l">
+            <div class="lib-hero-eyebrow">MY LIBRARY</div>
             <div class="lib-hero-t">បណ្ណាល័យ</div>
-            <div class="lib-hero-s kh">“ការអានគឺជាពន្លឺនៃប្រាជ្ញា” · Library · <span id="libTotal">—</span></div>
+            <div class="lib-hero-s kh">“ការអានគឺជាពន្លឺនៃប្រាជ្ញា” · <span id="libTotal">—</span></div>
           </div>
           <div class="lib-hero-a">
-            <input type="text" id="libSearch" class="tb-search kh" placeholder="🔍 ស្វែងរកសៀវភៅ, មេរៀន, ឯកសារ...">
-            <a class="btn btn-outline btn-sm kh lib-btn-ghost" id="libDriveLink" target="_blank" rel="noopener">📂 Drive</a>
-            <button type="button" class="btn btn-sm kh lib-btn-gold" id="libRefreshBtn" title="ទាញបញ្ជីថ្មីពី Google Drive">🔄 ធ្វើបច្ចុប្បន្នភាព</button>
+            <div class="lib-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+              <input type="text" id="libSearch" class="kh" placeholder="ស្វែងរកសៀវភៅ, មេរៀន, ឯកសារ..."></div>
+            <a class="lib-icbtn" id="libDriveLink" target="_blank" rel="noopener" title="បើក Folder ក្នុង Google Drive">📂</a>
+            <button type="button" class="lib-icbtn" id="libRefreshBtn" title="ទាញបញ្ជីថ្មីពី Google Drive">🔄</button>
           </div>
         </div>
         <div class="lib-kinds" id="libKinds" role="tablist" aria-label="Library media"></div>
@@ -6501,6 +6666,12 @@ const LIB_KINDS = [
   { k:'doc',    i:'📄', kh:'ឯកសារ',  en:'Documents' }
 ];
 // leather book colours: [top, bottom, ink]
+// modern cover gradients: [from, to, ink]
+const LIB_GRADS = [
+  ['#6366F1','#8B5CF6','#fff'], ['#0EA5E9','#2563EB','#fff'], ['#14B8A6','#0F766E','#fff'], ['#F59E0B','#EA580C','#fff'],
+  ['#F43F5E','#BE123C','#fff'], ['#10B981','#047857','#fff'], ['#64748B','#1E293B','#fff'], ['#EC4899','#9333EA','#fff'],
+  ['#F1F5F9','#CBD5E1','#0F172A'], ['#FDE68A','#F59E0B','#3B2412'], ['#A5B4FC','#6366F1','#fff'], ['#22D3EE','#0891B2','#fff']
+];
 const LIB_SPINES = [
   ['#8B2323','#5A1212','#F6E6BE'], ['#1E3A5F','#122540','#EBD9A4'], ['#1F4D3A','#11301F','#EAD9A0'], ['#B7791F','#7F5210','#2A1A08'],
   ['#6B4226','#43281A','#F1DFB4'], ['#2B2B2B','#141414','#D9C27A'], ['#1B5E63','#0E3B3F','#F0E2B6'], ['#5B2A4E','#3A1631','#EED9B0'],
@@ -6603,8 +6774,12 @@ function libIdbOpen(){
   if(libIdb) return libIdb;
   libIdb = new Promise(res => {
     try{
-      const r = indexedDB.open('kep_library', 1);
-      r.onupgradeneeded = () => r.result.createObjectStore('thumbs');
+      const r = indexedDB.open('kep_library', 2);
+      r.onupgradeneeded = () => {
+        const db = r.result;
+        if(!db.objectStoreNames.contains('thumbs')) db.createObjectStore('thumbs');
+        if(!db.objectStoreNames.contains('books')) db.createObjectStore('books');      // e-book files for the reader
+      };
       r.onsuccess = () => res(r.result); r.onerror = () => res(null);
     }catch(e){ res(null); }
   });
@@ -6625,7 +6800,7 @@ async function libIdbPut(id, v){
   const db = await libIdbOpen(); if(!db) return;
   try{ db.transaction('thumbs', 'readwrite').objectStore('thumbs').put(v, id); }catch(e){}
 }
-function libHasCover(it){ return it.kind === 'book' ? /^(pdf)$/.test(libExt(it.name)) || it.mime === 'application/pdf' : (it.kind === 'image' || it.kind === 'video' || it.kind === 'lesson' || it.kind === 'doc'); }
+function libHasCover(it){ return it.kind === 'book' ? /^(pdf|epub|mobi|azw3?|prc)$/.test(libExt(it.name)) || it.mime === 'application/pdf' : (it.kind === 'image' || it.kind === 'video' || it.kind === 'lesson' || it.kind === 'doc'); }
 function libThumbImg(it, sz){
   if(!libHasCover(it)) return '';
   const mem = libThumbMem.get(it.id);
@@ -6666,27 +6841,58 @@ async function libThumbFlush(){
   }
 }
 
-function libCoverHTML(it){
-  const h = libHash(it.id), p = LIB_SPINES[h % LIB_SPINES.length];
+function libPct(id){ const v = parseFloat(libGet('kep_lib_pct_' + id, '')); return isFinite(v) ? Math.max(0, Math.min(1, v)) : 0; }
+function libCoverInner(it){
+  const g = LIB_GRADS[libHash(it.id) % LIB_GRADS.length];
   const ext = libExt(it.name).toUpperCase();
-  return `<div class="lib-slot"><div class="lib-cover${libSel.has(it.id) ? ' is-sel' : ''}" data-id="${it.id}" tabindex="0" role="button"${libManage ? ' draggable="true"' : ''}
-      style="--c1:${p[0]}; --c2:${p[1]}; --ink:${p[2]};" title="${escHTML(it.title)}${it.path ? ' · ' + escHTML(it.path) : ''}">
-      <div class="lib-cover-fb"><span class="t">${escHTML(it.title)}</span><span class="o"></span><span class="x">${escHTML(ext)}</span></div>
+  return `<div class="lib-bk-cover" style="--g1:${g[0]}; --g2:${g[1]}; --gi:${g[2]};">
+      <div class="lib-bk-fb"><span class="x">${escHTML(ext)}</span><span class="t">${escHTML(it.title)}</span><span class="l"></span></div>
       ${libThumbImg(it)}
-      <div class="lib-cover-cap">${escHTML(it.title)}</div>
       <span class="lib-ck">✓</span><button type="button" class="lib-edit" data-edit="${it.id}" title="កែ / ផ្លាស់ / លុប">✎</button>
-    </div></div>`;
-}
-function libCabinetHTML(name, items, key, shelf){
-  const all = libExpanded.has(key) || libQuery;
-  const show = all ? items : items.slice(0, LIB_SHELF_LIMIT);
-  const books = show.map(libCoverHTML).join('');
-  const act = shelf ? `<div class="lib-plaque-act"><button type="button" data-shelf-edit="${escHTML(shelf.id)}">✎ ប្តូរឈ្មោះ</button>${items.length ? '' : `<button type="button" data-shelf-del="${escHTML(shelf.id)}">🗑</button>`}</div>` : '';
-  return `<div class="lib-cabinet"${shelf ? ` data-drop="${escHTML(shelf.id)}"` : ''}>
-      <div class="lib-plaque kh">${escHTML(name)} <span class="c">${items.length}</span></div>${act}
-      <div class="lib-shelf covers">${books || `<div class="lib-empty kh">${libManage ? 'អូសសៀវភៅមកដាក់ធ្នើនេះ' : 'ធ្នើនេះមិនទាន់មានសៀវភៅ'}</div>`}</div>
-      ${items.length > show.length ? `<button type="button" class="lib-more kh" data-more="${escHTML(key)}">📖 បង្ហាញទាំងអស់ (${items.length}) ▾</button>` : ''}
     </div>`;
+}
+function libCoverHTML(it){          // used by the edit dialog
+  return `<div class="lib-bk lib-bk-solo">${libCoverInner(it)}</div>`;
+}
+function libBookHTML(it){
+  const ext = libExt(it.name).toUpperCase();
+  const pct = libPct(it.id);
+  return `<div class="lib-bk${libSel.has(it.id) ? ' is-sel' : ''}" data-id="${it.id}" tabindex="0" role="button"${libManage ? ' draggable="true"' : ''} title="${escHTML(it.title)}${it.path ? ' · ' + escHTML(it.path) : ''}">
+      ${libCoverInner(it)}
+      ${pct > 0.01 ? `<div class="lib-bk-pct"><i style="width:${Math.round(pct * 100)}%"></i></div>` : ''}
+      <div class="lib-bk-t kh">${escHTML(it.title)}</div>
+      <div class="lib-bk-m">${escHTML(ext)}${it.size ? ' · ' + escHTML(libSize(it.size)) : ''}${pct > 0.01 ? ` · <b>${Math.round(pct * 100)}%</b>` : ''}</div>
+    </div>`;
+}
+const LIB_ROW_MAX = 18;
+function libSectionHTML(title, items, shelf, mode){
+  const n = items.length;
+  const shown = mode === 'row' ? items.slice(0, LIB_ROW_MAX) : items;
+  const tools = shelf ? `<div class="lib-sec-tools">
+      <button type="button" class="lib-sec-btn" data-shelf-edit="${escHTML(shelf.id)}">✎ ប្តូរឈ្មោះ</button>
+      ${n ? '' : `<button type="button" class="lib-sec-btn" data-shelf-del="${escHTML(shelf.id)}">🗑 លុប</button>`}</div>` : '';
+  const more = mode === 'row' && shelf && n > 0 ? `<button type="button" class="lib-seeall kh" data-shelf="${escHTML(shelf.id)}">មើលទាំងអស់ <span>${n}</span> →</button>` : '';
+  const empty = `<div class="lib-sec-empty kh">${libManage ? '⬇ អូសសៀវភៅមកដាក់ធ្នើនេះ' : 'ធ្នើនេះមិនទាន់មានសៀវភៅ'}</div>`;
+  return `<section class="lib-sec"${shelf ? ` data-drop="${escHTML(shelf.id)}"` : ''}>
+      <div class="lib-sec-h"><div class="lib-sec-tt"><h3 class="kh">${escHTML(title)}</h3><span class="lib-sec-n">${n} ក្បាល</span></div>${tools}${more}</div>
+      ${n ? `<div class="${mode === 'row' ? 'lib-rowscroll' : 'lib-bkgrid'}">${shown.map(libBookHTML).join('')}</div>` : empty}
+    </section>`;
+}
+function libContinueHTML(items){
+  return `<section class="lib-sec lib-cont-sec">
+      <div class="lib-sec-h"><div class="lib-sec-tt"><h3 class="kh">📖 បន្តអាន</h3><span class="lib-sec-n">Continue reading</span></div></div>
+      <div class="lib-cont-row">${items.map(it => {
+        const pct = Math.round(libPct(it.id) * 100);
+        return `<div class="lib-cont" data-id="${it.id}" tabindex="0" role="button">
+          <div class="lib-bk">${libCoverInner(it)}</div>
+          <div class="lib-cont-b">
+            <div class="lib-cont-t kh">${escHTML(it.title)}</div>
+            <div class="lib-cont-m kh">📁 ${escHTML(it.shelf)}</div>
+            <div class="lib-cont-p"><i style="width:${pct}%"></i></div>
+            <div class="lib-cont-m kh">${pct ? pct + '% · ' : ''}<b>បន្តអាន →</b></div>
+          </div></div>`;
+      }).join('')}</div>
+    </section>`;
 }
 function libCardHTML(it){
   const h = libHash(it.id), p = LIB_SPINES[h % LIB_SPINES.length];
@@ -6726,7 +6932,7 @@ function renderLibrary(){
   const counts = {}; LIB_KINDS.forEach(k => counts[k.k] = 0); all.forEach(it => counts[it.kind]++);
   document.getElementById('libKinds').innerHTML = LIB_KINDS.map(k => `
     <button type="button" class="lib-kind" role="tab" data-kind="${k.k}" aria-selected="${k.k === libKind}">
-      <span class="n">${counts[k.k] || ''}</span><span class="i">${k.i}</span><span class="t kh">${k.kh}</span><span class="e">${k.en}</span></button>`).join('');
+      <span class="i">${k.i}</span><span class="t kh">${k.kh}</span><span class="n">${counts[k.k] || 0}</span></button>`).join('');
 
   const ofKind = all.filter(it => it.kind === libKind);
   if(libShelf !== 'all' && !shelves.some(s => s.id === libShelf)) libShelf = 'all';
@@ -6736,7 +6942,7 @@ function renderLibrary(){
   document.getElementById('libMoveTo').innerHTML = '<option value="">— ជ្រើសធ្នើ —</option>' + shelves.map(s => `<option value="${escHTML(s.id)}">📁 ${escHTML(s.name)}</option>`).join('');
 
   if(!libData){
-    body.innerHTML = `<div class="lib-cabinet"><div class="lib-plaque kh">បណ្ណាល័យ</div><div class="lib-shelf covers"><div class="lib-empty kh">⏳ កំពុងរៀបចំធ្នើសៀវភៅ...</div></div></div>`;
+    body.innerHTML = `<div class="lib-empty-big kh"><div class="lib-spin"></div>កំពុងរៀបចំបណ្ណាល័យ...</div>`;
     libSyncBulk(); return;
   }
   const list = ofKind.filter(it => match(it) && (libShelf === 'all' || it.shelfId === libShelf));
@@ -6745,15 +6951,22 @@ function renderLibrary(){
 
   if(libKind === 'book'){
     let html = '';
-    if(!q && libShelf === 'all' && !libManage){
-      const rec = libRecent().map(id => libIndex.get(id)).filter(it => it && it.kind === 'book').slice(0, 10);
-      if(rec.length) html += `<div class="lib-recent">${libCabinetHTML('📌 កំពុងអាន · Recently opened', rec, '__recent', null)}</div>`;
+    const sh = libShelf !== 'all' ? shelves.find(x => x.id === libShelf) : null;
+    if(!q && !sh && !libManage){
+      const rec = libRecent().map(id => libIndex.get(id)).filter(it => it && it.kind === 'book').slice(0, 8);
+      if(rec.length) html += libContinueHTML(rec);
     }
-    const groups = libShelf === 'all'
-      ? shelves.map(s => ({ s, items: list.filter(it => it.shelfId === s.id).sort(byTitle) })).filter(g => g.items.length || libManage)
-      : [{ s: shelves.find(x => x.id === libShelf), items: list.slice().sort(byTitle) }];
-    html += groups.map(g => libCabinetHTML('📚 ' + g.s.name, g.items, g.s.id, g.s)).join('');
-    if(!list.length && !libManage) html += `<div class="lib-cabinet"><div class="lib-plaque kh">${q ? '🔍 ' + escHTML(libQuery) : '📚'}</div><div class="lib-shelf covers"><div class="lib-empty kh">${q ? 'រកមិនឃើញសៀវភៅត្រូវនឹងពាក្យនេះ' : 'មិនទាន់មានសៀវភៅ'}</div></div></div>`;
+    if(q){
+      html += list.length ? libSectionHTML('🔍 លទ្ធផលស្វែងរក “' + libQuery + '”', list.slice().sort(byTitle), null, 'grid')
+                          : `<div class="lib-empty-big kh"><div>🔍</div>រកមិនឃើញសៀវភៅត្រូវនឹង “${escHTML(libQuery)}”</div>`;
+    } else if(sh){
+      html += `<button type="button" class="lib-back kh" data-shelf="all">← ធ្នើទាំងអស់</button>`;
+      html += libSectionHTML('📁 ' + sh.name, list.slice().sort(byTitle), sh, 'grid');
+    } else {
+      const groups = shelves.map(s2 => ({ s: s2, items: list.filter(it => it.shelfId === s2.id).sort(byTitle) })).filter(g => g.items.length || libManage);
+      html += groups.map(g => libSectionHTML(g.s.name, g.items, g.s, libManage ? 'grid' : 'row')).join('');
+      if(!groups.length) html += `<div class="lib-empty-big kh"><div>📚</div>មិនទាន់មានសៀវភៅ</div>`;
+    }
     body.innerHTML = html;
   } else {
     const items = list.slice().sort((a, b) => String(b.modified).localeCompare(String(a.modified)));
@@ -6775,7 +6988,9 @@ function libOpen(id){
   document.getElementById('libReaderDrive').href = viewUrl;
   document.getElementById('libReaderMeta').textContent = [it.shelf + (it.path ? ' / ' + it.path : ''), ext.toUpperCase(), libSize(it.size)].filter(Boolean).join(' · ');
   const bodyEl = document.getElementById('libReaderBody');
-  if(/^(epub|mobi|azw3?|fb2|djvu)$/.test(ext)){
+  if(/^(epub|mobi|azw3?|prc|fb2)$/.test(ext)){
+    libOpenEbook(it, bodyEl);
+  } else if(/^(djvu)$/.test(ext)){
     bodyEl.innerHTML = `<div class="lib-reader-note kh"><div style="font-size:48px;">📕</div>
       <div style="font-size:15px; font-weight:700;">ឯកសារប្រភេទ .${escHTML(ext)} មិនអាចបើកអានក្នុង Browser បានទេ</div>
       <div style="opacity:.8; font-size:12.5px;">សូមទាញយក ហើយអានក្នុងកម្មវិធី Kindle / Google Play Books / Apple Books</div>
@@ -6788,7 +7003,125 @@ function libOpen(id){
   }
   document.getElementById('libReaderOverlay').classList.remove('hidden');
 }
+/* ---------- 📖 e-book reader (EPUB · MOBI · AZW3 · FB2) — foliate-js, file streamed from Apps Script ---------- */
+const LIB_FOLIATE = 'https://cdn.jsdelivr.net/npm/foliate-js@1.0.1/view.js';   // pinned version (MIT)
+const LIB_EB_CACHE_MAX = 12;                       // e-books kept on this device for instant re-open
+let libFoliateP = null, libEbView = null, libEbToken = 0;
+let libEbFont = Number(libGet('kep_lib_eb_font', '100')) || 100;
+function libFoliate(){ return libFoliateP || (libFoliateP = import(LIB_FOLIATE).catch(e => { libFoliateP = null; throw e; })); }
+function libB64(b64){ const bin = atob(b64), u = new Uint8Array(bin.length); for(let i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u; }
+async function libIdbGetBook(id){
+  const db = await libIdbOpen(); if(!db) return null;
+  return new Promise(res => { try{ const r = db.transaction('books', 'readonly').objectStore('books').get(id); r.onsuccess = () => res(r.result || null); r.onerror = () => res(null); }catch(e){ res(null); } });
+}
+async function libIdbPutBook(id, blob){
+  const db = await libIdbOpen(); if(!db) return;
+  try{
+    const st = db.transaction('books', 'readwrite').objectStore('books');
+    st.put(blob, id);
+    let ids = []; try{ ids = JSON.parse(libGet('kep_lib_eb_cached', '[]')) || []; }catch(e){}
+    ids = ids.filter(x => x !== id); ids.unshift(id);
+    ids.slice(LIB_EB_CACHE_MAX).forEach(old => { try{ st.delete(old); }catch(e){} });
+    libSet('kep_lib_eb_cached', JSON.stringify(ids.slice(0, LIB_EB_CACHE_MAX)));
+  }catch(e){}
+}
+async function libFetchBook(it, onProgress){
+  const cached = await libIdbGetBook(it.id);
+  if(cached && (!it.size || cached.size === Number(it.size))) return cached;
+  const chunks = []; let parts = 1;
+  for(let i = 0; i < parts; i++){
+    const j = await libApi({ op: 'file', id: it.id, part: i });
+    parts = j.parts || 1;
+    chunks.push(libB64(j.data || ''));
+    onProgress(i + 1, parts);
+  }
+  const blob = new Blob(chunks);
+  libIdbPutBook(it.id, blob);
+  return blob;
+}
+function libEbStyles(){
+  return `html{ font-size:${libEbFont}% !important; } body{ line-height:1.65; } p{ text-align:justify; } img{ max-width:100%; height:auto; }`;
+}
+async function libOpenEbook(it, bodyEl){
+  const token = ++libEbToken;
+  const viewUrl = libLink('https://drive.google.com/file/d/' + it.id + '/view');
+  bodyEl.innerHTML = `<div class="lib-eb">
+      <div class="lib-eb-stage" id="libEbStage"></div>
+      <button type="button" class="lib-eb-nav prev" id="libEbPrev" aria-label="ទំព័រមុន">‹</button>
+      <button type="button" class="lib-eb-nav next" id="libEbNext" aria-label="ទំព័របន្ទាប់">›</button>
+      <div class="lib-eb-bar">
+        <button type="button" id="libEbFontDn" title="អក្សរតូច">A−</button><button type="button" id="libEbFontUp" title="អក្សរធំ">A+</button>
+        <span class="lib-eb-ch kh" id="libEbCh"></span>
+        <div class="lib-eb-prog"><i id="libEbProg"></i></div><span class="mono" id="libEbPct">0%</span>
+      </div>
+      <div class="lib-reader-note kh lib-eb-load" id="libEbLoad"><div style="font-size:44px;">📖</div><div id="libEbLoadT">កំពុងបើកសៀវភៅ...</div><div class="lib-eb-lbar"><i id="libEbLBar"></i></div></div>
+    </div>`;
+  const loadT = document.getElementById('libEbLoadT'), lbar = document.getElementById('libEbLBar');
+  try{
+    const [blob] = await Promise.all([
+      libFetchBook(it, (i, n) => { if(token !== libEbToken) return; loadT.textContent = `កំពុងទាញសៀវភៅពី Drive... ${i}/${n}`; lbar.style.width = Math.round(i / n * 90) + '%'; }),
+      libFoliate()
+    ]);
+    if(token !== libEbToken) return;
+    loadT.textContent = 'កំពុងរៀបចំទំព័រ...'; lbar.style.width = '95%';
+    const file = new File([blob], it.name, { type: blob.type || '' });
+    const view = document.createElement('foliate-view');
+    view.style.cssText = 'display:block; width:100%; height:100%;';
+    document.getElementById('libEbStage').append(view);
+    libEbView = view;
+    await view.open(file);
+    if(token !== libEbToken){ libEbClose(); return; }
+    const r = view.renderer;
+    r.setAttribute('flow', 'paginated');
+    r.setAttribute('max-inline-size', '760px');
+    r.setAttribute('gap', '6%');
+    try{ r.setStyles && r.setStyles(libEbStyles()); }catch(e){}
+    view.addEventListener('relocate', e => {
+      const d = e.detail || {};
+      const pct = Math.round((d.fraction || 0) * 100);
+      const pe = document.getElementById('libEbPct'), pg = document.getElementById('libEbProg'), ch = document.getElementById('libEbCh');
+      if(pe) pe.textContent = pct + '%'; if(pg) pg.style.width = pct + '%';
+      if(ch) ch.textContent = (d.tocItem && d.tocItem.label) ? String(d.tocItem.label).trim() : '';
+      if(d.cfi) libSet('kep_lib_pos_' + it.id, d.cfi);
+      if(typeof d.fraction === 'number') libSet('kep_lib_pct_' + it.id, String(d.fraction));
+    });
+    const saved = libGet('kep_lib_pos_' + it.id, '');
+    try{
+      if(typeof view.init === 'function') await view.init({ lastLocation: saved || undefined, showTextStart: false });
+      else if(saved) await view.goTo(saved);
+      else await r.next();
+    }catch(e){ try{ await r.next(); }catch(_){} }
+    document.getElementById('libEbLoad').remove();
+    document.getElementById('libEbPrev').onclick = () => view.goLeft ? view.goLeft() : view.prev();
+    document.getElementById('libEbNext').onclick = () => view.goRight ? view.goRight() : view.next();
+    const setFont = d => { libEbFont = Math.max(70, Math.min(180, libEbFont + d)); libSet('kep_lib_eb_font', String(libEbFont)); try{ r.setStyles && r.setStyles(libEbStyles()); }catch(e){} };
+    document.getElementById('libEbFontDn').onclick = () => setFont(-10);
+    document.getElementById('libEbFontUp').onclick = () => setFont(10);
+  }catch(e){
+    if(token !== libEbToken) return;
+    const msg = String(e && e.message || e);
+    const why = /unknown op|Update Library/i.test(msg) ? 'សូម Update <b>Library.gs</b> (ជំនាន់ 3) ហើយ Deploy “New version”'
+              : /import|fetch|module|Failed to/i.test(msg) ? 'មិនអាចទាញកម្មវិធីអានសៀវភៅបាន (ពិនិត្យ Internet)'
+              : escHTML(msg);
+    bodyEl.innerHTML = `<div class="lib-reader-note kh"><div style="font-size:48px;">📕</div>
+      <div style="font-size:15px; font-weight:700;">បើកសៀវភៅនេះមិនបាន</div><div style="opacity:.85; font-size:12.5px;">${why}</div>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
+        <a class="btn btn-sm kh lib-btn-gold" href="${escHTML(libLink('https://drive.google.com/uc?export=download&id=' + it.id))}" target="_blank" rel="noopener">⬇ ទាញយក</a>
+        <a class="btn btn-sm kh lib-btn-ghost" href="${escHTML(viewUrl)}" target="_blank" rel="noopener">🔗 បើកក្នុង Drive</a></div></div>`;
+  }
+}
+function libEbClose(){
+  libEbToken++;
+  if(libEbView){ try{ libEbView.close && libEbView.close(); }catch(e){} try{ libEbView.remove(); }catch(e){} libEbView = null; }
+}
+document.addEventListener('keydown', e => {
+  if(!libEbView || document.getElementById('libReaderOverlay').classList.contains('hidden')) return;
+  if(e.key === 'ArrowLeft'){ e.preventDefault(); libEbView.goLeft ? libEbView.goLeft() : libEbView.prev(); }
+  if(e.key === 'ArrowRight'){ e.preventDefault(); libEbView.goRight ? libEbView.goRight() : libEbView.next(); }
+});
+
 function libCloseReader(){
+  libEbClose();
   document.getElementById('libReaderOverlay').classList.add('hidden');
   document.getElementById('libReaderBody').innerHTML = '';          // stops audio / video
   if(currentView === 'library' && libKind === 'book' && !libQuery && !libManage) renderLibrary();
@@ -6872,7 +7205,7 @@ function libEditOpen(type, id){
     nameEl.value = it.title;
     document.getElementById('libEditExt').textContent = libExt(it.name) ? '.' + libExt(it.name) : '';
     document.getElementById('libEditShelf').innerHTML = shelves.map(s => `<option value="${escHTML(s.id)}"${sh && s.id === sh.id ? ' selected' : ''}>📁 ${escHTML(s.name)}</option>`).join('');
-    document.getElementById('libEditCover').innerHTML = libCoverHTML(it).replace(/<div class="lib-slot">|<\/div>$/g, '');
+    document.getElementById('libEditCover').innerHTML = libCoverHTML(it);
     document.getElementById('libEditInfo').textContent = [it.path ? 'Folder: ' + it.shelf + ' / ' + it.path : '', libSize(it.size), it.modified ? 'កែចុងក្រោយ ' + fmtYMD(String(it.modified).slice(0, 10)) : ''].filter(Boolean).join(' · ');
     document.getElementById('libEditDel').textContent = '🗑 លុបសៀវភៅ';
   } else {
