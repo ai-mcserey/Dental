@@ -1378,6 +1378,28 @@
     .lib-bulk-act{ margin-left:0; width:100%; } .lib-bulk-hint{ display:none; }
     .lib-edit-top{ flex-direction:column; align-items:center; } .lib-edit-top > div:last-child{ width:100%; }
   }
+
+  /* ===== Lock screen: Library & CPD without PIN ===== */
+  .lock-guest{ margin-top:18px; }
+  .lock-or{ display:flex; align-items:center; gap:10px; font-size:11.5px; color:var(--ink-dim); margin-bottom:10px; }
+  .lock-or::before, .lock-or::after{ content:""; flex:1; height:1px; background:var(--border); }
+  .lock-guest-btns{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .lock-gbtn{ display:flex; flex-direction:column; align-items:center; gap:1px; padding:10px 6px 9px; border-radius:14px; cursor:pointer; font-family:inherit; transition:transform .15s, box-shadow .15s; }
+  .lock-gbtn:hover{ transform:translateY(-2px); }
+  .lock-gbtn .i{ font-size:22px; line-height:1.1; } .lock-gbtn .t{ font-size:13px; font-weight:800; } .lock-gbtn .e{ font-size:10px; opacity:.75; text-transform:uppercase; letter-spacing:.05em; }
+  .lock-gbtn.lib{ background:linear-gradient(180deg,#6b4423,#3b2412); color:#f1d98c; border:1px solid #3b2412; box-shadow:0 8px 18px -10px rgba(59,36,18,.8); }
+  .lock-gbtn.cpd{ background:linear-gradient(180deg,#8b5cf6,#6d28d9); color:#fff; border:1px solid #5b21b6; box-shadow:0 8px 18px -10px rgba(109,40,217,.8); }
+  .guest-bar{ display:none; }
+  body.guest .guest-bar{ position:fixed; top:10px; right:12px; z-index:120; display:flex; align-items:center; gap:8px; padding:6px 8px 6px 14px; border-radius:999px;
+    background:rgba(43,26,12,.92); color:#fbf3e2; font-size:12.5px; box-shadow:0 8px 20px -8px rgba(0,0,0,.5); }
+  body.guest .guest-bar button{ border:1px solid #c9a24a; background:linear-gradient(180deg,#f1d98c,#c9a24a); color:#3b2412; font-weight:700; font-size:12px; border-radius:999px; padding:5px 12px; cursor:pointer; font-family:inherit; }
+  body.guest .sidebar, body.guest .topbar, body.guest .sb-scrim{ display:none !important; }
+  body.guest .app-main{ margin-left:0 !important; }
+  body.guest .wrap{ padding-top:58px; }
+  body.guest .lib-tools, body.guest .lib-bulk, body.guest .lib-edit, body.guest #libReaderEdit, body.guest #view-library > details.cpd-cfg{ display:none !important; }
+  body.guest-cpd #cpdOverlay{ z-index:1001 !important; }
+  body.guest-cpd #cpdOverlay .cpd-cfg{ display:none; }
+  @media (max-width:600px){ body.guest .guest-bar{ left:8px; right:8px; justify-content:space-between; top:6px; } body.guest .guest-bar > span{ display:none; } }
 </style>
 <style id="dynamicPageStyle">@page{ size: A4 portrait; margin: 15mm; }</style>
 </head>
@@ -1394,8 +1416,22 @@
     <input type="password" id="appLockPinInput" maxlength="10" placeholder="••••" class="mono" style="text-align:center; font-size:28px; letter-spacing:10px; padding:14px 12px; width:100%; border:1.5px solid var(--border); border-radius:14px; margin-bottom:10px; box-sizing:border-box; background:var(--surface-2); transition:border-color .15s, box-shadow .15s;" onfocus="this.style.borderColor='var(--primary)'; this.style.boxShadow='0 0 0 4px var(--primary-soft)';" onblur="this.style.borderColor='var(--border)'; this.style.boxShadow='none';">
     <div id="appLockErrorMsg" class="kh" style="color:var(--coral-dark); font-size:12px; margin-bottom:12px; display:none;">លេខកូដ PIN មិនត្រឹមត្រូវទេ!</div>
     <button type="button" class="btn btn-primary kh" id="appLockSubmitBtn" style="width:100%; justify-content:center; border-radius:14px; height:46px; font-weight:700; box-shadow:0 10px 22px -8px rgba(33,102,214,0.5);">បើកចូល Unlock</button>
-    <div style="font-size:11px; color:var(--ink-dim); margin-top:20px;">© 2026 MCSEREY. All rights Reserved</div>
+    <div class="lock-guest">
+      <div class="lock-or kh"><span>ឬ ចូលមើលដោយមិនបាច់ PIN</span></div>
+      <div class="lock-guest-btns">
+        <button type="button" class="lock-gbtn lib kh" id="lockOpenLibrary"><span class="i">📚</span><span class="t">បណ្ណាល័យ</span><span class="e">Library</span></button>
+        <button type="button" class="lock-gbtn cpd kh" id="lockOpenCpd"><span class="i">🎓</span><span class="t">CPD</span><span class="e">Certificates</span></button>
+      </div>
+    </div>
+    <div style="font-size:11px; color:var(--ink-dim); margin-top:18px;">© 2026 MCSEREY. All rights Reserved</div>
   </div>
+</div>
+
+<!-- shown only while browsing the library from the lock screen -->
+<div class="guest-bar" id="guestBar">
+  <span class="kh">📚 បណ្ណាល័យ · <b>Guest</b></span>
+  <button type="button" class="kh" id="guestOpenCpd">🎓 CPD</button>
+  <button type="button" class="kh" id="guestBackLock">🔒 ត្រឡប់ទៅ Log in</button>
 </div>
 
 <div class="app-shell" id="appShell">
@@ -10164,6 +10200,7 @@ let lastActivityAt = Date.now();
 
 function showAppLock(){
   appIsLocked = true;
+  if(document.body.classList.contains('guest')){ document.body.classList.remove('guest'); if(typeof showView === 'function') showView('dashboard'); }
   const ov = document.getElementById('appLockOverlay');
   const input = document.getElementById('appLockPinInput');
   const err = document.getElementById('appLockErrorMsg');
@@ -10178,6 +10215,7 @@ function tryUnlockApp(){
   const err = document.getElementById('appLockErrorMsg');
   if(input.value === CLINIC_INFO_PIN){
     appIsLocked = false;
+    document.body.classList.remove('guest', 'guest-cpd');
     document.getElementById('appLockOverlay').style.display = 'none';
     lastActivityAt = Date.now();
   } else {
@@ -10204,6 +10242,34 @@ setInterval(() => {
     showAppLock();
   }
 }, 15000);
+
+// Library & CPD can be opened from the lock screen without a PIN ("guest" mode: read-only, no other pages).
+function openGuestLibrary(){
+  document.body.classList.add('guest');
+  libManage = false; libSel.clear();
+  document.getElementById('appLockOverlay').style.display = 'none';
+  showView('library');
+}
+function openGuestCpd(){
+  document.body.classList.add('guest-cpd');
+  openCpd();
+}
+function backToLockFromGuest(){
+  document.body.classList.remove('guest');
+  document.getElementById('libReaderOverlay').classList.add('hidden');
+  document.getElementById('libReaderBody').innerHTML = '';
+  showView('dashboard');
+  showAppLock();
+}
+document.getElementById('lockOpenLibrary').addEventListener('click', openGuestLibrary);
+document.getElementById('lockOpenCpd').addEventListener('click', openGuestCpd);
+document.getElementById('guestOpenCpd').addEventListener('click', openGuestCpd);
+document.getElementById('guestBackLock').addEventListener('click', backToLockFromGuest);
+// closing CPD that was opened from the lock screen returns to it
+(function(){
+  const ov = document.getElementById('cpdOverlay');
+  new MutationObserver(() => { if(ov.classList.contains('hidden')) document.body.classList.remove('guest-cpd'); }).observe(ov, { attributes: true, attributeFilter: ['class'] });
+})();
 
 // Require PIN immediately on every page load/refresh.
 showAppLock();
