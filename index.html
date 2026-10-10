@@ -1492,6 +1492,9 @@
   .lib-bk-cover::after{ content:""; position:absolute; inset:0; z-index:2; pointer-events:none; border-radius:inherit;
     background:linear-gradient(90deg, rgba(0,0,0,.14) 0, rgba(255,255,255,.18) 2px, transparent 7px), linear-gradient(180deg, rgba(255,255,255,.12), transparent 30%);
     box-shadow:inset 0 0 0 1px rgba(15,23,42,.08); }
+  #libBody [data-id]{ -webkit-touch-callout:none; -webkit-user-select:none; user-select:none; }
+  #libBody [data-id] img{ -webkit-user-drag:none; -webkit-touch-callout:none; }
+  .lib-bk.lp-press .lib-bk-cover, .lp-press.lib-cont{ transform:scale(.94) !important; transition:transform .55s ease !important; }
   .lib-bk:hover .lib-bk-cover, .lib-bk:focus-visible .lib-bk-cover{ transform:translateY(-6px); box-shadow:0 2px 4px rgba(15,23,42,.08), 0 22px 34px -16px rgba(15,23,42,.55); }
   .lib-bk-cover img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:top; background:#fff; opacity:0; transition:opacity .35s; z-index:1; }
   .lib-bk-cover img.ok{ opacity:1; }
@@ -2637,13 +2640,14 @@
         <div style="flex:1; min-width:0;">
           <div class="field" style="margin-bottom:10px;"><label class="kh" id="libEditNameLbl">ឈ្មោះសៀវភៅ</label>
             <div style="display:flex; align-items:center; gap:6px;"><input type="text" id="libEditName" class="kh" style="flex:1;"><span id="libEditExt" class="mono" style="color:var(--ink-dim); font-size:12px;"></span></div></div>
-          <div class="field" id="libEditShelfWrap" style="margin-bottom:6px;"><label class="kh">ធ្នើ · Shelf</label><select id="libEditShelf" class="kh"></select></div>
+          <div class="field" id="libEditShelfWrap" style="margin-bottom:6px;"><label class="kh">📦 ផ្លាស់ទៅធ្នើ · Move to shelf</label><select id="libEditShelf" class="kh"></select></div>
           <div class="kh" id="libEditInfo" style="font-size:11.5px; color:var(--ink-dim);"></div>
         </div>
       </div>
       <div class="form-error kh hidden" id="libEditErr"></div>
       <div class="modal-actions" style="margin-top:14px;">
         <button type="button" class="btn btn-danger btn-sm kh" id="libEditDel">🗑 លុប</button>
+        <button type="button" class="btn btn-outline btn-sm kh" id="libEditRead">📖 អាន</button>
         <span style="flex:1;"></span>
         <button type="button" class="btn btn-outline kh" id="libEditCancel">បោះបង់</button>
         <button type="button" class="btn btn-primary kh" id="libEditSave">💾 រក្សាទុក</button>
@@ -7286,6 +7290,7 @@ function libEditOpen(type, id){
   document.getElementById('libEditShelfWrap').style.display = isBook ? '' : 'none';
   document.getElementById('libEditCover').style.display = isBook ? '' : 'none';
   document.getElementById('libEditDel').style.display = type === 'newShelf' ? 'none' : '';
+  document.getElementById('libEditRead').style.display = isBook ? '' : 'none';
   if(isBook){
     const it = libIndex.get(id); if(!it) return;
     const sh = libShelfOf(id);
@@ -7385,6 +7390,26 @@ window.addEventListener('resize', () => {
     }
   });
   v.addEventListener('keydown', e => { if((e.key === 'Enter' || e.key === ' ') && e.target.matches('#libBody [data-id]')){ e.preventDefault(); e.target.click(); } });
+  /* long-press (press & hold) on a book → edit / move-to-shelf dialog */
+  let lpT = null, lpFired = false, lpX = 0, lpY = 0, lpEl = null;
+  const lpCancel = () => { clearTimeout(lpT); lpT = null; if(lpEl) lpEl.classList.remove('lp-press'); lpEl = null; };
+  v.addEventListener('pointerdown', e => {
+    const b = e.target.closest('#libBody [data-id]');
+    lpFired = false;
+    if(!b || e.button > 0 || document.body.classList.contains('guest')) return;
+    lpX = e.clientX; lpY = e.clientY; lpEl = b; b.classList.add('lp-press');
+    clearTimeout(lpT);
+    lpT = setTimeout(() => { const id = b.dataset.id; lpCancel(); lpFired = true; if(navigator.vibrate) try{ navigator.vibrate(30); }catch(_){} libEditOpen('book', id); }, 550);
+  });
+  v.addEventListener('pointermove', e => { if(lpT && (Math.abs(e.clientX - lpX) > 10 || Math.abs(e.clientY - lpY) > 10)) lpCancel(); });
+  ['pointerup', 'pointercancel', 'pointerleave', 'dragstart'].forEach(t => v.addEventListener(t, lpCancel));
+  v.addEventListener('scroll', lpCancel, true);
+  v.addEventListener('click', e => { if(lpFired){ e.stopPropagation(); e.preventDefault(); lpFired = false; } }, true);
+  v.addEventListener('contextmenu', e => {
+    const b = e.target.closest('#libBody [data-id]'); if(!b) return;
+    e.preventDefault();
+    if(!document.body.classList.contains('guest') && !lpFired && document.getElementById('libEditOverlay').classList.contains('hidden')) libEditOpen('book', b.dataset.id);
+  });
 
   // drag a book onto a shelf (cabinet or shelf chip) to move it
   v.addEventListener('dragstart', e => {
@@ -7434,6 +7459,7 @@ window.addEventListener('resize', () => {
   document.getElementById('libReaderEdit').addEventListener('click', () => { const id = document.getElementById('libReaderOverlay').dataset.id; libCloseReader(); if(id) libEditOpen('book', id); });
   document.getElementById('closeLibEdit').addEventListener('click', libEditClose);
   document.getElementById('libEditCancel').addEventListener('click', libEditClose);
+  document.getElementById('libEditRead').addEventListener('click', () => { const id = libEditCtx && libEditCtx.id; libEditClose(); if(id) libOpen(id); });
   document.getElementById('libEditSave').addEventListener('click', libEditSave);
   document.getElementById('libEditDel').addEventListener('click', libEditDelete);
   document.getElementById('libEditName').addEventListener('keydown', e => { if(e.key === 'Enter') libEditSave(); });
